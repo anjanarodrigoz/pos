@@ -1,0 +1,1 @@
+enum DrawerName { largeDrawer, smallDrawer }
