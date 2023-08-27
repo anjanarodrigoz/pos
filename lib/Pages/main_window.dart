@@ -3,11 +3,13 @@ import 'package:flutter/src/widgets/framework.dart';
 
 import 'package:get/get.dart';
 import 'package:pos/Pages/customer_manager/customer_form.dart';
+import 'package:pos/Pages/customer_manager/customer_page.dart';
+import 'package:pos/Pages/stock_manager.dart/stock_page.dart';
 
 import 'package:window_manager/window_manager.dart';
 
 import '../theme/t_colors.dart';
-import 'invoice_page.dart';
+import 'invoice_manager/invoice_page.dart';
 
 class MainWindow extends StatefulWidget {
   const MainWindow({super.key});
@@ -49,7 +51,7 @@ class _MainWindowState extends State<MainWindow> {
                 menuItem(() => {}, 'Credit Note'),
                 menuItem(() => {}, 'Quatation'),
                 menuItem(() => openCustomerManager(), 'Customers'),
-                menuItem(() => {}, 'Stock'),
+                menuItem(() => openStockManager(), 'Stock'),
                 menuItem(() => {}, 'Payments'),
                 menuItem(() => {}, 'Setup')
               ],
@@ -82,6 +84,10 @@ class _MainWindowState extends State<MainWindow> {
   }
 
   openCustomerManager() {
-    Get.offAll(() => CustomerFormPage());
+    Get.offAll(() => const CustomerPage());
+  }
+
+  openStockManager() {
+    Get.offAll(() => const StockPage());
   }
 }

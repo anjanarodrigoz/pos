@@ -9,13 +9,19 @@ class PaidStatus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(8.0),
-      child: Text(
-        isPaid ? 'Paid' : 'Pending',
-        style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: isPaid ? TColors.green : TColors.blue),
+    return Card(
+      color: isPaid ? TColors.green2 : TColors.blue2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0), // Adjust the radius as needed
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          isPaid ? 'Paid' : 'Pending',
+          style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: isPaid ? TColors.green : TColors.blue),
+        ),
       ),
     );
   }

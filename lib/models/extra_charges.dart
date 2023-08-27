@@ -1,3 +1,5 @@
+import '../utils/val.dart';
+
 class ExtraCharges {
   static const String nameKey = 'name';
   static const String qtyKey = 'qty';
@@ -15,6 +17,8 @@ class ExtraCharges {
     required this.price,
     this.comment,
   });
+
+  double get netTotal => price * qty;
 
   factory ExtraCharges.fromJson(Map<String, dynamic> json) {
     return ExtraCharges(
