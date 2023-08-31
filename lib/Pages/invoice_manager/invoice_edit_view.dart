@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pos/controllers/invoice_draft_contorller.dart';
+import 'package:pos/controllers/invoice_edit_controller.dart';
 import 'package:pos/data_sources/invoiceDataSource.dart';
 import 'package:pos/database/Cart_db_service.dart';
 import 'package:pos/enums/enums.dart';
@@ -18,32 +19,28 @@ import '../../utils/my_format.dart';
 import '../../utils/val.dart';
 import '../../widgets/pos_text_form_field.dart';
 
-class InvoiceView extends StatefulWidget {
-  InvoiceView({
+class InvoiceEditView extends StatefulWidget {
+  InvoiceEditView({
     super.key,
   });
 
   @override
-  State<InvoiceView> createState() => _InvoiceViewState();
+  State<InvoiceEditView> createState() => _InvoiceEditViewState();
 }
 
-class _InvoiceViewState extends State<InvoiceView> {
+class _InvoiceEditViewState extends State<InvoiceEditView> {
   final ScrollController controller = ScrollController();
   final ScrollController controller2 = ScrollController();
-  late Customer customer;
-  late InvoiceDraftController invoiceController;
+  late InvoiceEditController invoiceController;
   final dbService = CartDB();
   InvoiceDataSource invoiceDataSource = InvoiceDataSource(invoiceData: []);
-  late String invoiceId;
   late BuildContext context;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    invoiceController = Get.find<InvoiceDraftController>();
-    customer = invoiceController.customer;
-    invoiceId = invoiceController.invoiceId.value;
+    invoiceController = Get.find<InvoiceEditController>();
   }
 
   @override
@@ -68,19 +65,25 @@ class _InvoiceViewState extends State<InvoiceView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Invoice #$invoiceId',
+                              'Invoice #${invoiceController.invoice.invoiceId}',
                               style: const TextStyle(
                                   fontSize: 15.0, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(
                               height: 10.0,
                             ),
-                            detailsRowWidget('Customer ID', customer.id),
+                            detailsRowWidget('Customer ID',
+                                invoiceController.invoice.customerId),
                             const SizedBox(
                               height: 5.0,
                             ),
                             detailsRowWidget('Customer Name',
-                                '${customer.firstName} ${customer.lastName}'),
+                                invoiceController.invoice.customerName),
+                            const SizedBox(
+                              height: 5.0,
+                            ),
+                            detailsRowWidget('Customer Name',
+                                invoiceController.invoice.customerMobile),
                           ],
                         ),
                         SizedBox(
@@ -170,7 +173,7 @@ class _InvoiceViewState extends State<InvoiceView> {
                   }
                 }
               },
-              source: generateDataRowList(invoiceController.cartList,
+              source: generateDataRowList(invoiceController.newCartList,
                   invoiceController.extraList, invoiceController.comments),
               columns: [
                 GridColumn(
@@ -225,9 +228,8 @@ class _InvoiceViewState extends State<InvoiceView> {
     List<InvoiceRow> invoiceData = [];
 
     for (Cart cart in cartList) {
-      String itemId = cart.isPostedItem ? 'P ${cart.itemId}' : cart.itemId;
       invoiceData.add(InvoiceRow(
-          itemId: {cartList.indexOf(cart): itemId},
+          itemId: {cartList.indexOf(cart): cart.itemId},
           itemName: {InvoiceItemCategory.item: cart.name},
           gst: MyFormat.formatCurrency(cart.gst),
           netPrice: MyFormat.formatCurrency(cart.netPrice),
@@ -283,13 +285,15 @@ class _InvoiceViewState extends State<InvoiceView> {
   }
 
   Future<void> editItemDialog(int index) async {
-    Cart oldCart = invoiceController.cartList[index];
+    Cart oldCart = invoiceController.newCartList[index];
     TextEditingController netPriceController = TextEditingController();
     TextEditingController totalPriceController = TextEditingController();
     TextEditingController commentController = TextEditingController();
     TextEditingController qtyController = TextEditingController();
     double net = oldCart.netPrice;
-    RxBool isDeliveryItem = oldCart.isPostedItem.obs;
+
+    Cart? oldestCart = invoiceController.isItemExsits(oldCart.cartId!);
+
     netPriceController.text = MyFormat.formatPrice(net);
     totalPriceController.text =
         MyFormat.formatPrice(net * Val.gstTotalPrecentage);
@@ -306,7 +310,11 @@ class _InvoiceViewState extends State<InvoiceView> {
               Text(oldCart.name),
               IconButton(
                   onPressed: () async {
-                    await CartDB().removeItemFromCart(oldCart);
+                    if (oldestCart != null) {
+                      await CartDB().removeSavedItem(oldCart);
+                    } else {
+                      await CartDB().removeItemFromCart(oldCart);
+                    }
                     await invoiceController.updateCart();
                     Navigator.of(context).pop();
                   },
@@ -389,25 +397,11 @@ class _InvoiceViewState extends State<InvoiceView> {
                 ),
                 PosTextFormField(
                   width: 400.0,
-                  height: 60,
+                  height: 100,
                   maxLines: 3,
                   labelText: 'Comment',
                   controller: commentController,
                 ),
-                SizedBox(
-                  height: 5.0,
-                ),
-                Row(
-                  children: [
-                    Obx(() => Checkbox(
-                        semanticLabel: 'Delivery Item',
-                        value: isDeliveryItem.value,
-                        onChanged: (onChanged) {
-                          isDeliveryItem.value = onChanged ?? false;
-                        })),
-                    const Text('Delivery Item')
-                  ],
-                )
               ],
             ),
           ),
@@ -421,11 +415,12 @@ class _InvoiceViewState extends State<InvoiceView> {
                     : int.parse(qtyController.text);
                 if (qty != 0) {
                   Cart newCart = oldCart.copyWith(
-                      comment: commnet,
-                      netPrice: itemPrice,
-                      qty: qty,
-                      isPostedItem: isDeliveryItem.value);
-                  await CartDB().updateCart(oldCart, newCart);
+                      comment: commnet, netPrice: itemPrice, qty: qty);
+                  if (oldestCart != null) {
+                    await CartDB().updateSavedItem(oldestCart, newCart);
+                  } else {
+                    await CartDB().updateCart(oldCart, newCart);
+                  }
                   await invoiceController.updateCart();
                 }
                 Navigator.of(context).pop();

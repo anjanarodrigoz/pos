@@ -1,6 +1,4 @@
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-
 import '../database/Cart_db_service.dart';
 import '../database/invoice_db_service.dart';
 import '../models/cart.dart';
@@ -43,6 +41,7 @@ class InvoiceDraftController extends GetxController {
   }
 
   void addComments(String comment) {
+    comments.clear();
     comments.add(comment);
   }
 
@@ -88,7 +87,7 @@ class InvoiceDraftController extends GetxController {
         createdDate: DateTime.now(),
         customerId: customer.id,
         gstPrecentage: Val.gstPrecentage,
-        customerName: '${customer.lastName} ${customer.lastName}',
+        customerName: '${customer.firstName} ${customer.lastName}',
         billingAddress: customer.deliveryAddress,
         shippingAddress: customer.postalAddress,
         comments: comments,

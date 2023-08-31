@@ -246,7 +246,7 @@ class SaveInvoiceViewPage extends StatelessWidget {
           required double total}) =>
       DataRow(cells: [
         DataCell(
-          cell('#$id'),
+          cell(id),
         ),
         DataCell(cell(name)),
         DataCell(cell('$qty')),
@@ -260,11 +260,15 @@ class SaveInvoiceViewPage extends StatelessWidget {
     List<DataRow> dataRowList = [];
 
     for (InvoicedItem invoicedItem in cartList) {
+      String itemId = invoicedItem.isPostedItem
+          ? 'P ${invoicedItem.itemId}'
+          : invoicedItem.itemId;
+
       double gstPrice = (invoicedItem.netPrice * gstPrecentage);
       double itemPrcie = (invoicedItem.netPrice * (1 + gstPrecentage));
       double totalPrice = (itemPrcie * invoicedItem.qty);
       dataRowList.add(dataRow(
-        id: invoicedItem.itemId,
+        id: itemId,
         name: invoicedItem.name,
         gst: gstPrice,
         netPrice: invoicedItem.netPrice,
@@ -286,7 +290,7 @@ class SaveInvoiceViewPage extends StatelessWidget {
       double itemPrcie = (chrage.price * (1 + gstPrecentage));
       double totalPrice = (itemPrcie * chrage.qty);
       dataRowList.add(dataRow(
-        id: '',
+        id: '# ${extraList.indexOf(chrage) + 1}',
         name: chrage.name,
         gst: gstPrice,
         netPrice: chrage.price,

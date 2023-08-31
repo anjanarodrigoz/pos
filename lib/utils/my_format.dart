@@ -23,4 +23,14 @@ class MyFormat {
     final format = DateFormat('yyyy MMM dd, HH:mm aa');
     return format.format(dateTime);
   }
+
+  static String formatDateOne(DateTime dateTime) {
+    final format = DateFormat('dd MMM yyyy');
+    return format.format(dateTime);
+  }
+
+  static String formatTime(DateTime dateTime) {
+    final format = DateFormat('HH:mm aa');
+    return format.format(dateTime);
+  }
 }

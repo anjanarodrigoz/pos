@@ -54,6 +54,40 @@ class Invoice {
     this.shippingAddress,
   });
 
+  Invoice copyWith({
+    bool? isPaid,
+    bool? isDeleted,
+    String? customerId,
+    String? customerName,
+    String? customerMobile,
+    double? gstPrecentage,
+    List<InvoicedItem>? itemList,
+    List<ExtraCharges>? extraCharges,
+    DateTime? closeDate,
+    List<String>? comments,
+    List<Payments>? payments,
+    Address? billingAddress,
+    Address? shippingAddress,
+  }) {
+    return Invoice(
+      invoiceId: invoiceId,
+      createdDate: createdDate,
+      isPaid: isPaid ?? this.isPaid,
+      isDeleted: isDeleted ?? this.isDeleted,
+      customerId: customerId ?? this.customerId,
+      customerName: customerName ?? this.customerName,
+      customerMobile: customerMobile ?? this.customerMobile,
+      gstPrecentage: gstPrecentage ?? this.gstPrecentage,
+      itemList: itemList ?? this.itemList,
+      extraCharges: extraCharges ?? this.extraCharges,
+      closeDate: closeDate ?? this.closeDate,
+      comments: comments ?? this.comments,
+      payments: payments ?? this.payments,
+      billingAddress: billingAddress ?? this.billingAddress,
+      shippingAddress: shippingAddress ?? this.shippingAddress,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       _customerMobile: customerMobile,

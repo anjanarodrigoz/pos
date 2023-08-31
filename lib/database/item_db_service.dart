@@ -51,14 +51,10 @@ class ItemDB {
     await box.write(DBVal.itemId, itemIds);
   }
 
-  Future<void> convertItemToCart(Cart cartItem) async {
-    Item itme = getItem(cartItem.itemId);
-    final updatedItem = itme.copyWith(qty: itme.qty - cartItem.qty);
+  Future<void> getItemFromStock(String itemId, int qty) async {
+    Item itme = getItem(itemId);
+    final updatedItem = itme.copyWith(qty: itme.qty - qty);
     await updateItem(updatedItem);
-
-    final cartDb = CartDB();
-
-    cartDb.addItemToCart(cartItem);
   }
 
   Future<bool> returnFromCart(List<Cart> cartList) async {

@@ -1,5 +1,3 @@
-import 'package:get_storage/get_storage.dart';
-
 import 'address.dart';
 
 class Customer {

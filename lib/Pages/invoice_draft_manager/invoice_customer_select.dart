@@ -4,9 +4,7 @@ import 'package:pos/Pages/customer_manager/customer_page.dart';
 import 'package:pos/Pages/invoice_draft_manager/invoice_customer_view.dart';
 import 'package:pos/database/customer_db_service.dart';
 import 'package:pos/theme/t_colors.dart';
-import 'package:pos/widgets/pos_button.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-
 import '../../models/address.dart';
 import '../../models/customer.dart';
 

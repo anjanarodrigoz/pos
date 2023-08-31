@@ -20,23 +20,44 @@ class CartDB {
     return cartList.map((data) => Cart.fromJson(data)).toList();
   }
 
-  String _generateUniqueItemId() {
+  static String generateUniqueItemId() {
     final random = Random();
     return '${DateTime.now().millisecondsSinceEpoch}_${random.nextInt(10000)}';
   }
 
   Future<void> addItemToCart(Cart cart) async {
-    String cartId = _generateUniqueItemId();
+    ItemDB itemDB = ItemDB();
+    await itemDB.getItemFromStock(cart.itemId, cart.qty);
+    String cartId = generateUniqueItemId();
     Cart finalCart = cart.copyWith(cartId: cartId);
     await _storage.write(cartId, finalCart.toJson());
   }
 
-  Future<void> updateCart(Cart cart) async {
-    await _storage.write(cart.cartId!, cart.toJson());
+  Future<void> updateCart(Cart oldCart, Cart newCart) async {
+    ItemDB itemDB = ItemDB();
+    int qty = newCart.qty - oldCart.qty;
+    await itemDB.getItemFromStock(oldCart.itemId, qty);
+    await _storage.write(oldCart.cartId!, newCart.toJson());
   }
 
-  Future<void> removeItemFromCart(String cartId) async {
-    await _storage.remove(cartId);
+  Future<void> updateSavedItem(Cart oldCart, Cart newCart) async {
+    ItemDB itemDb = ItemDB();
+    int qty = newCart.qty - oldCart.qty;
+    await itemDb.getItemFromStock(oldCart.itemId, qty);
+    await _storage.write(oldCart.cartId!, newCart.copyWith(qty: qty).toJson());
+  }
+
+  Future<void> removeSavedItem(Cart cart) async {
+    ItemDB itemDB = ItemDB();
+    await itemDB.getItemFromStock(cart.itemId, -(cart.qty));
+    await _storage.write(
+        cart.cartId!, cart.copyWith(qty: -(cart.qty)).toJson());
+  }
+
+  Future<void> removeItemFromCart(Cart cart) async {
+    ItemDB itemDB = ItemDB();
+    await itemDB.getItemFromStock(cart.itemId, -(cart.qty));
+    await _storage.remove(cart.cartId!);
   }
 
   Future<void> resetCart() async {

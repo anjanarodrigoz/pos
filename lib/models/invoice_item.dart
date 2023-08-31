@@ -1,7 +1,3 @@
-import 'package:pos/utils/val.dart';
-
-import 'invoice.dart';
-
 class InvoicedItem {
   static const String itemIdKey = 'itemId';
   static const String nameKey = 'name';

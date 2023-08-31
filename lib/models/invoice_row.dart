@@ -9,7 +9,7 @@ class InvoiceRow {
   static const String itemPriceKey = 'Item Price';
   static const String totalKey = 'Total';
 
-  String itemId;
+  Map<int, String> itemId;
   Map<InvoiceItemCategory, String> itemName;
   String qty;
   String netPrice;
@@ -18,7 +18,7 @@ class InvoiceRow {
   String total;
 
   InvoiceRow(
-      {this.itemId = '',
+      {required this.itemId,
       required this.itemName,
       this.qty = '',
       this.netPrice = '',

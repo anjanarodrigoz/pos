@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:pos/controllers/invoice_draft_contorller.dart';
+import 'package:pos/controllers/invoice_edit_controller.dart';
+import 'package:pos/database/Cart_db_service.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/utils/val.dart';
@@ -15,8 +17,10 @@ import '../../models/item.dart';
 import '../stock_manager.dart/stock_page.dart';
 
 class InvoiceItemSelectPage extends StatefulWidget {
-  final InvoiceDraftController invoiceController;
-  const InvoiceItemSelectPage({super.key, required this.invoiceController});
+  final InvoiceDraftController? invoiceController;
+  final InvoiceEditController? invoiceEditController;
+  const InvoiceItemSelectPage(
+      {super.key, this.invoiceController, this.invoiceEditController});
 
   @override
   State<InvoiceItemSelectPage> createState() => InvoiceItemSelectPageState();
@@ -27,13 +31,14 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
   List<Item> _item = [];
   ItemDataSource itemDataSource = ItemDataSource(itemData: []);
   Function? disposeListen;
-  late InvoiceDraftController invoiceController;
+  var invoiceController;
 
   @override
   void initState() {
     super.initState();
     _databaseService = ItemDB();
-    invoiceController = widget.invoiceController;
+    invoiceController =
+        widget.invoiceController ?? widget.invoiceEditController;
     disposeListen = GetStorage(DBVal.items).listen(() {
       getItemData();
     });
@@ -51,50 +56,43 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 100.0,
         title: Text(
           'Select Item',
           style: TStyle.titleBarStyle,
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Obx(() => detailsRowWidget('Net Total',
+                    MyFormat.formatCurrency(invoiceController.netTotal.value))),
+                const SizedBox(
+                  height: 5.0,
+                ),
+                Obx(() => detailsRowWidget('GST Total',
+                    MyFormat.formatCurrency(invoiceController.gstTotal.value))),
+                const SizedBox(
+                  height: 5.0,
+                ),
+                Obx(() => detailsRowWidget('Total',
+                    MyFormat.formatCurrency(invoiceController.total.value))),
+                const SizedBox(
+                  height: 5.0,
+                ),
+              ],
+            ),
+          )
+        ],
       ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10.0),
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Obx(() => detailsRowWidget(
-                            'Net Total',
-                            MyFormat.formatCurrency(
-                                invoiceController.netTotal.value))),
-                        const SizedBox(
-                          height: 5.0,
-                        ),
-                        Obx(() => detailsRowWidget(
-                            'GST Total',
-                            MyFormat.formatCurrency(
-                                invoiceController.gstTotal.value))),
-                        const SizedBox(
-                          height: 5.0,
-                        ),
-                        Obx(() => detailsRowWidget(
-                            'Total',
-                            MyFormat.formatCurrency(
-                                invoiceController.total.value))),
-                        const SizedBox(
-                          height: 5.0,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
               SfDataGrid(
                 gridLinesVisibility: GridLinesVisibility.both,
                 headerGridLinesVisibility: GridLinesVisibility.both,
@@ -167,28 +165,25 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
     TextEditingController commentController = TextEditingController();
     TextEditingController qtyController = TextEditingController(text: '1');
     double net = item.price;
-
+    RxBool isDeliveryItem = false.obs;
     netPriceController.text = MyFormat.formatPrice(item.price);
-    totalPriceController.text = MyFormat.formatPrice(item.price * 1.10);
+    totalPriceController.text =
+        MyFormat.formatPrice(item.price * Val.gstTotalPrecentage);
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Add Item'),
+          title: Text(item.name),
           content: SizedBox(
-            height: 150,
+            height: 200,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                PosTextFormField(
-                  width: 400.0,
-                  labelText: 'Comment',
-                  controller: commentController,
-                ),
                 Padding(
                   padding: const EdgeInsets.only(top: 10.0),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       PosTextFormField(
                         width: 100.0,
@@ -250,6 +245,23 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                     ],
                   ),
                 ),
+                PosTextFormField(
+                  width: 400.0,
+                  height: 70.0,
+                  labelText: 'Comment',
+                  controller: commentController,
+                ),
+                Row(
+                  children: [
+                    Obx(() => Checkbox(
+                        semanticLabel: 'Delivery Item',
+                        value: isDeliveryItem.value,
+                        onChanged: (onChanged) {
+                          isDeliveryItem.value = onChanged ?? false;
+                        })),
+                    const Text('Delivery Item')
+                  ],
+                )
               ],
             ),
           ),
@@ -267,8 +279,9 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                       name: item.name,
                       netPrice: itemPrice,
                       qty: qty,
+                      isPostedItem: isDeliveryItem.value,
                       comment: commnet);
-                  await _databaseService.convertItemToCart(cartItem);
+                  await CartDB().addItemToCart(cartItem);
                   await invoiceController.updateCart();
                 }
                 Navigator.of(context).pop();
@@ -287,12 +300,11 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
       children: [
         Text(
           '$key : ',
-          style: TextStyle(
-              color: Colors.grey.shade600, fontWeight: FontWeight.w400),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400),
         ),
         Text(
           value,
-          style: TextStyle(color: TColors.blue, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         )
       ],
     );

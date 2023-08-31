@@ -10,7 +10,7 @@ import '../../widgets/pos_button.dart';
 import '../../widgets/pos_text_form_field.dart';
 
 class CustomerViewPage extends StatefulWidget {
-  String cusId;
+  final String cusId;
   CustomerViewPage({super.key, required this.cusId});
 
   @override
@@ -35,7 +35,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
   @override
   Widget build(BuildContext context) {
     WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1150, 800), size: Size(1150, 800), center: true);
+        minimumSize: Size(1300, 800), size: Size(1300, 800), center: true);
 
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();

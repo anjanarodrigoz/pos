@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pos/Pages/invoice_draft_manager/invoice_item_select_page.dart';
+import 'package:pos/Pages/invoice_manager/invoice_edit_view.dart';
 import 'package:pos/Pages/invoice_manager/invoice_page.dart';
 import 'package:pos/controllers/invoice_draft_contorller.dart';
+import 'package:pos/controllers/invoice_edit_controller.dart';
 import 'package:pos/database/Cart_db_service.dart';
 import 'package:pos/database/invoice_db_service.dart';
 import 'package:pos/models/extra_charges.dart';
@@ -13,11 +15,10 @@ import '../../theme/t_colors.dart';
 import '../../utils/my_format.dart';
 import '../../widgets/pos_button.dart';
 import '../../widgets/pos_text_form_field.dart';
-import 'invoice_view.dart';
 
-class InvoiceDraftPage extends StatelessWidget {
-  InvoiceDraftPage({super.key});
-  final InvoiceDraftController _controller = Get.find<InvoiceDraftController>();
+class InvoiceEditPage extends StatelessWidget {
+  InvoiceEditPage({super.key});
+  final InvoiceEditController _controller = Get.find<InvoiceEditController>();
   late BuildContext context;
 
   @override
@@ -25,10 +26,10 @@ class InvoiceDraftPage extends StatelessWidget {
     this.context = context;
     return Scaffold(
       appBar: AppBar(
-        title: Obx(() => Text(
-              'Draft Invoice - #${_controller.invoiceId.value}',
-              style: TStyle.titleBarStyle,
-            )),
+        title: Text(
+          'Edit Invoice - #${_controller.invoice.invoiceId}',
+          style: TStyle.titleBarStyle,
+        ),
       ),
       body: Row(
         children: [
@@ -47,7 +48,7 @@ class InvoiceDraftPage extends StatelessWidget {
                           context: context,
                           builder: ((context) => Dialog(
                                 child: InvoiceItemSelectPage(
-                                  invoiceController: _controller,
+                                  invoiceEditController: _controller,
                                 ),
                               )));
                     }),
@@ -63,17 +64,17 @@ class InvoiceDraftPage extends StatelessWidget {
                     }),
                 SizedBox(height: 50.0),
                 PosButton(
-                  text: 'Close Draft',
+                  text: 'Update Invoice',
+                  onPressed: () {
+                    updateInvoice();
+                  },
+                ),
+                PosButton(
+                  text: 'Close',
                   onPressed: () async {
                     final storage = CartDB();
                     await storage.resetCart();
                     Get.offAll(InvoicePage());
-                  },
-                ),
-                PosButton(
-                  text: 'Save Invoice',
-                  onPressed: () {
-                    saveDraftInvoice();
                   },
                 ),
               ],
@@ -81,7 +82,7 @@ class InvoiceDraftPage extends StatelessWidget {
           ),
           Column(
             children: [
-              Expanded(child: InvoiceView()),
+              Expanded(child: InvoiceEditView()),
             ],
           ),
         ],
@@ -267,8 +268,8 @@ class InvoiceDraftPage extends StatelessWidget {
     );
   }
 
-  Future<void> saveDraftInvoice() async {
-    await _controller.saveInvoice();
+  Future<void> updateInvoice() async {
+    await _controller.updateInvoice();
     Get.offAll(InvoicePage());
   }
 }

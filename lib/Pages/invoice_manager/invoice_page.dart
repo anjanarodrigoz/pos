@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:pdf/pdf.dart';
 import 'package:pos/Pages/invoice_draft_manager/invoice_customer_select.dart';
+import 'package:pos/Pages/invoice_manager/invoice_edit_page.dart';
 import 'package:pos/Pages/invoice_manager/save_invoice_page.dart';
+import 'package:pos/controllers/invoice_edit_controller.dart';
 import 'package:pos/database/invoice_db_service.dart';
 import 'package:window_manager/window_manager.dart';
+import '../../api/pdf_api.dart';
+import '../../api/pdf_invoice_api.dart';
 import '../../models/invoice.dart';
-
 import '../../theme/t_colors.dart';
-import '../invoice_draft_manager/invoice_view.dart';
 import '../main_window.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class InvoicePage extends StatelessWidget {
   List<Invoice> invoiceList = [];
-  RxInt index = 0.obs;
+  final RxInt index = 0.obs;
 
   // late InvoiceDataSource _invoiceDataSource;
 
@@ -53,15 +59,20 @@ class InvoicePage extends StatelessWidget {
                 children: [
                   menuItem(() => openNewInvoice(context), '+ New Invoice'),
                   menuItem(() => {}, 'Search Invoice'),
-                  menuItem(() => {}, 'Edit '),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  menuItem(() => openOldInvoice(), 'Edit '),
                   menuItem(() => {}, 'Remove '),
-                  menuItem(() => {}, 'Pay '),
                   SizedBox(
                     height: 50,
                   ),
-                  menuItem(() => {}, 'Customers'),
-                  menuItem(() => {}, 'Stock'),
+                  menuItem(() => {}, 'Pay '),
                   menuItem(() => {}, 'Paymnets'),
+                  SizedBox(
+                    height: 50,
+                  ),
+                  menuItem(() => printInvoice(context), 'Print'),
                   SizedBox(height: 150),
                   Card(
                     color: TColors.blue,
@@ -162,5 +173,15 @@ class InvoicePage extends StatelessWidget {
             child: InvoiceCustomerSelectPage(),
           );
         });
+  }
+
+  void openOldInvoice() {
+    // Get.put(InvoiceEditController(invoice: invoiceList[index.value]));
+    // Get.to(InvoiceEditPage());
+  }
+
+  Future<void> printInvoice(context) async {
+    final pdfFile = await PdfInvoiceApi.generate(invoiceList[index.value]);
+    PdfApi.openFile(pdfFile);
   }
 }

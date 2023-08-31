@@ -31,6 +31,16 @@ class InvoiceDataSource extends DataGridSource {
     // TODO: implement buildRow
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((e) {
+      if (e.columnName == InvoiceRow.itemIdKey) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          alignment: Alignment.center,
+          child: Text(
+            e.value.values.toList()[0].toString(),
+            style: const TextStyle(fontSize: 13.0),
+          ),
+        );
+      }
       if (e.columnName == InvoiceRow.nameKey) {
         String value = e.value.values.toList()[0].toString();
         InvoiceItemCategory itemCategory = e.value.keys.toList()[0];
@@ -41,7 +51,7 @@ class InvoiceDataSource extends DataGridSource {
             itemCategory == InvoiceItemCategory.empty ? '' : value,
             style: TextStyle(
                 fontSize:
-                    itemCategory == InvoiceItemCategory.comment ? 11.0 : 12.0,
+                    itemCategory == InvoiceItemCategory.comment ? 12.0 : 13.0,
                 fontWeight: itemCategory == InvoiceItemCategory.comment
                     ? FontWeight.w500
                     : FontWeight.bold,
@@ -61,7 +71,7 @@ class InvoiceDataSource extends DataGridSource {
           alignment: Alignment.centerRight,
           child: Text(
             e.value.toString(),
-            style: const TextStyle(fontSize: 12.0),
+            style: const TextStyle(fontSize: 13.0),
           ),
         );
       }
@@ -71,7 +81,7 @@ class InvoiceDataSource extends DataGridSource {
         alignment: Alignment.center,
         child: Text(
           e.value.toString(),
-          style: const TextStyle(fontSize: 12.0),
+          style: const TextStyle(fontSize: 13.0),
         ),
       );
     }).toList());
