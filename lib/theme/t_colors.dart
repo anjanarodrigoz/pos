@@ -18,6 +18,8 @@ class TStyle {
       const TextStyle(fontSize: 13.0, color: Colors.black);
   static TextStyle style_02 = TextStyle(
       fontSize: 12.0, color: TColors.blue, fontWeight: FontWeight.w500);
+  static TextStyle style_03 =
+      TextStyle(fontSize: 12.0, color: Colors.red, fontWeight: FontWeight.w500);
 
   static TextStyle titleBarStyle = const TextStyle(
       fontSize: 17.0, color: Colors.white, fontWeight: FontWeight.w500);

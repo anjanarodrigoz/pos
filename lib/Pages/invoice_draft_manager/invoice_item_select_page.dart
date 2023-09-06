@@ -234,13 +234,13 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                         width: 10,
                       ),
                       PosTextFormField(
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d*\-?\d*'))
+                        ],
                         width: 100.0,
                         labelText: 'Quantity',
                         controller: qtyController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
                       ),
                     ],
                   ),
@@ -304,7 +304,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
         ),
         Text(
           value,
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         )
       ],
     );

@@ -292,7 +292,9 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
     TextEditingController qtyController = TextEditingController();
     double net = oldCart.netPrice;
 
-    Cart? oldestCart = invoiceController.isItemExsits(oldCart.cartId!);
+    List list = invoiceController.oldCartList
+        .where((element) => element.cartId == oldCart.cartId)
+        .toList();
 
     netPriceController.text = MyFormat.formatPrice(net);
     totalPriceController.text =
@@ -310,8 +312,8 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
               Text(oldCart.name),
               IconButton(
                   onPressed: () async {
-                    if (oldestCart != null) {
-                      await CartDB().removeSavedItem(oldCart);
+                    if (list.isNotEmpty) {
+                      await CartDB().removeOldItemFromCart(list[0], oldCart);
                     } else {
                       await CartDB().removeItemFromCart(oldCart);
                     }
@@ -413,16 +415,16 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                 int qty = qtyController.text.isEmpty
                     ? 0
                     : int.parse(qtyController.text);
-                if (qty != 0) {
-                  Cart newCart = oldCart.copyWith(
-                      comment: commnet, netPrice: itemPrice, qty: qty);
-                  if (oldestCart != null) {
-                    await CartDB().updateSavedItem(oldestCart, newCart);
-                  } else {
-                    await CartDB().updateCart(oldCart, newCart);
-                  }
-                  await invoiceController.updateCart();
+
+                Cart newCart = oldCart.copyWith(
+                    comment: commnet, netPrice: itemPrice, qty: qty);
+                if (list.isNotEmpty) {
+                  await CartDB().updateOldCart(list[0], newCart);
+                } else {
+                  await CartDB().updateCart(oldCart, newCart);
                 }
+                await invoiceController.updateCart();
+
                 Navigator.of(context).pop();
               },
               child: const Text('Update Item'),

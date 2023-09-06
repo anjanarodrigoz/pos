@@ -4,10 +4,10 @@ import 'package:pos/models/invoice_row.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-class InvoiceDataSource extends DataGridSource {
+class InvoiceListDataSource extends DataGridSource {
   List<DataGridRow> _invoiceData = [];
 
-  InvoiceDataSource({required List<InvoiceRow> invoiceData}) {
+  InvoiceListDataSource({required List<InvoiceRow> invoiceData}) {
     _invoiceData = invoiceData
         .map<DataGridRow>((e) => DataGridRow(cells: [
               DataGridCell(columnName: InvoiceRow.itemIdKey, value: e.itemId),
@@ -54,7 +54,7 @@ class InvoiceDataSource extends DataGridSource {
                     itemCategory == InvoiceItemCategory.comment ? 12.0 : 13.0,
                 fontWeight: itemCategory == InvoiceItemCategory.comment
                     ? FontWeight.w500
-                    : FontWeight.w500,
+                    : FontWeight.w700,
                 color: itemCategory == InvoiceItemCategory.comment
                     ? TColors.blue
                     : Colors.black),

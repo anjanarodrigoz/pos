@@ -6,12 +6,14 @@ import 'package:pos/controllers/invoice_draft_contorller.dart';
 import '../../database/customer_db_service.dart';
 import '../../models/address.dart';
 import '../../models/customer.dart';
+import '../../models/invoice.dart';
 import '../../theme/t_colors.dart';
 import '../../widgets/pos_text_form_field.dart';
 
 class InvoiceCustomerViewPage extends StatefulWidget {
   String cusId;
-  InvoiceCustomerViewPage({super.key, required this.cusId});
+  Invoice? invoice;
+  InvoiceCustomerViewPage({super.key, required this.cusId, this.invoice});
 
   @override
   State<InvoiceCustomerViewPage> createState() =>
@@ -24,12 +26,14 @@ class _InvoiceCustomerViewPageState extends State<InvoiceCustomerViewPage> {
   final Address deliveryAddress = Address();
   final Address postalAddress = Address();
   final dbService = CustomerDB();
+  Invoice? invoice;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _customer = dbService.getCustomer(widget.cusId);
+    invoice = widget.invoice;
   }
 
   @override
@@ -342,7 +346,8 @@ class _InvoiceCustomerViewPageState extends State<InvoiceCustomerViewPage> {
 
       _customer.deliveryAddress = deliveryAddress;
       _customer.postalAddress = postalAddress;
-      Get.put(InvoiceDraftController(customer: _customer));
+      Get.put(
+          InvoiceDraftController(customer: _customer, copyInvoice: invoice));
       Get.offAll(InvoiceDraftPage());
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

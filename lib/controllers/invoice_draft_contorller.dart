@@ -15,6 +15,7 @@ class InvoiceDraftController extends GetxController {
   RxList<String> comments = <String>[].obs;
   RxList<Cart> cartList = <Cart>[].obs;
   Function? disposeListen;
+  Invoice? copyInvoice;
   var netTotal = 0.0.obs;
   var gstTotal = 0.0.obs;
   var cartTotal = 0.0;
@@ -22,9 +23,19 @@ class InvoiceDraftController extends GetxController {
   var total = 0.0.obs;
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
     invoiceId.value = InvoiceDB().generateInvoiceId();
+    if (copyInvoice != null) {
+      extraList.value = copyInvoice!.extraCharges ?? [];
+      comments.value = copyInvoice!.comments ?? [];
+      cartList.value = copyInvoice!.itemList
+          .map((invoiceItem) => Cart.fromInvoiceItem(invoiceItem))
+          .toList();
+      await CartDB().copyInvoiceItem(cartList);
+      updateExtraTotal();
+      updateCart();
+    }
   }
 
   @override
@@ -33,7 +44,7 @@ class InvoiceDraftController extends GetxController {
     super.onClose();
   }
 
-  InvoiceDraftController({required this.customer});
+  InvoiceDraftController({required this.customer, this.copyInvoice});
 
   void addExtraCharges(ExtraCharges extraCharges) {
     extraList.add(extraCharges);

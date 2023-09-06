@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:pos/Pages/customer_manager/customer_form.dart';
+import 'package:pos/Pages/supplyer_manager/supplyer_form.dart';
 import 'package:pos/Pages/main_window.dart';
-import 'package:pos/database/customer_db_service.dart';
+import 'package:pos/database/supplyer_db_service.dart';
 import 'package:pos/models/address.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/val.dart';
@@ -11,32 +11,34 @@ import 'package:pos/widgets/pos_button.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:window_manager/window_manager.dart';
 
-import '../../models/customer.dart';
-import 'customer_view.dart';
+import '../../database/supplyer_db_service.dart';
+import '../../models/supplyer.dart';
+import '../../models/supplyer.dart';
+import 'supplyer_view.dart';
 
-class CustomerPage extends StatefulWidget {
-  const CustomerPage({super.key});
+class SupplyerPage extends StatefulWidget {
+  const SupplyerPage({super.key});
 
   @override
-  State<CustomerPage> createState() => _CustomerPageState();
+  State<SupplyerPage> createState() => _SupplyerPageState();
 }
 
-class _CustomerPageState extends State<CustomerPage> {
+class _SupplyerPageState extends State<SupplyerPage> {
   late final _databaseService; // Use your DatabaseService class
 
-  List<Customer> _customers = [];
-  CustomerDataSource customerDataSource = CustomerDataSource(customersData: []);
+  List<Supplyer> _supplyer = [];
+  SupplyerDataSource supplyerDataSource = SupplyerDataSource(supplyersData: []);
   Function? disposeListen;
 
   @override
   void initState() {
     super.initState();
-    _databaseService = CustomerDB();
+    _databaseService = SupplyerDB();
 
-    disposeListen = GetStorage(DBVal.customers).listen(() {
-      getCustomerData();
+    disposeListen = GetStorage(DBVal.supplyer).listen(() {
+      getSupplyerData();
     });
-    getCustomerData();
+    getSupplyerData();
   }
 
   @override
@@ -64,7 +66,7 @@ class _CustomerPageState extends State<CustomerPage> {
             },
             icon: Icon(Icons.arrow_back_outlined)),
         title: Text(
-          'Customers',
+          'Supplyers',
           style: TStyle.titleBarStyle,
         ),
       ),
@@ -72,9 +74,9 @@ class _CustomerPageState extends State<CustomerPage> {
         padding: EdgeInsets.all(20.0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           PosButton(
-              text: '+ New Customer',
+              text: '+ New Supplyer',
               onPressed: () {
-                Get.to(const CustomerFormPage());
+                Get.to(const SupplyerFormPage());
               }),
           SizedBox(
             height: 30.0,
@@ -87,32 +89,32 @@ class _CustomerPageState extends State<CustomerPage> {
               allowColumnsResizing: true,
               showFilterIconOnHover: true,
               columnWidthMode: ColumnWidthMode.auto,
-              source: customerDataSource,
+              source: supplyerDataSource,
               onCellTap: ((details) {
                 if (details.rowColumnIndex.rowIndex != 0) {
                   int selectedRowIndex = details.rowColumnIndex.rowIndex - 1;
-                  var row = customerDataSource.effectiveRows
+                  var row = supplyerDataSource.effectiveRows
                       .elementAt(selectedRowIndex);
 
-                  Get.to(CustomerViewPage(
+                  Get.to(SupplyerViewPage(
                       cusId: row.getCells()[0].value.toString()));
                 }
               }),
               columns: [
                 GridColumn(
-                    columnName: Customer.idKey,
+                    columnName: Supplyer.idKey,
                     label: Center(child: const Text('ID'))),
                 GridColumn(
-                    columnName: Customer.firstNameKey,
+                    columnName: Supplyer.firstNameKey,
                     label: Center(child: const Text('First Name'))),
                 GridColumn(
-                    columnName: Customer.lastNameKey,
+                    columnName: Supplyer.lastNameKey,
                     label: Center(child: const Text('Last Name'))),
                 GridColumn(
-                    columnName: Customer.mobileNumberKey,
+                    columnName: Supplyer.mobileNumberKey,
                     label: Center(child: const Text('Mobile Number'))),
                 GridColumn(
-                    columnName: Customer.emailKey,
+                    columnName: Supplyer.emailKey,
                     label: Center(child: const Text('Email'))),
                 GridColumn(
                     columnName: Address.areaCodeKey,
@@ -133,41 +135,40 @@ class _CustomerPageState extends State<CustomerPage> {
     );
   }
 
-  Future<void> getCustomerData() async {
-    _customers = await _databaseService.getAllCustomers();
-    customerDataSource = CustomerDataSource(customersData: _customers);
+  Future<void> getSupplyerData() async {
+    _supplyer = await _databaseService.getAllSupplyers();
+    supplyerDataSource = SupplyerDataSource(supplyersData: _supplyer);
     setState(() {});
   }
 }
 
-class CustomerDataSource extends DataGridSource {
-  List<DataGridRow> _customersData = [];
+class SupplyerDataSource extends DataGridSource {
+  List<DataGridRow> _supplyerData = [];
 
-  CustomerDataSource({required List<Customer> customersData}) {
-    _customersData = customersData
+  SupplyerDataSource({required List<Supplyer> supplyersData}) {
+    _supplyerData = supplyersData
         .map<DataGridRow>((e) => DataGridRow(cells: [
-              DataGridCell(columnName: Customer.idKey, value: e.id),
+              DataGridCell(columnName: Supplyer.idKey, value: e.id),
               DataGridCell(
-                  columnName: Customer.firstNameKey, value: e.firstName),
-              DataGridCell(columnName: Customer.lastNameKey, value: e.lastName),
+                  columnName: Supplyer.firstNameKey, value: e.firstName),
+              DataGridCell(columnName: Supplyer.lastNameKey, value: e.lastName),
               DataGridCell(
-                  columnName: Customer.mobileNumberKey, value: e.mobileNumber),
-              DataGridCell(columnName: Customer.emailKey, value: e.email),
+                  columnName: Supplyer.mobileNumberKey, value: e.mobileNumber),
+              DataGridCell(columnName: Supplyer.emailKey, value: e.email),
               DataGridCell(
                   columnName: Address.areaCodeKey,
-                  value: e.deliveryAddress?.areaCode ?? ''),
+                  value: e.address?.areaCode ?? ''),
               DataGridCell(
-                  columnName: Address.cityKey,
-                  value: e.deliveryAddress?.city ?? ''),
+                  columnName: Address.cityKey, value: e.address?.city ?? ''),
               DataGridCell(
                   columnName: Address.postalCodeKey,
-                  value: e.deliveryAddress?.postalCode ?? ''),
+                  value: e.address?.postalCode ?? ''),
             ]))
         .toList();
   }
 
   @override
-  List<DataGridRow> get rows => _customersData;
+  List<DataGridRow> get rows => _supplyerData;
 
   @override
   DataGridRowAdapter? buildRow(DataGridRow row) {

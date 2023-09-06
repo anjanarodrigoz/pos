@@ -203,15 +203,6 @@ class _InvoiceViewState extends State<InvoiceView> {
             )));
   }
 
-  Widget cell(
-    String value,
-  ) {
-    return Text(
-      value,
-      style: TStyle.style_01,
-    );
-  }
-
   commentDataRow(String comment) {
     return comment
         .split('\n')

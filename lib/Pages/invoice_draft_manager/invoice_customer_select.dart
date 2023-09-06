@@ -7,11 +7,15 @@ import 'package:pos/theme/t_colors.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../models/address.dart';
 import '../../models/customer.dart';
+import '../../models/invoice.dart';
 
 class InvoiceCustomerSelectPage extends StatelessWidget {
-  InvoiceCustomerSelectPage({super.key});
   final DataGridController _dataGridController = DataGridController();
   late List<Customer> customerList;
+  Invoice? invoice;
+
+  InvoiceCustomerSelectPage({super.key, this.invoice});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,9 +95,11 @@ class InvoiceCustomerSelectPage extends StatelessWidget {
                             splashRadius: 20.0,
                             onPressed: () {
                               Get.to(InvoiceCustomerViewPage(
-                                  cusId: _dataGridController.selectedRow
-                                      ?.getCells()[0]
-                                      .value));
+                                cusId: _dataGridController.selectedRow
+                                    ?.getCells()[0]
+                                    .value,
+                                invoice: invoice,
+                              ));
                             }),
                       )
                     ],

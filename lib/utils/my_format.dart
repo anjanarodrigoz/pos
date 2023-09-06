@@ -20,12 +20,12 @@ class MyFormat {
   }
 
   static String formatDate(DateTime dateTime) {
-    final format = DateFormat('yyyy MMM dd, HH:mm aa');
+    final format = DateFormat('dd MMM yy, HH:mm aa');
     return format.format(dateTime);
   }
 
   static String formatDateOne(DateTime dateTime) {
-    final format = DateFormat('dd MMM yyyy');
+    final format = DateFormat('dd/MM/yyyy');
     return format.format(dateTime);
   }
 

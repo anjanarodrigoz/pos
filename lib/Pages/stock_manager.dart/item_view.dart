@@ -30,7 +30,7 @@ class _ItemViewPageState extends State<ItemViewPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _item = dbService.getItem(widget.itemId);
+    _item = dbService.getItem(widget.itemId)!;
   }
 
   @override

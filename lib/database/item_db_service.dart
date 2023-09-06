@@ -21,8 +21,8 @@ class ItemDB {
     return itemData.map((data) => Item.fromJson(data)).toList();
   }
 
-  Item getItem(String itemId) {
-    Item item = Item.fromJson(_storage.read(itemId));
+  Item? getItem(String itemId) {
+    Item? item = Item.fromJson(_storage.read(itemId));
     return item;
   }
 
@@ -52,15 +52,39 @@ class ItemDB {
   }
 
   Future<void> getItemFromStock(String itemId, int qty) async {
-    Item itme = getItem(itemId);
+    Item itme = getItem(itemId) ??
+        Item(
+            id: itemId,
+            price: 0.00,
+            name: 'Deleted Item',
+            description: 'Deleted item return from invoice');
     final updatedItem = itme.copyWith(qty: itme.qty - qty);
     await updateItem(updatedItem);
   }
 
   Future<bool> returnFromCart(List<Cart> cartList) async {
     cartList.forEach((cart) async {
-      Item itme = getItem(cart.itemId);
+      Item itme = getItem(cart.itemId) ??
+          Item(
+              id: cart.itemId,
+              price: 0.00,
+              name: 'Deleted Item',
+              description: 'Deleted item return from invoice');
       final updatedItem = itme.copyWith(qty: itme.qty + cart.qty);
+      await updateItem(updatedItem);
+    });
+    return true;
+  }
+
+  Future<bool> copyItemsInInvoice(List<Cart> cartList) async {
+    cartList.forEach((cart) async {
+      Item itme = getItem(cart.itemId) ??
+          Item(
+              id: cart.itemId,
+              price: 0.00,
+              name: 'Deleted Item',
+              description: 'Deleted item return from invoice');
+      final updatedItem = itme.copyWith(qty: itme.qty - cart.qty);
       await updateItem(updatedItem);
     });
     return true;

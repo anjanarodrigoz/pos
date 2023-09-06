@@ -2,11 +2,8 @@ import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/widgets.dart';
-import 'package:pos/models/address.dart';
 import 'package:pos/models/extra_charges.dart';
 import 'package:pos/utils/my_format.dart';
-
-import '../models/customer.dart';
 import '../models/invoice.dart';
 import '../models/invoice_item.dart';
 import 'pdf_api.dart';
@@ -16,6 +13,7 @@ class PdfInvoiceApi {
     final pdf = Document();
 
     pdf.addPage(MultiPage(
+      margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
       build: (context) => [
         buildHeader(invoice),
         SizedBox(height: 3 * PdfPageFormat.cm),
@@ -31,15 +29,9 @@ class PdfInvoiceApi {
   }
 
   static Widget buildHeader(Invoice invoice) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: 1 * PdfPageFormat.cm),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              buildCompanyInfo(),
-            ],
-          ),
+          buildCompanyInfo(),
           SizedBox(height: 1 * PdfPageFormat.cm),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -91,9 +83,14 @@ class PdfInvoiceApi {
   }
 
   static Widget buildCompanyInfo() => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text('Aruna Stores', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text('HTT CLOTHING', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text('Work Wear Specialists',
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          Text('ABN 79 659 875 789', style: TextStyle(fontSize: 10.0)),
+          Text('5 Waston Gardens Berwick', style: TextStyle(fontSize: 10.0)),
+          Text('Victoria 3806', style: TextStyle(fontSize: 10.0)),
           SizedBox(height: 1 * PdfPageFormat.mm),
           Text('Work Wear Specialists'),
         ],
@@ -111,11 +108,19 @@ class PdfInvoiceApi {
       );
 
   static Widget buildInvoice(Invoice invoice) {
-    final headers = ['Description', 'Quantity', 'Unit Price', 'Gst', 'Total'];
+    final headers = [
+      'Item Id',
+      'Description',
+      'Quantity',
+      'Unit Price',
+      'Gst',
+      'Total'
+    ];
     List<List> items = [];
     for (InvoicedItem item in invoice.itemList) {
       final total = item.netTotal * (1 + invoice.gstPrecentage);
       items.add([
+        item.isPostedItem ? 'P${item.itemId}' : item.itemId,
         item.name,
         '${item.qty}',
         '\$ ${item.netPrice.toStringAsFixed(2)}',
@@ -124,7 +129,7 @@ class PdfInvoiceApi {
       ]);
       if (item.comment != null) {
         if (item.comment!.isNotEmpty) {
-          items.add([item.comment.toString(), '', '', '', '']);
+          items.add(['', item.comment.toString(), '', '', '', '']);
         }
       }
     }
@@ -133,6 +138,7 @@ class PdfInvoiceApi {
       final total = extra.netTotal * (1 + invoice.gstPrecentage);
 
       items.add([
+        '#${(invoice.extraCharges?.indexOf(extra)) ?? 0 + 1}',
         extra.name,
         '${extra.qty}',
         '\$ ${extra.price.toStringAsFixed(2)}',
@@ -141,7 +147,7 @@ class PdfInvoiceApi {
       ]);
       if (extra.comment != null) {
         if (extra.comment!.isNotEmpty) {
-          items.add([extra.comment.toString(), '', '', '', '']);
+          items.add(['', extra.comment.toString(), '', '', '', '']);
         }
       }
     }
@@ -150,6 +156,7 @@ class PdfInvoiceApi {
       items += comment
           .split('\n')
           .map((e) => [
+                '',
                 e,
                 '',
                 '',
@@ -168,20 +175,20 @@ class PdfInvoiceApi {
       cellHeight: 8,
       cellAlignments: {
         0: Alignment.centerLeft,
-        1: Alignment.centerRight,
+        1: Alignment.centerLeft,
         2: Alignment.centerRight,
         3: Alignment.centerRight,
         4: Alignment.centerRight,
         5: Alignment.centerRight,
+        6: Alignment.centerRight,
       },
     );
   }
 
   static Widget buildTotal(Invoice invoice) {
-    final data = invoice.calculteTotalNetPrice();
-    final netTotal = data[0];
-    final vat = data[1];
-    final total = data[2];
+    final netTotal = invoice.totalNetPrice;
+    final vat = invoice.totalGstPrice;
+    final total = invoice.total;
 
     return Container(
       alignment: Alignment.centerRight,

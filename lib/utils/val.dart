@@ -21,4 +21,9 @@ class DBVal {
   static const String itemId = 'item_id';
   static const String invoice = 'Invoices';
   static const String invoiceId = 'invoice_id';
+  static const String payId = 'pay_id';
+  static const String extraCharges = 'extra_charges';
+  static const String comments = 'comments';
+  static const String supplyer = 'supplyer';
+  static const String supplyerId = 'supplyerId';
 }

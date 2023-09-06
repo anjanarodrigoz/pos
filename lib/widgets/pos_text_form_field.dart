@@ -12,12 +12,17 @@ class PosTextFormField extends StatelessWidget {
   List<TextInputFormatter>? inputFormatters;
   String? initialValue;
   Function(String)? onChanged;
+  Function()? onTap;
   TextInputType? keyboardType;
   TextEditingController? controller;
+  Widget? suffixIcon;
+  Widget? prefixIcon;
+  String? hintText;
 
   PosTextFormField(
       {super.key,
       this.labelText,
+      this.onTap,
       this.onSaved,
       this.height = 50,
       this.inputFormatters,
@@ -26,7 +31,10 @@ class PosTextFormField extends StatelessWidget {
       this.onChanged,
       this.keyboardType,
       this.controller,
+      this.suffixIcon,
       this.initialValue,
+      this.hintText,
+      this.prefixIcon,
       this.enable = true,
       this.width = 300});
 
@@ -38,6 +46,12 @@ class PosTextFormField extends StatelessWidget {
         width: width,
         height: height,
         child: TextFormField(
+          onTap: onTap ??
+              (controller != null
+                  ? () => controller?.selection = TextSelection(
+                      baseOffset: 0,
+                      extentOffset: controller!.value.text.length)
+                  : null),
           keyboardType: keyboardType,
           onChanged: onChanged,
           enabled: enable,
@@ -46,7 +60,11 @@ class PosTextFormField extends StatelessWidget {
           initialValue: initialValue,
           controller: controller,
           decoration: InputDecoration(
-              labelText: labelText, border: const OutlineInputBorder()),
+              prefixIcon: prefixIcon,
+              hintText: hintText,
+              suffixIcon: suffixIcon,
+              labelText: labelText,
+              border: const OutlineInputBorder()),
           onSaved: onSaved,
           validator: validator,
         ),

@@ -37,21 +37,23 @@ class CartDB {
     ItemDB itemDB = ItemDB();
     int qty = newCart.qty - oldCart.qty;
     await itemDB.getItemFromStock(oldCart.itemId, qty);
-    await _storage.write(oldCart.cartId!, newCart.toJson());
+    if (newCart.qty != 0) {
+      await _storage.write(oldCart.cartId!, newCart.toJson());
+    }
   }
 
-  Future<void> updateSavedItem(Cart oldCart, Cart newCart) async {
-    ItemDB itemDb = ItemDB();
+  Future<void> updateOldCart(Cart oldCart, Cart newCart) async {
+    ItemDB itemDB = ItemDB();
     int qty = newCart.qty - oldCart.qty;
-    await itemDb.getItemFromStock(oldCart.itemId, qty);
+    await itemDB.getItemFromStock(oldCart.itemId, qty);
     await _storage.write(oldCart.cartId!, newCart.copyWith(qty: qty).toJson());
   }
 
-  Future<void> removeSavedItem(Cart cart) async {
+  Future<void> removeOldItemFromCart(Cart oldCart, Cart newCart) async {
     ItemDB itemDB = ItemDB();
-    await itemDB.getItemFromStock(cart.itemId, -(cart.qty));
+    await itemDB.getItemFromStock(oldCart.itemId, -(newCart.qty));
     await _storage.write(
-        cart.cartId!, cart.copyWith(qty: -(cart.qty)).toJson());
+        oldCart.cartId!, oldCart.copyWith(qty: -(oldCart.qty)).toJson());
   }
 
   Future<void> removeItemFromCart(Cart cart) async {
@@ -65,6 +67,13 @@ class CartDB {
     final cartList = await getCartItems();
     await itemDb.returnFromCart(cartList);
     clearCart();
+  }
+
+  Future<void> copyInvoiceItem(List<Cart> cartList) async {
+    for (Cart cart in cartList) {
+      await _storage.write(cart.cartId!, cart.toJson());
+    }
+    await ItemDB().copyItemsInInvoice(cartList);
   }
 
   Future<void> clearCart() async {

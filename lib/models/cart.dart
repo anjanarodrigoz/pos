@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import '../utils/val.dart';
+import 'invoice_item.dart';
 
 class Cart {
   static const String itemIdKey = 'itemId';
@@ -59,6 +62,16 @@ class Cart {
     );
   }
 
+  factory Cart.fromInvoiceItem(InvoicedItem item) {
+    return Cart(
+        cartId: generateUniqueItemId(),
+        itemId: item.itemId,
+        name: item.name,
+        netPrice: item.netPrice,
+        qty: item.qty,
+        comment: item.comment);
+  }
+
   Map<String, dynamic> toJson() {
     return {
       itemIdKey: itemId,
@@ -69,6 +82,11 @@ class Cart {
       cartIdKey: cartId,
       isPostedItemKey: isPostedItem,
     };
+  }
+
+  static String generateUniqueItemId() {
+    final random = Random();
+    return '${DateTime.now().millisecondsSinceEpoch}_${random.nextInt(10000)}';
   }
 
   double get gst => (netPrice * Val.gstPrecentage);

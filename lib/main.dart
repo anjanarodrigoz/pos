@@ -3,18 +3,20 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:pos/Pages/main_window.dart';
 import 'package:pos/database/Cart_db_service.dart';
-import 'package:pos/database/customer_db_service.dart';
-import 'package:pos/database/invoice_db_service.dart';
-import 'package:pos/database/item_db_service.dart';
+import 'package:pos/utils/val.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-  await GetStorage.init('Customers');
-  await GetStorage.init('Items');
-  await GetStorage.init('Invoices');
-  await GetStorage.init('Cart');
+  await GetStorage.init(DBVal.customers);
+  await GetStorage.init(DBVal.items);
+  await GetStorage.init(DBVal.invoice);
+  await GetStorage.init(DBVal.cart);
+  await GetStorage.init(DBVal.comments);
+  await GetStorage.init(DBVal.supplyer);
+  await GetStorage.init(DBVal.extraCharges);
+
   await windowManager.ensureInitialized();
 
   final storage = CartDB();

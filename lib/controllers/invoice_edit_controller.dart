@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../database/Cart_db_service.dart';
 import '../database/invoice_db_service.dart';
 import '../models/cart.dart';
@@ -23,17 +24,8 @@ class InvoiceEditController extends GetxController {
   void onInit() {
     super.onInit();
     extraList.value = invoice.extraCharges ?? [];
-    for (InvoicedItem item in invoice.itemList) {
-      oldCartList.add(Cart(
-          itemId: item.itemId,
-          name: item.name,
-          netPrice: item.netPrice,
-          qty: item.qty,
-          isPostedItem: item.isPostedItem,
-          comment: item.comment,
-          cartId: CartDB.generateUniqueItemId()));
-    }
-    newCartList.value = oldCartList;
+    oldCartList =
+        invoice.itemList.map((item) => Cart.fromInvoiceItem(item)).toList();
     comments.value = invoice.comments ?? [];
     updateCart();
     updateExtraTotal();
@@ -59,30 +51,36 @@ class InvoiceEditController extends GetxController {
 
   Future<void> updateCart() async {
     cartTotal = 0;
-    var cartList = await CartDB().getCartItems();
+    newCartList.clear();
+    List<Cart> cartList = await CartDB().getCartItems();
+
+    for (Cart oldCart in oldCartList) {
+      var list = cartList
+          .where((cart) => cart.cartId.toString() == oldCart.cartId.toString())
+          .toList();
+
+      if (list.isNotEmpty) {
+        Cart cart = list[0];
+        int qty = oldCart.qty + cart.qty;
+        cart = cart.copyWith(qty: qty);
+        if (qty != 0) {
+          newCartList.add(cart);
+        }
+        cartList.removeWhere((element) => element.cartId == cart.cartId);
+      } else {
+        newCartList.add(oldCart);
+      }
+    }
 
     for (Cart cart in cartList) {
-      Cart? oldCart = isItemExsits(cart.cartId!);
-      if (oldCart != null) {
-        print('old item');
-        print(cart.cartId);
-        print(cart.qty);
-        print(oldCart.qty);
-        int qty = oldCart.qty + cart.qty;
-        newCartList.remove(oldCart);
-
-        if (qty != 0) {
-          newCartList.add(cart.copyWith(qty: oldCart.qty + cart.qty));
-        }
-      } else {
-        print('new Item');
-        newCartList.add(cart);
-      }
+      newCartList.add(cart);
+      print(cart.toJson());
     }
 
     for (Cart cart in newCartList) {
       cartTotal += cart.netTotal;
     }
+
     updateTotals();
   }
 
@@ -98,15 +96,6 @@ class InvoiceEditController extends GetxController {
     netTotal.value = extraTotal + cartTotal;
     gstTotal.value = netTotal.value * Val.gstPrecentage;
     total.value = netTotal.value * Val.gstTotalPrecentage;
-  }
-
-  Cart? isItemExsits(String id) {
-    for (Cart cart in oldCartList) {
-      if (cart.cartId == id) {
-        return cart;
-      }
-    }
-    return null;
   }
 
   Future<void> updateInvoice() async {
