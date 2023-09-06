@@ -1,39 +1,60 @@
 import 'address.dart';
 import 'extra_charges.dart';
 import 'invoice_item.dart';
-import 'payments.dart';
+import 'payment.dart';
 
 class Invoice {
-  static const String _invoiceIdKey = 'invoiceId';
-  static const String _createdDateKey = 'createdDate';
-  static const String _isPaidKey = 'isPaid';
-  static const String _customerIdKey = 'customerId';
-  static const String _customerNameKey = 'customerName';
-  static const String _itemListKey = 'itemList';
-  static const String _extraChargesKey = 'extraCharges';
-  static const String _closeDateKey = 'closeDate';
-  static const String _commentsKey = 'comments';
-  static const String _paymentsKey = 'payments';
-  static const String _billingAddressKey = 'billingAddress';
-  static const String _shippingAddressKey = 'shippingAddress';
+  static const String invoiceIdKey = 'invoiceId';
+  static const String createdDateKey = 'createdDate';
+  static const String isPaidKey = 'isPaid';
+  static const String customerIdKey = 'customerId';
+  static const String customerNameKey = 'customerName';
+  static const String itemListKey = 'itemList';
+  static const String extraChargesKey = 'extraCharges';
+  static const String closeDateKey = 'closeDate';
+  static const String commentsKey = 'comments';
+  static const String paymentsKey = 'payments';
+  static const String isDeletedKey = 'isDeleted';
+  static const String billingAddressKey = 'billingAddress';
+  static const String shippingAddressKey = 'shippingAddress';
+  static const String gstPrecentageKey = 'gstPrecentage';
+  static const String customerMobileKey = 'customerMobile';
+  static const String totalKey = 'total';
+  static const String netKey = 'netTotal';
+  static const String gstKey = 'gstTotal';
+  static const String paykey = 'toPay';
 
   final String invoiceId;
   final DateTime createdDate;
   bool isPaid;
+  bool isDeleted;
   String customerId;
   String customerName;
+  String customerMobile;
+  double gstPrecentage;
   List<InvoicedItem> itemList;
   List<ExtraCharges>? extraCharges;
   DateTime? closeDate;
   List<String>? comments;
-  List<Payments>? payments;
-  Address billingAddress;
-  Address shippingAddress;
+  List<Payment>? payments;
+  Address? billingAddress;
+  Address? shippingAddress;
+  double totalNetPrice = 0.0;
+  double totalItemPrice = 0.0;
+  double totalExtraPrice = 0.0;
+  double totalGstPrice = 0.0;
+  double total = 0.0;
+  double toPay = 0.0;
+  double paidAmount = 0.0;
+  Duration outStandingDates = const Duration(days: 0);
 
   Invoice({
+    required this.customerMobile,
     required this.invoiceId,
     required this.createdDate,
+    required this.gstPrecentage,
     this.isPaid = false,
+    this.isDeleted = false,
     required this.customerId,
     required this.customerName,
     required this.itemList,
@@ -41,53 +62,117 @@ class Invoice {
     this.closeDate,
     this.comments,
     this.payments,
-    required this.billingAddress,
-    required this.shippingAddress,
-  });
+    this.billingAddress,
+    this.shippingAddress,
+  }) {
+    calOtherValues();
+  }
+
+  Invoice copyWith({
+    bool? isPaid,
+    bool? isDeleted,
+    String? customerId,
+    String? customerName,
+    String? customerMobile,
+    double? gstPrecentage,
+    List<InvoicedItem>? itemList,
+    List<ExtraCharges>? extraCharges,
+    DateTime? closeDate,
+    List<String>? comments,
+    List<Payment>? payments,
+    Address? billingAddress,
+    Address? shippingAddress,
+  }) {
+    return Invoice(
+      invoiceId: invoiceId,
+      createdDate: createdDate,
+      isPaid: isPaid ?? this.isPaid,
+      isDeleted: isDeleted ?? this.isDeleted,
+      customerId: customerId ?? this.customerId,
+      customerName: customerName ?? this.customerName,
+      customerMobile: customerMobile ?? this.customerMobile,
+      gstPrecentage: gstPrecentage ?? this.gstPrecentage,
+      itemList: itemList ?? this.itemList,
+      extraCharges: extraCharges ?? this.extraCharges,
+      closeDate: closeDate ?? this.closeDate,
+      comments: comments ?? this.comments,
+      payments: payments ?? this.payments,
+      billingAddress: billingAddress ?? this.billingAddress,
+      shippingAddress: shippingAddress ?? this.shippingAddress,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
-      _invoiceIdKey: invoiceId,
-      _createdDateKey: createdDate.toIso8601String(),
-      _isPaidKey: isPaid,
-      _customerIdKey: customerId,
-      _customerNameKey: customerName,
-      _itemListKey: itemList.map((item) => item.toJson()).toList(),
-      _extraChargesKey: extraCharges?.map((charge) => charge.toJson()).toList(),
-      _closeDateKey: closeDate?.toIso8601String(),
-      _commentsKey: comments,
-      _paymentsKey: payments?.map((payment) => payment.toJson()).toList(),
-      _billingAddressKey: billingAddress.toJson(),
-      _shippingAddressKey: shippingAddress.toJson(),
+      customerMobileKey: customerMobile,
+      gstPrecentageKey: gstPrecentage,
+      invoiceIdKey: invoiceId,
+      createdDateKey: createdDate.toIso8601String(),
+      isPaidKey: isPaid,
+      isDeletedKey: isDeleted,
+      customerIdKey: customerId,
+      customerNameKey: customerName,
+      itemListKey: itemList.map((item) => item.toJson()).toList(),
+      extraChargesKey: extraCharges?.map((charge) => charge.toJson()).toList(),
+      closeDateKey: closeDate?.toIso8601String(),
+      commentsKey: comments,
+      paymentsKey: payments?.map((payment) => payment.toJson()).toList(),
+      billingAddressKey: billingAddress?.toJson(),
+      shippingAddressKey: shippingAddress?.toJson(),
     };
   }
 
   factory Invoice.fromJson(Map<String, dynamic> json) {
     return Invoice(
-      invoiceId: json[_invoiceIdKey],
-      createdDate: DateTime.parse(json[_createdDateKey]),
-      isPaid: json[_isPaidKey],
-      customerId: json[_customerIdKey],
-      customerName: json[_customerNameKey],
-      itemList: (json[_itemListKey] as List<dynamic>)
+      customerMobile: json[customerMobileKey],
+      gstPrecentage: json[gstPrecentageKey],
+      invoiceId: json[invoiceIdKey],
+      createdDate: DateTime.parse(json[createdDateKey]),
+      isPaid: json[isPaidKey],
+      isDeleted: json[isDeletedKey],
+      customerId: json[customerIdKey],
+      customerName: json[customerNameKey],
+      itemList: (json[itemListKey] as List<dynamic>)
           .map((itemJson) => InvoicedItem.fromJson(itemJson))
           .toList(),
-      extraCharges: (json[_extraChargesKey] as List<dynamic>?)
+      extraCharges: (json[extraChargesKey] as List<dynamic>?)
           ?.map((chargeJson) => ExtraCharges.fromJson(chargeJson))
           .toList(),
-      closeDate: json[_closeDateKey] != null
-          ? DateTime.parse(json[_closeDateKey])
+      closeDate: json[closeDateKey] != null
+          ? DateTime.parse(json[closeDateKey])
           : null,
-      comments: json[_commentsKey] != null
-          ? (json[_commentsKey] as List<dynamic>).cast<String>()
+      comments: json[commentsKey] != null
+          ? (json[commentsKey] as List<dynamic>).cast<String>()
           : null,
-      payments: (json[_paymentsKey] as List<dynamic>?)
-          ?.map((paymentJson) => Payments.fromJson(paymentJson))
+      payments: (json[paymentsKey] as List<dynamic>?)
+          ?.map((paymentJson) => Payment.fromJson(paymentJson))
           .toList(),
-      billingAddress: Address.fromJson(json[_billingAddressKey]),
-      shippingAddress: Address.fromJson(json[_shippingAddressKey]),
+      billingAddress: Address.fromJson(json[billingAddressKey]),
+      shippingAddress: Address.fromJson(json[shippingAddressKey]),
     );
   }
-}
 
-// Define InvoicedItem, ExtraCharges, Payments, and Address classes as before
+  calOtherValues() {
+    for (InvoicedItem item in itemList) {
+      totalItemPrice += item.netTotal;
+    }
+
+    for (ExtraCharges extra in extraCharges ?? []) {
+      totalExtraPrice += extra.netTotal;
+    }
+
+    for (Payment payment in payments ?? []) {
+      paidAmount += payment.amount;
+    }
+
+    totalNetPrice = totalExtraPrice + totalItemPrice;
+
+    totalGstPrice = (totalNetPrice * gstPrecentage * 100).round() / 100;
+
+    total = (totalNetPrice * (1 + gstPrecentage) * 100).round() / 100;
+
+    toPay = total - paidAmount;
+
+    outStandingDates = DateTime.now().difference(createdDate);
+  }
+}

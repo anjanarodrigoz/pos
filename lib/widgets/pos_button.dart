@@ -7,10 +7,15 @@ class PosButton extends StatelessWidget {
   String text;
   double width;
   double height;
+  bool enable;
+  Color? color;
+
   PosButton(
       {super.key,
       required this.text,
       required this.onPressed,
+      this.enable = true,
+      this.color,
       this.width = 180.0,
       this.height = 50.0});
 
@@ -19,10 +24,10 @@ class PosButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: enable ? onPressed : null,
         style: ElevatedButton.styleFrom(
           fixedSize: Size(width, height),
-          backgroundColor: TColors.blue,
+          backgroundColor: color ?? TColors.blue,
         ),
         child: Text(text),
       ),

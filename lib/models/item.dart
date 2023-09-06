@@ -12,7 +12,7 @@ class Item {
   static const String lastInDateKey = 'lastInDate';
   static const String lastOutDateKey = 'lastOutDate';
 
-  final String id;
+  String id;
   String name;
   String? description;
   String? comment;
@@ -28,9 +28,9 @@ class Item {
   Item({
     required this.id,
     required this.name,
+    required this.price,
     this.description,
     this.comment,
-    required this.price,
     this.priceTwo = 0,
     this.priceThree = 0,
     this.priceFour = 0,
@@ -39,6 +39,35 @@ class Item {
     this.lastInDate,
     this.lastOutDate,
   });
+
+  Item copyWith({
+    String? name,
+    String? description,
+    String? comment,
+    double? price,
+    double? priceTwo,
+    double? priceThree,
+    double? priceFour,
+    double? priceFive,
+    int? qty,
+    DateTime? lastInDate,
+    DateTime? lastOutDate,
+  }) {
+    return Item(
+      id: id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      comment: comment ?? this.comment,
+      price: price ?? this.price,
+      priceTwo: priceTwo ?? this.priceTwo,
+      priceThree: priceThree ?? this.priceThree,
+      priceFour: priceFour ?? this.priceFour,
+      priceFive: priceFive ?? this.priceFive,
+      qty: qty ?? this.qty,
+      lastInDate: lastInDate ?? this.lastInDate,
+      lastOutDate: lastOutDate ?? this.lastOutDate,
+    );
+  }
 
   factory Item.fromJson(Map<String, dynamic> json) {
     return Item(

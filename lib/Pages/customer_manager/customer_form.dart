@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:pos/Pages/main_window.dart';
 import 'package:pos/database/customer_db_service.dart';
 import 'package:pos/models/address.dart';
 import 'package:pos/theme/t_colors.dart';
@@ -21,21 +19,23 @@ class CustomerFormPage extends StatefulWidget {
 class _CustomerFormPageState extends State<CustomerFormPage> {
   final _formKey = GlobalKey<FormState>();
   final customerDb = CustomerDB();
-  final Customer _customer =
-      Customer(id: Customer.generateCustomerId(), firstName: '', lastName: '');
-  final Address _deliverAddress = Address();
-  final Address _postalAddress = Address();
+  final Customer _customer = Customer(
+      id: CustomerDB.generateCustomerId(),
+      firstName: '',
+      lastName: '',
+      mobileNumber: '');
+  final Address deliveryAddress = Address();
+  final Address postalAddress = Address();
 
   Future<void> _saveCustomerDetails() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      _customer.copyWith(
-          deliveryAddress: _deliverAddress, postalAddress: _postalAddress);
-
+      _customer.deliveryAddress = deliveryAddress;
+      _customer.postalAddress = postalAddress;
       await customerDb.addCustomer(_customer);
-      await Customer.saveLastId(_customer.id);
-      Get.offAll(const MainWindow());
+      await customerDb.saveLastId(_customer.id);
+      Get.back();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: const Text('Customer details saved')),
@@ -56,7 +56,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
       appBar: AppBar(
           leading: IconButton(
             onPressed: () {
-              Get.offAll(const MainWindow());
+              Get.back();
             },
             icon: const Icon(Icons.arrow_back_outlined),
           ),
@@ -124,8 +124,15 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                                         ),
                                         PosTextFormField(
                                           labelText: 'Mobile Number',
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Please enter mobile number';
+                                            }
+                                            return null;
+                                          },
                                           onSaved: (value) =>
-                                              _customer.mobileNumber = value,
+                                              _customer.mobileNumber = value!,
                                         ),
                                         // Add more TextFormField widgets for other customer properties
                                         PosTextFormField(
@@ -187,35 +194,35 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                                             PosTextFormField(
                                               labelText: 'Street',
                                               onSaved: (value) =>
-                                                  _deliverAddress.street =
+                                                  deliveryAddress.street =
                                                       value,
                                             ),
                                             PosTextFormField(
                                               labelText: 'City',
                                               onSaved: (value) =>
-                                                  _deliverAddress.city = value,
+                                                  deliveryAddress.city = value,
                                             ),
                                             PosTextFormField(
                                               labelText: 'State',
                                               onSaved: (value) =>
-                                                  _deliverAddress.state = value,
+                                                  deliveryAddress.state = value,
                                             ),
                                             PosTextFormField(
                                               labelText: 'Area Code',
                                               onSaved: (value) =>
-                                                  _deliverAddress.areaCode =
+                                                  deliveryAddress.areaCode =
                                                       value,
                                             ),
                                             PosTextFormField(
                                               labelText: 'Postal Code',
                                               onSaved: (value) =>
-                                                  _deliverAddress.postalCode =
+                                                  deliveryAddress.postalCode =
                                                       value,
                                             ),
                                             PosTextFormField(
                                               labelText: 'Country',
                                               onSaved: (value) =>
-                                                  _deliverAddress.county =
+                                                  deliveryAddress.county =
                                                       value,
                                             ),
                                           ],
@@ -241,32 +248,32 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                                             PosTextFormField(
                                               labelText: 'Street',
                                               onSaved: (value) =>
-                                                  _postalAddress.street = value,
+                                                  postalAddress.street = value,
                                             ),
                                             PosTextFormField(
                                               labelText: 'City',
                                               onSaved: (value) =>
-                                                  _postalAddress.city = value,
+                                                  postalAddress.city = value,
                                             ),
                                             PosTextFormField(
                                               labelText: 'State',
                                               onSaved: (value) =>
-                                                  _postalAddress.state = value,
+                                                  postalAddress.state = value,
                                             ),
                                             PosTextFormField(
                                               labelText: 'Area Code',
-                                              onSaved: (value) => _postalAddress
+                                              onSaved: (value) => postalAddress
                                                   .areaCode = value,
                                             ),
                                             PosTextFormField(
                                               labelText: 'Postal Code',
-                                              onSaved: (value) => _postalAddress
+                                              onSaved: (value) => postalAddress
                                                   .postalCode = value,
                                             ),
                                             PosTextFormField(
                                               labelText: 'Country',
                                               onSaved: (value) =>
-                                                  _postalAddress.county = value,
+                                                  postalAddress.county = value,
                                             ),
                                           ],
                                         ),
