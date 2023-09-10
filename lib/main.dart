@@ -16,6 +16,7 @@ void main() async {
   await GetStorage.init(DBVal.comments);
   await GetStorage.init(DBVal.supplyer);
   await GetStorage.init(DBVal.extraCharges);
+  await GetStorage.init(DBVal.supplyerInvoice);
 
   await windowManager.ensureInitialized();
 

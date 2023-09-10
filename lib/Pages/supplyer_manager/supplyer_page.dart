@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:get_storage/get_storage.dart';
@@ -16,37 +18,12 @@ import '../../models/supplyer.dart';
 import '../../models/supplyer.dart';
 import 'supplyer_view.dart';
 
-class SupplyerPage extends StatefulWidget {
-  const SupplyerPage({super.key});
-
-  @override
-  State<SupplyerPage> createState() => _SupplyerPageState();
-}
-
-class _SupplyerPageState extends State<SupplyerPage> {
-  late final _databaseService; // Use your DatabaseService class
+class SupplyerPage extends StatelessWidget {
+  SupplyerPage({super.key});
 
   List<Supplyer> _supplyer = [];
   SupplyerDataSource supplyerDataSource = SupplyerDataSource(supplyersData: []);
   Function? disposeListen;
-
-  @override
-  void initState() {
-    super.initState();
-    _databaseService = SupplyerDB();
-
-    disposeListen = GetStorage(DBVal.supplyer).listen(() {
-      getSupplyerData();
-    });
-    getSupplyerData();
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    disposeListen?.call();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,63 +59,67 @@ class _SupplyerPageState extends State<SupplyerPage> {
             height: 30.0,
           ),
           Expanded(
-            child: SfDataGrid(
-              gridLinesVisibility: GridLinesVisibility.both,
-              headerGridLinesVisibility: GridLinesVisibility.both,
-              allowFiltering: true,
-              allowColumnsResizing: true,
-              showFilterIconOnHover: true,
-              columnWidthMode: ColumnWidthMode.auto,
-              source: supplyerDataSource,
-              onCellTap: ((details) {
-                if (details.rowColumnIndex.rowIndex != 0) {
-                  int selectedRowIndex = details.rowColumnIndex.rowIndex - 1;
-                  var row = supplyerDataSource.effectiveRows
-                      .elementAt(selectedRowIndex);
+            child: StreamBuilder<List<Supplyer>>(
+                stream: SupplyerDB().getStreamAllSupplyer(),
+                builder: (context, snapshot) {
+                  _supplyer.clear();
+                  _supplyer = snapshot.data ?? [];
+                  supplyerDataSource =
+                      SupplyerDataSource(supplyersData: _supplyer);
+                  return SfDataGrid(
+                    gridLinesVisibility: GridLinesVisibility.both,
+                    headerGridLinesVisibility: GridLinesVisibility.both,
+                    allowFiltering: true,
+                    allowColumnsResizing: true,
+                    showFilterIconOnHover: true,
+                    columnWidthMode: ColumnWidthMode.auto,
+                    source: supplyerDataSource,
+                    onCellDoubleTap: ((details) {}),
+                    onCellTap: ((details) {
+                      if (details.rowColumnIndex.rowIndex != 0) {
+                        int selectedRowIndex =
+                            details.rowColumnIndex.rowIndex - 1;
+                        var row = supplyerDataSource.effectiveRows
+                            .elementAt(selectedRowIndex);
 
-                  Get.to(SupplyerViewPage(
-                      cusId: row.getCells()[0].value.toString()));
-                }
-              }),
-              columns: [
-                GridColumn(
-                    columnName: Supplyer.idKey,
-                    label: Center(child: const Text('ID'))),
-                GridColumn(
-                    columnName: Supplyer.firstNameKey,
-                    label: Center(child: const Text('First Name'))),
-                GridColumn(
-                    columnName: Supplyer.lastNameKey,
-                    label: Center(child: const Text('Last Name'))),
-                GridColumn(
-                    columnName: Supplyer.mobileNumberKey,
-                    label: Center(child: const Text('Mobile Number'))),
-                GridColumn(
-                    columnName: Supplyer.emailKey,
-                    label: Center(child: const Text('Email'))),
-                GridColumn(
-                    columnName: Address.areaCodeKey,
-                    label: Center(child: const Text('Area Code'))),
-                GridColumn(
-                    columnName: Address.cityKey,
-                    label: Center(child: const Text('City'))),
-                GridColumn(
-                    columnName: Address.postalCodeKey,
-                    label: Center(child: const Text('Postal Code'))),
+                        Get.to(SupplyerViewPage(
+                            supplyId: row.getCells()[0].value.toString()));
+                      }
+                    }),
+                    columns: [
+                      GridColumn(
+                          columnName: Supplyer.idKey,
+                          label: Center(child: const Text('ID'))),
+                      GridColumn(
+                          columnName: Supplyer.firstNameKey,
+                          label: Center(child: const Text('First Name'))),
+                      GridColumn(
+                          columnName: Supplyer.lastNameKey,
+                          label: Center(child: const Text('Last Name'))),
+                      GridColumn(
+                          columnName: Supplyer.mobileNumberKey,
+                          label: Center(child: const Text('Mobile Number'))),
+                      GridColumn(
+                          columnName: Supplyer.emailKey,
+                          label: Center(child: const Text('Email'))),
+                      GridColumn(
+                          columnName: Address.areaCodeKey,
+                          label: Center(child: const Text('Area Code'))),
+                      GridColumn(
+                          columnName: Address.cityKey,
+                          label: Center(child: const Text('City'))),
+                      GridColumn(
+                          columnName: Address.postalCodeKey,
+                          label: Center(child: const Text('Postal Code'))),
 
-                // Add more columns as needed
-              ],
-            ),
+                      // Add more columns as needed
+                    ],
+                  );
+                }),
           )
         ]),
       ),
     );
-  }
-
-  Future<void> getSupplyerData() async {
-    _supplyer = await _databaseService.getAllSupplyers();
-    supplyerDataSource = SupplyerDataSource(supplyersData: _supplyer);
-    setState(() {});
   }
 }
 

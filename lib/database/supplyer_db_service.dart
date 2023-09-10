@@ -20,6 +20,17 @@ class SupplyerDB {
     return supplyerData.map((data) => Supplyer.fromJson(data)).toList();
   }
 
+  Stream<List<Supplyer>> getStreamAllSupplyer() async* {
+    List supplyerData = await _storage.getValues().toList() ?? [];
+
+    _storage.listen(() async {
+      supplyerData.clear();
+      supplyerData = await _storage.getValues().toList() ?? [];
+    });
+
+    yield supplyerData.map((data) => Supplyer.fromJson(data)).toList();
+  }
+
   Supplyer getSupplyer(String supplyerId) {
     Supplyer supplyer = Supplyer.fromJson(_storage.read(supplyerId));
     return supplyer;

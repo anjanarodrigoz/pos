@@ -26,4 +26,12 @@ class DBVal {
   static const String comments = 'comments';
   static const String supplyer = 'supplyer';
   static const String supplyerId = 'supplyerId';
+  static const String supplyerInvoice = 'supplyer_invoice';
+  static const String supplyerInvoiceId = 'supplyer_invoice_id';
+  static const String creditNote = 'credit_note';
+  static const String creditNoteId = 'credit_note_id';
+  static const String returnNote = 'return_note';
+  static const String returnNoteId = 'return_note_id';
+  static const String quatation = 'quatation';
+  static const String quatationId = 'quatation_id';
 }

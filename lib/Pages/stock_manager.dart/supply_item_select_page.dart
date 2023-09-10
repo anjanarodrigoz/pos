@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:pos/controllers/invoice_draft_contorller.dart';
 import 'package:pos/controllers/invoice_edit_controller.dart';
+import 'package:pos/controllers/suppy_invoice_draft_controller.dart';
 import 'package:pos/database/Cart_db_service.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/my_format.dart';
@@ -16,29 +17,26 @@ import '../../models/cart.dart';
 import '../../models/item.dart';
 import '../stock_manager.dart/stock_page.dart';
 
-class InvoiceItemSelectPage extends StatefulWidget {
-  final InvoiceDraftController? invoiceController;
-  final InvoiceEditController? invoiceEditController;
-  const InvoiceItemSelectPage(
-      {super.key, this.invoiceController, this.invoiceEditController});
+class SupplyItemSelectPage extends StatefulWidget {
+  final SupplyInvoiceDraftController invoiceController;
+  const SupplyItemSelectPage({super.key, required this.invoiceController});
 
   @override
-  State<InvoiceItemSelectPage> createState() => InvoiceItemSelectPageState();
+  State<SupplyItemSelectPage> createState() => SupplyItemSelectPageState();
 }
 
-class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
+class SupplyItemSelectPageState extends State<SupplyItemSelectPage> {
   late final _databaseService; // Use your DatabaseService class
   List<Item> _item = [];
   ItemDataSource itemDataSource = ItemDataSource(itemData: []);
   Function? disposeListen;
-  var invoiceController;
+  late SupplyInvoiceDraftController invoiceController;
 
   @override
   void initState() {
     super.initState();
     _databaseService = ItemDB();
-    invoiceController =
-        widget.invoiceController ?? widget.invoiceEditController;
+    invoiceController = widget.invoiceController;
     disposeListen = GetStorage(DBVal.items).listen(() {
       getItemData();
     });
@@ -165,7 +163,6 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
     TextEditingController commentController = TextEditingController();
     TextEditingController qtyController = TextEditingController(text: '1');
     double net = item.price;
-    RxBool isDeliveryItem = false.obs;
     netPriceController.text = MyFormat.formatPrice(item.price);
     totalPriceController.text =
         MyFormat.formatPrice(item.price * Val.gstTotalPrecentage);
@@ -175,96 +172,81 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
       builder: (context) {
         return AlertDialog(
           title: Text(item.name),
-          content: SizedBox(
-            height: 200,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      PosTextFormField(
-                        width: 100.0,
-                        labelText: 'Net price',
-                        controller: netPriceController,
-                        keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\.?\d*')),
-                        ],
-                        onChanged: (value) {
-                          if (value.isNotEmpty) {
-                            net = double.parse(value);
-                            double totalWithGST = (net *
-                                (1 +
-                                    Val.gstTotalPrecentage)); // Assuming GST is 10%
-                            totalPriceController.text =
-                                totalWithGST.toStringAsFixed(2);
-                          } else {
-                            totalPriceController.clear();
-                          }
-                        },
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      PosTextFormField(
-                        width: 100.0,
-                        controller: totalPriceController,
-                        labelText: 'Total Price',
-                        keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\.?\d*')),
-                        ],
-                        onChanged: (value) {
-                          if (value.isNotEmpty) {
-                            double totalWithGST = double.parse(value);
-                            net = totalWithGST / 1.1; // Reverse GST calculation
-                            netPriceController.text = net.toStringAsFixed(2);
-                          } else {
-                            netPriceController.clear();
-                          }
-                        },
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      PosTextFormField(
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\-?\d*'))
-                        ],
-                        width: 100.0,
-                        labelText: 'Quantity',
-                        controller: qtyController,
-                      ),
-                    ],
-                  ),
-                ),
-                PosTextFormField(
-                  width: 400.0,
-                  height: 70.0,
-                  labelText: 'Comment',
-                  controller: commentController,
-                ),
-                Row(
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Obx(() => Checkbox(
-                        semanticLabel: 'Delivery Item',
-                        value: isDeliveryItem.value,
-                        onChanged: (onChanged) {
-                          isDeliveryItem.value = onChanged ?? false;
-                        })),
-                    const Text('Delivery Item')
+                    PosTextFormField(
+                      width: 100.0,
+                      labelText: 'Net price',
+                      controller: netPriceController,
+                      keyboardType:
+                          TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'^\d*\.?\d*')),
+                      ],
+                      onChanged: (value) {
+                        if (value.isNotEmpty) {
+                          net = double.parse(value);
+                          double totalWithGST = (net *
+                              (1 +
+                                  Val.gstTotalPrecentage)); // Assuming GST is 10%
+                          totalPriceController.text =
+                              totalWithGST.toStringAsFixed(2);
+                        } else {
+                          totalPriceController.clear();
+                        }
+                      },
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    PosTextFormField(
+                      width: 100.0,
+                      controller: totalPriceController,
+                      labelText: 'Total Price',
+                      keyboardType:
+                          TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'^\d*\.?\d*')),
+                      ],
+                      onChanged: (value) {
+                        if (value.isNotEmpty) {
+                          double totalWithGST = double.parse(value);
+                          net = totalWithGST / 1.1; // Reverse GST calculation
+                          netPriceController.text = net.toStringAsFixed(2);
+                        } else {
+                          netPriceController.clear();
+                        }
+                      },
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    PosTextFormField(
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'^\d*\-?\d*'))
+                      ],
+                      width: 100.0,
+                      labelText: 'Quantity',
+                      controller: qtyController,
+                    ),
                   ],
-                )
-              ],
-            ),
+                ),
+              ),
+              PosTextFormField(
+                width: 400.0,
+                height: 70.0,
+                labelText: 'Comment',
+                controller: commentController,
+              ),
+            ],
           ),
           actions: [
             TextButton(
@@ -280,9 +262,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                       name: item.name,
                       netPrice: itemPrice,
                       qty: qty,
-                      isPostedItem: isDeliveryItem.value,
                       comment: commnet);
-                  await CartDB().addItemToCart(cartItem);
                   await invoiceController.updateCart();
                 }
                 Navigator.of(context).pop();

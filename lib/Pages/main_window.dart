@@ -26,9 +26,9 @@ class _MainWindowState extends State<MainWindow> {
   @override
   Widget build(BuildContext context) {
     WindowOptions windowOptions = const WindowOptions(
-        size: Size(200, 500),
-        minimumSize: Size(200, 466),
-        maximumSize: Size(200, 466),
+        size: Size(200, 600),
+        minimumSize: Size(200, 600),
+        maximumSize: Size(200, 600),
         center: true,
         titleBarStyle: TitleBarStyle.hidden,
         windowButtonVisibility: false);

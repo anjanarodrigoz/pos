@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:pos/database/item_db_service.dart';
 import 'package:pos/models/payment.dart';
+import 'package:pos/utils/alert_message.dart';
 import 'package:pos/utils/val.dart';
 import '../models/cart.dart';
 import '../models/invoice.dart'; // Assuming you have an Invoice model
@@ -115,23 +117,27 @@ class InvoiceDB {
     await saveLastPayId(payId);
   }
 
-  Future<void> removeInvoicePayment(String invoiceId, String paymentId) async {
+  Future<void> removeInvoicePayment(
+      String invoiceId, String paymentId, BuildContext context) async {
     Invoice invoice = getInvoice(invoiceId);
 
-    List<Payment> payments = invoice.payments ?? [];
+    if (DateTime.now().difference(invoice.createdDate) >
+        const Duration(days: 7)) {
+      AlertMessage.snakMessage('Can not be deleteted', context);
+    } else {
+      List<Payment> payments = invoice.payments ?? [];
 
-    for (Payment payment in payments) {
-      if (payment.payId == paymentId) {
-        payments.remove(payment);
-        break;
+      for (Payment payment in payments) {
+        if (payment.payId == paymentId) {
+          payments.remove(payment);
+          break;
+        }
       }
+
+      invoice.closeDate = null;
+      invoice = invoice.copyWith(isPaid: false, payments: payments);
+
+      await updateInvoice(invoice);
     }
-
-    invoice.closeDate = null;
-    invoice = invoice.copyWith(isPaid: false, payments: payments);
-
-    print(invoice.closeDate);
-
-    await updateInvoice(invoice);
   }
 }
