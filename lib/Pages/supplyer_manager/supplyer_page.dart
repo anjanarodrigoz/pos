@@ -1,20 +1,13 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:pos/Pages/supplyer_manager/supplyer_form.dart';
 import 'package:pos/Pages/main_window.dart';
 import 'package:pos/database/supplyer_db_service.dart';
 import 'package:pos/models/address.dart';
 import 'package:pos/theme/t_colors.dart';
-import 'package:pos/utils/val.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:window_manager/window_manager.dart';
-
-import '../../database/supplyer_db_service.dart';
-import '../../models/supplyer.dart';
 import '../../models/supplyer.dart';
 import 'supplyer_view.dart';
 

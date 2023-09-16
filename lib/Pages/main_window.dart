@@ -95,7 +95,7 @@ class _MainWindowState extends State<MainWindow> {
   }
 
   openSupplyerManager() {
-    Get.offAll(() => const SupplyerPage());
+    Get.offAll(() => SupplyerPage());
   }
 
   openPaymentManager() {
