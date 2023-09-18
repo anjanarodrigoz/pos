@@ -1,22 +1,25 @@
 import 'package:get/get.dart';
+import 'package:pos/database/item_db_service.dart';
 import 'package:pos/database/supplyer_invoice_db_service.dart';
-import '../database/Cart_db_service.dart';
+import '../database/cart_db_service.dart';
 import '../database/invoice_db_service.dart';
 import '../models/cart.dart';
 import '../models/customer.dart';
 import '../models/extra_charges.dart';
 import '../models/invoice.dart';
 import '../models/invoice_item.dart';
+import '../models/supply_invoice.dart';
 import '../models/supplyer.dart';
 import '../utils/val.dart';
 
 class SupplyInvoiceDraftController extends GetxController {
   final Supplyer supplyer;
   RxString invoiceId = ''.obs;
+  RxString referenceId = ''.obs;
   RxList<ExtraCharges> extraList = <ExtraCharges>[].obs;
   RxList<String> comments = <String>[].obs;
   RxList<Cart> cartList = <Cart>[].obs;
-  Invoice? copyInvoice;
+  SupplyInvoice? copyInvoice;
 
   var netTotal = 0.0.obs;
   var gstTotal = 0.0.obs;
@@ -30,7 +33,21 @@ class SupplyInvoiceDraftController extends GetxController {
     super.onClose();
   }
 
-  SupplyInvoiceDraftController({required this.supplyer});
+  @override
+  void onInit() async {
+    super.onInit();
+    invoiceId.value = SupplyerInvoiceDB().generateInvoiceId();
+    if (copyInvoice != null) {
+      extraList.value = copyInvoice!.extraCharges ?? [];
+      cartList.value =
+          (copyInvoice!.itemList).map((e) => Cart.fromInvoiceItem(e)).toList();
+      comments.value = copyInvoice!.comments ?? [];
+      updateCart();
+      updateExtraTotal();
+    }
+  }
+
+  SupplyInvoiceDraftController({required this.supplyer, this.copyInvoice});
 
   void addExtraCharges(ExtraCharges extraCharges) {
     extraList.add(extraCharges);
@@ -42,7 +59,7 @@ class SupplyInvoiceDraftController extends GetxController {
     comments.add(comment);
   }
 
-  Future<void> updateCart() async {
+  void updateCart() async {
     cartTotal = 0;
     for (Cart cart in cartList) {
       cartTotal += cart.netTotal;
@@ -77,18 +94,21 @@ class SupplyInvoiceDraftController extends GetxController {
             isPostedItem: cart.isPostedItem))
         .toList();
 
-    Invoice invoice = Invoice(
-        customerMobile: supplyer.mobileNumber,
+    SupplyInvoice invoice = SupplyInvoice(
+        referenceId: referenceId.value,
+        supplyerMobile: supplyer.mobileNumber,
         invoiceId: invoiceId.value,
         createdDate: DateTime.now(),
-        customerId: supplyer.id,
+        supplyerId: supplyer.id,
         gstPrecentage: Val.gstPrecentage,
-        customerName: '${supplyer.firstName} ${supplyer.lastName}',
+        supplyerName: '${supplyer.firstName} ${supplyer.lastName}',
         billingAddress: supplyer.address,
         comments: comments,
         extraCharges: extraList,
         itemList: itemList);
 
+    await db.saveLastId(invoiceId.value);
     await db.addInvoice(invoice);
+    Get.delete<SupplyInvoiceDraftController>();
   }
 }

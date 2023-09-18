@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
-
 import 'package:get/get.dart';
 import 'package:pos/Pages/customer_manager/customer_form.dart';
 import 'package:pos/Pages/customer_manager/customer_page.dart';
 import 'package:pos/Pages/payment_manager/payment_pdage.dart';
+import 'package:pos/Pages/quotation_manager/all_quotation_invoice.dart';
 import 'package:pos/Pages/stock_manager.dart/stock_page.dart';
 import 'package:pos/Pages/supplyer_manager/supplyer_page.dart';
-
 import 'package:window_manager/window_manager.dart';
-
 import '../theme/t_colors.dart';
 import 'invoice_manager/invoice_page.dart';
+import 'supply_invoice_manager/supply_all_invoice.dart';
 
 class MainWindow extends StatefulWidget {
   const MainWindow({super.key});
@@ -26,9 +25,9 @@ class _MainWindowState extends State<MainWindow> {
   @override
   Widget build(BuildContext context) {
     WindowOptions windowOptions = const WindowOptions(
-        size: Size(200, 600),
-        minimumSize: Size(200, 600),
-        maximumSize: Size(200, 600),
+        size: Size(460, 380),
+        minimumSize: Size(460, 380),
+        maximumSize: Size(460, 380),
         center: true,
         titleBarStyle: TitleBarStyle.hidden,
         windowButtonVisibility: false);
@@ -46,17 +45,37 @@ class _MainWindowState extends State<MainWindow> {
             height: 40.0,
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                menuItem(() => openNewWindow(), 'Invoice'),
-                menuItem(() => {}, 'Credit Note'),
-                menuItem(() => {}, 'Quatation'),
-                menuItem(() => openCustomerManager(), 'Customers'),
-                menuItem(() => openSupplyerManager(), 'Supplyers'),
-                menuItem(() => openStockManager(), 'Stock'),
-                menuItem(() => openPaymentManager(), 'Payments'),
-                menuItem(() => {}, 'Setup')
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      children: [
+                        menuItem(() => openNewWindow(), 'Invoice'),
+                        menuItem(() => {}, 'Credit Note'),
+                        menuItem(() => openQuoteManager(), 'Quatation'),
+                        menuItem(
+                            () => openSupplyInvoiceManager(), 'Supply Invoice'),
+                        menuItem(() => {}, 'Setup')
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        menuItem(() => openPaymentManager(), 'Payments'),
+                        menuItem(() => openStockManager(), 'Stock'),
+                        menuItem(() => openCustomerManager(), 'Customers'),
+                        menuItem(() => openSupplyerManager(), 'Supplyers'),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 20.0,
+                ),
               ],
             ),
           ),
@@ -100,5 +119,13 @@ class _MainWindowState extends State<MainWindow> {
 
   openPaymentManager() {
     Get.offAll(() => const PaymentPage());
+  }
+
+  openSupplyInvoiceManager() {
+    Get.offAll(() => SupplyAllInvoice());
+  }
+
+  openQuoteManager() {
+    Get.offAll(() => AllQuotesPage());
   }
 }

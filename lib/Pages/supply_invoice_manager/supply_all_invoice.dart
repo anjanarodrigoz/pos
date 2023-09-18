@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
+import 'package:pos/Pages/main_window.dart';
+
 import 'package:pos/Pages/stock_manager.dart/stock_page.dart';
+import 'package:pos/Pages/supply_invoice_manager/supply_invoice_page.dart';
 import 'package:pos/database/supplyer_invoice_db_service.dart';
 import 'package:pos/models/invoice.dart';
 import 'package:pos/theme/t_colors.dart';
@@ -8,18 +11,20 @@ import 'package:pos/utils/my_format.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:window_manager/window_manager.dart';
+import '../../models/supply_invoice.dart';
+import 'select_supplyer_page.dart';
 
-class SupplyInvoicePage extends StatelessWidget {
-  SupplyInvoicePage({super.key});
+class SupplyAllInvoice extends StatelessWidget {
+  SupplyAllInvoice({super.key});
 
-  List<Invoice> supplyInvoice = [];
+  List<SupplyInvoice> supplyInvoice = [];
   SupplyInvoiceDataSource invoiceDataSource =
       SupplyInvoiceDataSource(invoiceData: []);
 
   @override
   Widget build(BuildContext context) {
     WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1150, 800), size: Size(1150, 800), center: true);
+        minimumSize: Size(1300, 800), size: Size(1300, 800), center: true);
 
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
@@ -30,7 +35,7 @@ class SupplyInvoicePage extends StatelessWidget {
         backgroundColor: TColors.blue,
         leading: IconButton(
             onPressed: () {
-              Get.offAll(StockPage());
+              Get.offAll(const MainWindow());
             },
             icon: Icon(Icons.arrow_back_outlined)),
         title: Text(
@@ -45,8 +50,10 @@ class SupplyInvoicePage extends StatelessWidget {
             height: 10.0,
           ),
           PosButton(
-            text: ' + New Supply Invoice',
-            onPressed: () {},
+            text: ' + Add Supply Invoice',
+            onPressed: () {
+              Get.to(SelectSupplyerPage());
+            },
             width: 200.0,
           ),
           Expanded(
@@ -68,52 +75,59 @@ class SupplyInvoicePage extends StatelessWidget {
                     );
                   }
 
-                  return SfDataGrid(
-                    gridLinesVisibility: GridLinesVisibility.both,
-                    headerGridLinesVisibility: GridLinesVisibility.both,
-                    allowFiltering: true,
-                    allowColumnsResizing: true,
-                    showFilterIconOnHover: true,
-                    columnWidthMode: ColumnWidthMode.auto,
-                    source: invoiceDataSource,
-                    onCellTap: ((details) {
-                      if (details.rowColumnIndex.rowIndex != 0) {
-                        int selectedRowIndex =
-                            details.rowColumnIndex.rowIndex - 1;
-                        var row = invoiceDataSource.effectiveRows
-                            .elementAt(selectedRowIndex);
-                        String invoiceId = row.getCells()[0].value;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    child: SfDataGrid(
+                      gridLinesVisibility: GridLinesVisibility.both,
+                      headerGridLinesVisibility: GridLinesVisibility.both,
+                      allowFiltering: true,
+                      allowColumnsResizing: true,
+                      showFilterIconOnHover: true,
+                      columnWidthMode: ColumnWidthMode.auto,
+                      source: invoiceDataSource,
+                      onCellTap: ((details) {
+                        if (details.rowColumnIndex.rowIndex != 0) {
+                          int selectedRowIndex =
+                              details.rowColumnIndex.rowIndex - 1;
+                          var row = invoiceDataSource.effectiveRows
+                              .elementAt(selectedRowIndex);
+                          String invoiceId = row.getCells()[0].value;
 
-                        // Get.to(InvoicePage(
-                        //   searchInvoiceId: invoiceId,
-                        // ));
-                      }
-                    }),
-                    columns: [
-                      GridColumn(
-                          columnName: Invoice.invoiceIdKey,
-                          label: Center(child: const Text('Invoice ID'))),
-                      GridColumn(
-                          columnName: Invoice.customerNameKey,
-                          label: Center(child: const Text('Supplyer Name'))),
-                      GridColumn(
-                          columnName: Invoice.customerIdKey,
-                          label: Center(child: const Text('Supplyer ID'))),
-                      GridColumn(
-                          columnName: Invoice.createdDateKey,
-                          label: Center(child: const Text('Created Date'))),
-                      GridColumn(
-                          columnName: Invoice.netKey,
-                          label: Center(child: const Text('Net Total'))),
-                      GridColumn(
-                          columnName: Invoice.gstKey,
-                          label: Center(child: const Text('GST Total'))),
-                      GridColumn(
-                          columnName: Invoice.totalKey,
-                          label: Center(child: const Text('Total'))),
+                          Get.to(SupplyInvoicePage(
+                            invoiceId: invoiceId,
+                          ));
+                        }
+                      }),
+                      columns: [
+                        GridColumn(
+                            columnName: Invoice.invoiceIdKey,
+                            label: Center(child: const Text('Invoice ID'))),
+                        GridColumn(
+                            columnName: Invoice.invoiceIdKey,
+                            label: Center(child: const Text('Reference ID'))),
+                        GridColumn(
+                            columnName: Invoice.customerNameKey,
+                            label: Center(child: const Text('Supplyer Name'))),
+                        GridColumn(
+                            columnName: Invoice.customerIdKey,
+                            label: Center(child: const Text('Supplyer ID'))),
+                        GridColumn(
+                            columnName: Invoice.createdDateKey,
+                            label: Center(child: const Text('Created Date'))),
+                        GridColumn(
+                            columnName: Invoice.netKey,
+                            label: Center(child: const Text('Net Total'))),
+                        GridColumn(
+                            columnName: Invoice.gstKey,
+                            label: Center(child: const Text('GST Total'))),
+                        GridColumn(
+                            columnName: Invoice.totalKey,
+                            label: Center(child: const Text('Total'))),
 
-                      // Add more columns as needed
-                    ],
+                        // Add more columns as needed
+                      ],
+                    ),
                   );
                 }),
           )
@@ -126,15 +140,17 @@ class SupplyInvoicePage extends StatelessWidget {
 class SupplyInvoiceDataSource extends DataGridSource {
   List<DataGridRow> _customersData = [];
 
-  SupplyInvoiceDataSource({required List<Invoice> invoiceData}) {
+  SupplyInvoiceDataSource({required List<SupplyInvoice> invoiceData}) {
     _customersData = invoiceData
         .map<DataGridRow>((e) => DataGridRow(cells: [
               DataGridCell(
                   columnName: Invoice.invoiceIdKey, value: e.invoiceId),
               DataGridCell(
-                  columnName: Invoice.customerNameKey, value: e.customerName),
+                  columnName: Invoice.invoiceIdKey, value: e.referenceId),
               DataGridCell(
-                  columnName: Invoice.customerIdKey, value: e.customerId),
+                  columnName: Invoice.customerNameKey, value: e.supplyerName),
+              DataGridCell(
+                  columnName: Invoice.customerIdKey, value: e.supplyerId),
               DataGridCell(
                   columnName: Invoice.createdDateKey, value: e.createdDate),
               DataGridCell(columnName: Invoice.netKey, value: e.totalNetPrice),

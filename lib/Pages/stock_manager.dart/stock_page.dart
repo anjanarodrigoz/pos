@@ -4,7 +4,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:pos/Pages/main_window.dart';
 import 'package:pos/Pages/stock_manager.dart/item_form.dart';
 import 'package:pos/Pages/stock_manager.dart/item_view.dart';
-import 'package:pos/Pages/stock_manager.dart/supply_invoice_page.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -70,22 +69,14 @@ class _StockPageState extends State<StockPage> {
         body: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  PosButton(
-                      text: '+ Add Item',
-                      onPressed: () {
-                        Get.to(ItemFormPage());
-                      }),
-                  // PosButton(
-                  //     text: 'Supplyer Invoice',
-                  //     onPressed: () {
-                  //       Get.to(SupplyInvoicePage());
-                  //     })
-                ],
-              ),
-              SizedBox(
+              PosButton(
+                  text: '+ Add Item',
+                  onPressed: () {
+                    Get.to(ItemFormPage());
+                  }),
+              const SizedBox(
                 height: 20.0,
               ),
               Expanded(

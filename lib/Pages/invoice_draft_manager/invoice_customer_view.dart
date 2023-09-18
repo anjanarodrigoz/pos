@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pos/Pages/credit_note_manager/credit_draft_page.dart';
 import 'package:pos/Pages/invoice_draft_manager/invoice_draft_page.dart';
+import 'package:pos/Pages/quotation_manager/all_quotation_invoice.dart';
+import 'package:pos/controllers/credit_draft_controller.dart';
 import 'package:pos/controllers/invoice_draft_contorller.dart';
+import 'package:pos/controllers/quote_draft_controller.dart';
+import 'package:pos/enums/enums.dart';
 
 import '../../database/customer_db_service.dart';
 import '../../models/address.dart';
@@ -9,11 +14,17 @@ import '../../models/customer.dart';
 import '../../models/invoice.dart';
 import '../../theme/t_colors.dart';
 import '../../widgets/pos_text_form_field.dart';
+import '../quotation_manager/quatation_draft_page.dart';
 
 class InvoiceCustomerViewPage extends StatefulWidget {
   String cusId;
   Invoice? invoice;
-  InvoiceCustomerViewPage({super.key, required this.cusId, this.invoice});
+  InvoiceType invoiceType;
+  InvoiceCustomerViewPage(
+      {super.key,
+      required this.cusId,
+      this.invoice,
+      required this.invoiceType});
 
   @override
   State<InvoiceCustomerViewPage> createState() =>
@@ -346,9 +357,23 @@ class _InvoiceCustomerViewPageState extends State<InvoiceCustomerViewPage> {
 
       _customer.deliveryAddress = deliveryAddress;
       _customer.postalAddress = postalAddress;
-      Get.put(
-          InvoiceDraftController(customer: _customer, copyInvoice: invoice));
-      Get.offAll(InvoiceDraftPage());
+      switch (widget.invoiceType) {
+        case InvoiceType.invoice:
+          Get.put(InvoiceDraftController(
+              customer: _customer, copyInvoice: invoice));
+          Get.offAll(InvoiceDraftPage());
+        case InvoiceType.supplyInvoice:
+        // TODO: Handle this case.
+        case InvoiceType.quotation:
+          Get.put(
+              QuoteDraftController(customer: _customer, copyInvoice: invoice));
+          Get.offAll(QuoteDraftPage());
+        case InvoiceType.creditNote:
+          // TODO: Handle this case.
+          Get.put(
+              CreditDraftController(customer: _customer, copyInvoice: invoice));
+          Get.offAll(CreditDraftPage());
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: const Text('Invalid Value')),

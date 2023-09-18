@@ -5,7 +5,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:pos/controllers/invoice_draft_contorller.dart';
 import 'package:pos/controllers/invoice_edit_controller.dart';
 import 'package:pos/controllers/suppy_invoice_draft_controller.dart';
-import 'package:pos/database/Cart_db_service.dart';
+import 'package:pos/database/cart_db_service.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/utils/val.dart';
@@ -15,22 +15,22 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../database/item_db_service.dart';
 import '../../models/cart.dart';
 import '../../models/item.dart';
-import '../stock_manager.dart/stock_page.dart';
+import '../Pages/stock_manager.dart/stock_page.dart';
 
-class SupplyItemSelectPage extends StatefulWidget {
-  final SupplyInvoiceDraftController invoiceController;
-  const SupplyItemSelectPage({super.key, required this.invoiceController});
+class ItemSelectWidget extends StatefulWidget {
+  final invoiceController;
+  const ItemSelectWidget({super.key, required this.invoiceController});
 
   @override
-  State<SupplyItemSelectPage> createState() => SupplyItemSelectPageState();
+  State<ItemSelectWidget> createState() => ItemSelectWidgetState();
 }
 
-class SupplyItemSelectPageState extends State<SupplyItemSelectPage> {
+class ItemSelectWidgetState extends State<ItemSelectWidget> {
   late final _databaseService; // Use your DatabaseService class
   List<Item> _item = [];
   ItemDataSource itemDataSource = ItemDataSource(itemData: []);
   Function? disposeListen;
-  late SupplyInvoiceDraftController invoiceController;
+  late final invoiceController;
 
   @override
   void initState() {
@@ -170,106 +170,114 @@ class SupplyItemSelectPageState extends State<SupplyItemSelectPage> {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(item.name),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    PosTextFormField(
-                      width: 100.0,
-                      labelText: 'Net price',
-                      controller: netPriceController,
-                      keyboardType:
-                          TextInputType.numberWithOptions(decimal: true),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(
-                            RegExp(r'^\d*\.?\d*')),
-                      ],
-                      onChanged: (value) {
-                        if (value.isNotEmpty) {
-                          net = double.parse(value);
-                          double totalWithGST = (net *
-                              (1 +
-                                  Val.gstTotalPrecentage)); // Assuming GST is 10%
-                          totalPriceController.text =
-                              totalWithGST.toStringAsFixed(2);
-                        } else {
-                          totalPriceController.clear();
-                        }
-                      },
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    PosTextFormField(
-                      width: 100.0,
-                      controller: totalPriceController,
-                      labelText: 'Total Price',
-                      keyboardType:
-                          TextInputType.numberWithOptions(decimal: true),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(
-                            RegExp(r'^\d*\.?\d*')),
-                      ],
-                      onChanged: (value) {
-                        if (value.isNotEmpty) {
-                          double totalWithGST = double.parse(value);
-                          net = totalWithGST / 1.1; // Reverse GST calculation
-                          netPriceController.text = net.toStringAsFixed(2);
-                        } else {
-                          netPriceController.clear();
-                        }
-                      },
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    PosTextFormField(
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'^\d*\-?\d*'))
-                      ],
-                      width: 100.0,
-                      labelText: 'Quantity',
-                      controller: qtyController,
-                    ),
-                  ],
+        return SizedBox(
+          width: 300,
+          height: 400,
+          child: AlertDialog(
+            title: Text('${item.id} - ${item.name}'),
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      PosTextFormField(
+                        width: 100.0,
+                        labelText: 'Net price',
+                        controller: netPriceController,
+                        keyboardType:
+                            TextInputType.numberWithOptions(decimal: true),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d*\.?\d*')),
+                        ],
+                        onChanged: (value) {
+                          if (value.isNotEmpty) {
+                            net = double.parse(value);
+                            double totalWithGST = (net *
+                                (1 +
+                                    Val.gstTotalPrecentage)); // Assuming GST is 10%
+                            totalPriceController.text =
+                                totalWithGST.toStringAsFixed(2);
+                          } else {
+                            totalPriceController.clear();
+                          }
+                        },
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      PosTextFormField(
+                        width: 100.0,
+                        controller: totalPriceController,
+                        labelText: 'Total Price',
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d*\.?\d*')),
+                        ],
+                        onChanged: (value) {
+                          if (value.isNotEmpty) {
+                            double totalWithGST = double.parse(value);
+                            net = totalWithGST / 1.1; // Reverse GST calculation
+                            netPriceController.text = net.toStringAsFixed(2);
+                          } else {
+                            netPriceController.clear();
+                          }
+                        },
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      PosTextFormField(
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d*\-?\d*'))
+                        ],
+                        width: 100.0,
+                        labelText: 'Quantity',
+                        controller: qtyController,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              PosTextFormField(
-                width: 400.0,
-                height: 70.0,
-                labelText: 'Comment',
-                controller: commentController,
+                PosTextFormField(
+                  width: 400.0,
+                  height: 70.0,
+                  labelText: 'Comment',
+                  controller: commentController,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  double itemPrice = net;
+                  String commnet = commentController.text;
+                  int qty = qtyController.text.isEmpty
+                      ? 0
+                      : int.parse(qtyController.text);
+                  if (qty != 0) {
+                    Cart cartItem = Cart(
+                        itemId: item.id,
+                        name: item.name,
+                        netPrice: itemPrice,
+                        qty: qty,
+                        comment: commnet);
+                    invoiceController.cartList.add(cartItem);
+                    invoiceController.updateCart();
+                  }
+
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Add to Invoice'),
               ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                double itemPrice = net;
-                String commnet = commentController.text;
-                int qty = qtyController.text.isEmpty
-                    ? 0
-                    : int.parse(qtyController.text);
-                if (qty != 0) {
-                  Cart cartItem = Cart(
-                      itemId: item.id,
-                      name: item.name,
-                      netPrice: itemPrice,
-                      qty: qty,
-                      comment: commnet);
-                  await invoiceController.updateCart();
-                }
-                Navigator.of(context).pop();
-              },
-              child: Text('Add to Invoice'),
-            ),
-          ],
         );
       },
     );

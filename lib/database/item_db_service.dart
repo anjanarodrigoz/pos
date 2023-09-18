@@ -1,5 +1,5 @@
 import 'package:get_storage/get_storage.dart';
-import 'package:pos/database/Cart_db_service.dart';
+import 'package:pos/database/cart_db_service.dart';
 import 'package:pos/utils/val.dart';
 
 import '../models/cart.dart';
@@ -68,7 +68,7 @@ class ItemDB {
           Item(
               id: cart.itemId,
               price: 0.00,
-              name: 'Deleted Item',
+              name: cart.name,
               description: 'Deleted item return from invoice');
       final updatedItem = itme.copyWith(qty: itme.qty + cart.qty);
       await updateItem(updatedItem);
@@ -82,7 +82,7 @@ class ItemDB {
           Item(
               id: cart.itemId,
               price: 0.00,
-              name: 'Deleted Item',
+              name: cart.name,
               description: 'Deleted item return from invoice');
       final updatedItem = itme.copyWith(qty: itme.qty - cart.qty);
       await updateItem(updatedItem);

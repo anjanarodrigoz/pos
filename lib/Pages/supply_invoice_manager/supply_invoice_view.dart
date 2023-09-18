@@ -1,16 +1,14 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pos/controllers/invoice_draft_contorller.dart';
-import 'package:pos/controllers/invoice_edit_controller.dart';
+import 'package:pos/controllers/suppy_invoice_draft_controller.dart';
 import 'package:pos/data_sources/invoiceDataSource.dart';
 import 'package:pos/database/cart_db_service.dart';
 import 'package:pos/enums/enums.dart';
-import 'package:pos/models/customer.dart';
 import 'package:pos/models/extra_charges.dart';
+import 'package:pos/models/supplyer.dart';
 import 'package:pos/utils/alert_message.dart';
+import 'package:window_manager/window_manager.dart';
 import '../../models/invoice_row.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../models/cart.dart';
@@ -19,36 +17,46 @@ import '../../utils/my_format.dart';
 import '../../utils/val.dart';
 import '../../widgets/pos_text_form_field.dart';
 
-class InvoiceEditView extends StatefulWidget {
-  InvoiceEditView({
+class SupplyInvoiceView extends StatefulWidget {
+  SupplyInvoiceView({
     super.key,
   });
 
   @override
-  State<InvoiceEditView> createState() => _InvoiceEditViewState();
+  State<SupplyInvoiceView> createState() => _SupplyInvoiceViewState();
 }
 
-class _InvoiceEditViewState extends State<InvoiceEditView> {
+class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
   final ScrollController controller = ScrollController();
   final ScrollController controller2 = ScrollController();
-  late InvoiceEditController invoiceController;
+  late Supplyer supplyer;
+  late SupplyInvoiceDraftController invoiceController;
   final dbService = CartDB();
   InvoiceDataSource invoiceDataSource = InvoiceDataSource(invoiceData: []);
+  late String invoiceId;
   late BuildContext context;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    invoiceController = Get.find<InvoiceEditController>();
+    invoiceController = Get.find<SupplyInvoiceDraftController>();
+    supplyer = invoiceController.supplyer;
+    invoiceId = invoiceController.invoiceId.value;
   }
 
   @override
   Widget build(BuildContext context) {
     this.context = context;
+
+    WindowOptions windowOptions = const WindowOptions(
+        minimumSize: Size(1300, 800), size: Size(1300, 800), center: true);
+
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+    });
     return Container(
       width: 1100,
-      padding: EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(10.0),
       child: Column(
         children: [
           Card(
@@ -65,25 +73,31 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Invoice #${invoiceController.invoice.invoiceId}',
+                              'Invoice #$invoiceId',
                               style: const TextStyle(
                                   fontSize: 15.0, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(
+                              height: 5.0,
+                            ),
+                            Obx(() => InkWell(
+                                  onTap: () => openDailog(),
+                                  child: Text(
+                                    'Reference No #${invoiceController.referenceId.value}',
+                                    style: const TextStyle(
+                                        fontSize: 15.0,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                )),
+                            const SizedBox(
                               height: 10.0,
                             ),
-                            detailsRowWidget('Customer ID',
-                                invoiceController.invoice.customerId),
+                            detailsRowWidget('Supplyer ID', supplyer.id),
                             const SizedBox(
                               height: 5.0,
                             ),
-                            detailsRowWidget('Customer Name',
-                                invoiceController.invoice.customerName),
-                            const SizedBox(
-                              height: 5.0,
-                            ),
-                            detailsRowWidget('Customer Name',
-                                invoiceController.invoice.customerMobile),
+                            detailsRowWidget('Supplyer Name',
+                                '${supplyer.firstName} ${supplyer.lastName}'),
                           ],
                         ),
                         SizedBox(
@@ -173,7 +187,7 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                   }
                 }
               },
-              source: generateDataRowList(invoiceController.newCartList,
+              source: generateDataRowList(invoiceController.cartList,
                   invoiceController.extraList, invoiceController.comments),
               columns: [
                 GridColumn(
@@ -206,15 +220,6 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
             )));
   }
 
-  Widget cell(
-    String value,
-  ) {
-    return Text(
-      value,
-      style: TStyle.style_01,
-    );
-  }
-
   commentDataRow(String comment) {
     return comment
         .split('\n')
@@ -228,8 +233,9 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
     List<InvoiceRow> invoiceData = [];
 
     for (Cart cart in cartList) {
+      String itemId = cart.isPostedItem ? 'P ${cart.itemId}' : cart.itemId;
       invoiceData.add(InvoiceRow(
-          itemId: {cartList.indexOf(cart): cart.itemId},
+          itemId: {cartList.indexOf(cart): itemId},
           itemName: {InvoiceItemCategory.item: cart.name},
           gst: MyFormat.formatCurrency(cart.gst),
           netPrice: MyFormat.formatCurrency(cart.netPrice),
@@ -285,17 +291,13 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
   }
 
   Future<void> editItemDialog(int index) async {
-    Cart oldCart = invoiceController.newCartList[index];
+    Cart oldCart = invoiceController.cartList[index];
     TextEditingController netPriceController = TextEditingController();
     TextEditingController totalPriceController = TextEditingController();
     TextEditingController commentController = TextEditingController();
     TextEditingController qtyController = TextEditingController();
     double net = oldCart.netPrice;
-
-    List list = invoiceController.oldCartList
-        .where((element) => element.cartId == oldCart.cartId)
-        .toList();
-
+    RxBool isDeliveryItem = oldCart.isPostedItem.obs;
     netPriceController.text = MyFormat.formatPrice(net);
     totalPriceController.text =
         MyFormat.formatPrice(net * Val.gstTotalPrecentage);
@@ -312,12 +314,8 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
               Text(oldCart.name),
               IconButton(
                   onPressed: () async {
-                    if (list.isNotEmpty) {
-                      await CartDB().removeOldItemFromCart(list[0], oldCart);
-                    } else {
-                      await CartDB().removeItemFromCart(oldCart);
-                    }
-                    await invoiceController.updateCart();
+                    invoiceController.cartList.remove(oldCart);
+                    invoiceController.updateCart();
                     Navigator.of(context).pop();
                   },
                   icon: Icon(
@@ -399,11 +397,25 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                 ),
                 PosTextFormField(
                   width: 400.0,
-                  height: 100,
+                  height: 60,
                   maxLines: 3,
                   labelText: 'Comment',
                   controller: commentController,
                 ),
+                SizedBox(
+                  height: 5.0,
+                ),
+                Row(
+                  children: [
+                    Obx(() => Checkbox(
+                        semanticLabel: 'Delivery Item',
+                        value: isDeliveryItem.value,
+                        onChanged: (onChanged) {
+                          isDeliveryItem.value = onChanged ?? false;
+                        })),
+                    const Text('Delivery Item')
+                  ],
+                )
               ],
             ),
           ),
@@ -415,16 +427,15 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                 int qty = qtyController.text.isEmpty
                     ? 0
                     : int.parse(qtyController.text);
-
-                Cart newCart = oldCart.copyWith(
-                    comment: commnet, netPrice: itemPrice, qty: qty);
-                if (list.isNotEmpty) {
-                  await CartDB().updateOldCart(list[0], newCart);
-                } else {
-                  await CartDB().updateCart(oldCart, newCart);
+                if (qty != 0) {
+                  Cart newCart = oldCart.copyWith(
+                      comment: commnet,
+                      netPrice: itemPrice,
+                      qty: qty,
+                      isPostedItem: isDeliveryItem.value);
+                  invoiceController.cartList[index] = newCart;
+                  invoiceController.updateCart();
                 }
-                await invoiceController.updateCart();
-
                 Navigator.of(context).pop();
               },
               child: const Text('Update Item'),
@@ -581,11 +592,42 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                 }
                 Navigator.of(context).pop();
               },
-              child: Text('Update Item'),
+              child: const Text('Update Item'),
             ),
           ],
         );
       },
     );
+  }
+
+  void openDailog() {
+    TextEditingController realInvoiceIdController =
+        TextEditingController(text: invoiceController.referenceId.value);
+    showDialog(
+        context: context,
+        builder: (context) => SizedBox(
+              height: 200.0,
+              width: 400.0,
+              child: AlertDialog(
+                title: const Text('Reference ID'),
+                content: PosTextFormField(
+                    controller: realInvoiceIdController,
+                    labelText: 'Reference ID'),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        invoiceController.referenceId.value =
+                            realInvoiceIdController.text;
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('save')),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('close'))
+                ],
+              ),
+            ));
   }
 }

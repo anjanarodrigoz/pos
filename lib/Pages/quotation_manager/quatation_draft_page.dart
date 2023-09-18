@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pos/Pages/invoice_draft_manager/invoice_item_select_page.dart';
 import 'package:pos/Pages/invoice_manager/invoice_page.dart';
+import 'package:pos/Pages/quotation_manager/all_quotation_invoice.dart';
 import 'package:pos/controllers/invoice_draft_contorller.dart';
+import 'package:pos/controllers/quote_draft_controller.dart';
 import 'package:pos/database/cart_db_service.dart';
 import 'package:pos/database/extra_charges_db_service.dart';
 import 'package:pos/database/invoice_db_service.dart';
@@ -11,24 +13,27 @@ import 'package:pos/models/extra_charges.dart';
 import 'package:pos/utils/val.dart';
 import 'package:pos/widgets/comments_widget.dart';
 import 'package:pos/widgets/extra_charge_widget.dart';
+import 'package:pos/widgets/invoice_draft_widget.dart';
+import 'package:pos/widgets/item_select_widget.dart';
+import 'package:window_manager/window_manager.dart';
 import '../../models/invoice.dart';
 import '../../theme/t_colors.dart';
 import '../../utils/my_format.dart';
 import '../../widgets/pos_button.dart';
-import '../../widgets/invoice_draft_widget.dart';
 
-class InvoiceDraftPage extends StatelessWidget {
-  InvoiceDraftPage({super.key});
-  final InvoiceDraftController _controller = Get.find<InvoiceDraftController>();
+class QuoteDraftPage extends StatelessWidget {
+  QuoteDraftPage({super.key});
+  final QuoteDraftController _controller = Get.find<QuoteDraftController>();
   late BuildContext context;
 
   @override
   Widget build(BuildContext context) {
     this.context = context;
+
     return Scaffold(
       appBar: AppBar(
         title: Obx(() => Text(
-              'Draft Invoice - #${_controller.invoiceId.value}',
+              'Draft Quote - #${_controller.invoiceId.value}',
               style: TStyle.titleBarStyle,
             )),
       ),
@@ -48,7 +53,7 @@ class InvoiceDraftPage extends StatelessWidget {
                       showDialog(
                           context: context,
                           builder: ((context) => Dialog(
-                                child: InvoiceItemSelectPage(
+                                child: ItemSelectWidget(
                                   invoiceController: _controller,
                                 ),
                               )));
@@ -67,13 +72,13 @@ class InvoiceDraftPage extends StatelessWidget {
                 PosButton(
                   text: 'Close Draft',
                   onPressed: () async {
-                    final storage = CartDB();
-                    await storage.resetCart();
-                    Get.offAll(InvoicePage());
+                    Get.offAll(AllQuotesPage());
                   },
                 ),
                 PosButton(
-                  text: 'Save Invoice',
+                  text: _controller.wantToUpdate
+                      ? 'Update Invoice'
+                      : 'Save Invoice',
                   onPressed: () {
                     saveDraftInvoice();
                   },
@@ -143,7 +148,11 @@ class InvoiceDraftPage extends StatelessWidget {
   }
 
   Future<void> saveDraftInvoice() async {
-    await _controller.saveInvoice();
-    Get.offAll(InvoicePage());
+    if (_controller.wantToUpdate) {
+      await _controller.updateInvoice();
+    } else {
+      await _controller.saveInvoice();
+    }
+    Get.offAll(AllQuotesPage());
   }
 }

@@ -6,6 +6,7 @@ import 'package:pos/Pages/invoice_manager/invoice_edit_page.dart';
 import 'package:pos/Pages/invoice_manager/save_invoice_page.dart';
 import 'package:pos/Pages/invoice_manager/search_invoice_page.dart';
 import 'package:pos/database/invoice_db_service.dart';
+import 'package:pos/enums/enums.dart';
 import 'package:pos/models/payment.dart';
 import 'package:pos/utils/alert_message.dart';
 import 'package:pos/widgets/alert_dialog.dart';
@@ -194,7 +195,9 @@ class _InvoicePageState extends State<InvoicePage> {
         context: context,
         builder: (BuildContext context) {
           return Dialog(
-            child: InvoiceCustomerSelectPage(),
+            child: InvoiceCustomerSelectPage(
+              invoiceType: InvoiceType.invoice,
+            ),
           );
         });
   }
@@ -216,7 +219,8 @@ class _InvoicePageState extends State<InvoicePage> {
   }
 
   Future<void> printInvoice(context) async {
-    final pdfFile = await PdfInvoiceApi.generate(invoiceList[index.value]);
+    final pdfFile =
+        await PdfInvoiceApi.generateInvoicePDF(invoiceList[index.value]);
     PdfApi.openFile(pdfFile);
   }
 
@@ -349,6 +353,7 @@ class _InvoicePageState extends State<InvoicePage> {
             return Dialog(
               child: InvoiceCustomerSelectPage(
                 invoice: invoice,
+                invoiceType: InvoiceType.invoice,
               ),
             );
           });

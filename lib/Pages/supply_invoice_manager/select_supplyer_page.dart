@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:pos/Pages/supplyer_manager/supplyer_form.dart';
 import 'package:pos/Pages/main_window.dart';
 import 'package:pos/database/supplyer_db_service.dart';
 import 'package:pos/models/address.dart';
+import 'package:pos/models/supply_invoice.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/val.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:window_manager/window_manager.dart';
-
 import '../../controllers/suppy_invoice_draft_controller.dart';
-import '../../database/supplyer_db_service.dart';
-import '../../models/supplyer.dart';
 import '../../models/supplyer.dart';
 import 'supplyer_invoice_draft_page.dart';
 
 class SelectSupplyerPage extends StatefulWidget {
-  const SelectSupplyerPage({super.key});
+  SupplyInvoice? supplyInvoice;
+  SelectSupplyerPage({super.key, this.supplyInvoice});
 
   @override
   State<SelectSupplyerPage> createState() => _SelectSupplyerPageState();
@@ -26,6 +26,7 @@ class SelectSupplyerPage extends StatefulWidget {
 
 class _SelectSupplyerPageState extends State<SelectSupplyerPage> {
   late final _databaseService; // Use your DatabaseService class
+  late Supplyer supplyer;
 
   List<Supplyer> _supplyer = [];
   SupplyerDataSource supplyerDataSource = SupplyerDataSource(supplyersData: []);
@@ -86,13 +87,15 @@ class _SelectSupplyerPageState extends State<SelectSupplyerPage> {
                 showFilterIconOnHover: true,
                 columnWidthMode: ColumnWidthMode.auto,
                 source: supplyerDataSource,
-                onCellTap: ((details) {
+                selectionMode: SelectionMode.single,
+                onCellTap: ((details) async {
                   if (details.rowColumnIndex.rowIndex != 0) {
                     int selectedRowIndex = details.rowColumnIndex.rowIndex - 1;
                     var row = supplyerDataSource.effectiveRows
                         .elementAt(selectedRowIndex);
 
-                    // Get.to();
+                    supplyer =
+                        SupplyerDB().getSupplyer(row.getCells()[0].value);
                   }
                 }),
                 columns: [
@@ -135,12 +138,9 @@ class _SelectSupplyerPageState extends State<SelectSupplyerPage> {
                   color: Colors.blue,
                   splashRadius: 20.0,
                   onPressed: () {
-                    SupplyInvoiceDraftController(
-                        supplyer: SupplyerDB().getSupplyer(_dataGridController
-                            .selectedRow
-                            ?.getCells()[0]
-                            .value));
-                    Get.to(SupplyInvoiceDraftPage());
+                    Get.put(SupplyInvoiceDraftController(
+                        supplyer: supplyer, copyInvoice: widget.supplyInvoice));
+                    Get.offAll(SupplyInvoiceDraftPage());
                   }),
             )
           ],

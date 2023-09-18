@@ -1,32 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pos/Pages/invoice_draft_manager/invoice_item_select_page.dart';
-import 'package:pos/Pages/invoice_manager/invoice_page.dart';
-import 'package:pos/controllers/invoice_draft_contorller.dart';
-import 'package:pos/database/Cart_db_service.dart';
-import 'package:pos/database/extra_charges_db_service.dart';
-import 'package:pos/database/invoice_db_service.dart';
+import 'package:pos/Pages/supply_invoice_manager/supply_all_invoice.dart';
+import 'package:pos/Pages/supply_invoice_manager/supply_invoice_view.dart';
+import 'package:pos/database/supplyer_invoice_db_service.dart';
 import 'package:pos/models/extra_charges.dart';
-import 'package:pos/utils/val.dart';
 import 'package:pos/widgets/comments_widget.dart';
 import 'package:pos/widgets/extra_charge_widget.dart';
+import 'package:pos/widgets/item_select_widget.dart';
+import 'package:pos/widgets/pos_text_form_field.dart';
+import 'package:window_manager/window_manager.dart';
 import '../../controllers/suppy_invoice_draft_controller.dart';
-import '../../models/invoice.dart';
 import '../../theme/t_colors.dart';
-import '../../utils/my_format.dart';
 import '../../widgets/pos_button.dart';
-import 'supply_item_select_page.dart';
 
 class SupplyInvoiceDraftPage extends StatelessWidget {
   SupplyInvoiceDraftPage({super.key});
+
   final SupplyInvoiceDraftController _controller =
       Get.find<SupplyInvoiceDraftController>();
+
   late BuildContext context;
 
   @override
   Widget build(BuildContext context) {
     this.context = context;
+    WindowOptions windowOptions = const WindowOptions(
+        minimumSize: Size(1200, 800), size: Size(1200, 800), center: true);
+
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Show the dialog
+      openDailog();
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Obx(() => Text(
@@ -50,7 +59,7 @@ class SupplyInvoiceDraftPage extends StatelessWidget {
                       showDialog(
                           context: context,
                           builder: ((context) => Dialog(
-                                child: SupplyItemSelectPage(
+                                child: ItemSelectWidget(
                                     invoiceController: _controller),
                               )));
                     }),
@@ -68,9 +77,8 @@ class SupplyInvoiceDraftPage extends StatelessWidget {
                 PosButton(
                   text: 'Close Draft',
                   onPressed: () async {
-                    final storage = CartDB();
-                    await storage.resetCart();
-                    Get.offAll(InvoicePage());
+                    Get.delete<SupplyInvoiceDraftController>();
+                    Get.offAll(SupplyAllInvoice());
                   },
                 ),
                 PosButton(
@@ -84,7 +92,7 @@ class SupplyInvoiceDraftPage extends StatelessWidget {
           ),
           Column(
             children: [
-              //Expanded(child: InvoiceView()),
+              Expanded(child: SupplyInvoiceView()),
             ],
           ),
         ],
@@ -142,6 +150,36 @@ class SupplyInvoiceDraftPage extends StatelessWidget {
 
   Future<void> saveDraftInvoice() async {
     await _controller.saveInvoice();
-    Get.offAll(InvoicePage());
+    Get.offAll(SupplyAllInvoice());
+  }
+
+  void openDailog() {
+    TextEditingController realInvoiceIdController = TextEditingController();
+    showDialog(
+        context: context,
+        builder: (context) => SizedBox(
+              height: 200.0,
+              width: 400.0,
+              child: AlertDialog(
+                title: const Text('Real Invoice ID'),
+                content: PosTextFormField(
+                    controller: realInvoiceIdController,
+                    labelText: 'Real Invoice ID'),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        _controller.referenceId.value =
+                            realInvoiceIdController.text;
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('save')),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('close'))
+                ],
+              ),
+            ));
   }
 }
