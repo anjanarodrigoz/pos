@@ -12,8 +12,8 @@ import '../../widgets/pos_button.dart';
 import '../../widgets/pos_text_form_field.dart';
 
 class SupplyerViewPage extends StatefulWidget {
-  final String cusId;
-  SupplyerViewPage({super.key, required this.cusId});
+  final String supplyId;
+  SupplyerViewPage({super.key, required this.supplyId});
 
   @override
   State<SupplyerViewPage> createState() => _SupplyerViewPageState();
@@ -31,7 +31,7 @@ class _SupplyerViewPageState extends State<SupplyerViewPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _supplyer = dbService.getSupplyer(widget.cusId);
+    _supplyer = dbService.getSupplyer(widget.supplyId);
   }
 
   @override

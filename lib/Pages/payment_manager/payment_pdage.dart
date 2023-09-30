@@ -94,7 +94,7 @@ class _PaymentPageState extends State<PaymentPage> {
               }),
               columns: [
                 GridColumn(
-                    width: 100.0,
+                    width: 120.0,
                     columnName: Payment.dateKey,
                     label: const Center(child: Text('Date'))),
                 GridColumn(
@@ -167,7 +167,8 @@ class _PaymentPageState extends State<PaymentPage> {
               actions: [
                 TextButton(
                     onPressed: () async {
-                      await InvoiceDB().removeInvoicePayment(invoiceId, payId);
+                      await InvoiceDB()
+                          .removeInvoicePayment(invoiceId, payId, context);
                       Navigator.of(context).pop();
                     },
                     child: const Text(

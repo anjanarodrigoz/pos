@@ -18,6 +18,7 @@ class PosTextFormField extends StatelessWidget {
   Widget? suffixIcon;
   Widget? prefixIcon;
   String? hintText;
+  String? errorText;
 
   PosTextFormField(
       {super.key,
@@ -35,6 +36,7 @@ class PosTextFormField extends StatelessWidget {
       this.initialValue,
       this.hintText,
       this.prefixIcon,
+      this.errorText,
       this.enable = true,
       this.width = 300});
 
@@ -64,6 +66,7 @@ class PosTextFormField extends StatelessWidget {
               hintText: hintText,
               suffixIcon: suffixIcon,
               labelText: labelText,
+              errorText: errorText,
               border: const OutlineInputBorder()),
           onSaved: onSaved,
           validator: validator,

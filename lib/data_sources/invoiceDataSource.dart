@@ -28,7 +28,6 @@ class InvoiceDataSource extends DataGridSource {
 
   @override
   DataGridRowAdapter? buildRow(DataGridRow row) {
-    // TODO: implement buildRow
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((e) {
       if (e.columnName == InvoiceRow.itemIdKey) {

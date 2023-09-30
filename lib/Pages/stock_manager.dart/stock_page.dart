@@ -69,18 +69,14 @@ class _StockPageState extends State<StockPage> {
         body: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  PosButton(
-                      text: '+ Add Item',
-                      onPressed: () {
-                        Get.to(ItemFormPage());
-                      }),
-                  PosButton(text: '+ Add Stock', onPressed: () {})
-                ],
-              ),
-              SizedBox(
+              PosButton(
+                  text: '+ Add Item',
+                  onPressed: () {
+                    Get.to(ItemFormPage());
+                  }),
+              const SizedBox(
                 height: 20.0,
               ),
               Expanded(

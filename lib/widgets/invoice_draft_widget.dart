@@ -5,33 +5,35 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pos/controllers/invoice_draft_contorller.dart';
 import 'package:pos/data_sources/invoiceDataSource.dart';
-import 'package:pos/database/Cart_db_service.dart';
+import 'package:pos/database/cart_db_service.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/customer.dart';
 import 'package:pos/models/extra_charges.dart';
 import 'package:pos/utils/alert_message.dart';
-import '../../models/invoice_row.dart';
+import '../models/invoice_row.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import '../../models/cart.dart';
-import '../../theme/t_colors.dart';
-import '../../utils/my_format.dart';
-import '../../utils/val.dart';
-import '../../widgets/pos_text_form_field.dart';
+import '../models/cart.dart';
+import '../theme/t_colors.dart';
+import '../utils/my_format.dart';
+import '../utils/val.dart';
+import 'pos_text_form_field.dart';
 
-class InvoiceView extends StatefulWidget {
-  InvoiceView({
+class InvoiceDraftWidget extends StatefulWidget {
+  final invoiceController;
+  InvoiceDraftWidget({
     super.key,
+    required this.invoiceController,
   });
 
   @override
-  State<InvoiceView> createState() => _InvoiceViewState();
+  State<InvoiceDraftWidget> createState() => _InvoiceDraftWidgetState();
 }
 
-class _InvoiceViewState extends State<InvoiceView> {
+class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
   final ScrollController controller = ScrollController();
   final ScrollController controller2 = ScrollController();
   late Customer customer;
-  late InvoiceDraftController invoiceController;
+  late final invoiceController;
   final dbService = CartDB();
   InvoiceDataSource invoiceDataSource = InvoiceDataSource(invoiceData: []);
   late String invoiceId;
@@ -41,7 +43,7 @@ class _InvoiceViewState extends State<InvoiceView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    invoiceController = Get.find<InvoiceDraftController>();
+    invoiceController = widget.invoiceController;
     customer = invoiceController.customer;
     invoiceId = invoiceController.invoiceId.value;
   }

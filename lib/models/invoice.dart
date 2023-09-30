@@ -2,6 +2,7 @@ import 'address.dart';
 import 'extra_charges.dart';
 import 'invoice_item.dart';
 import 'payment.dart';
+import 'supply_invoice.dart';
 
 class Invoice {
   static const String invoiceIdKey = 'invoiceId';

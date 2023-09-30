@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:pos/controllers/invoice_draft_contorller.dart';
 import 'package:pos/controllers/invoice_edit_controller.dart';
-import 'package:pos/database/Cart_db_service.dart';
+import 'package:pos/database/cart_db_service.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/utils/val.dart';
@@ -198,8 +198,9 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                         onChanged: (value) {
                           if (value.isNotEmpty) {
                             net = double.parse(value);
-                            double totalWithGST =
-                                net + (net * 0.100); // Assuming GST is 10%
+                            double totalWithGST = (net *
+                                (1 +
+                                    Val.gstTotalPrecentage)); // Assuming GST is 10%
                             totalPriceController.text =
                                 totalWithGST.toStringAsFixed(2);
                           } else {

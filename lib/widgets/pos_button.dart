@@ -9,6 +9,9 @@ class PosButton extends StatelessWidget {
   double height;
   bool enable;
   Color? color;
+  IconData? icon;
+  Color? iconColor;
+  double iconSize;
 
   PosButton(
       {super.key,
@@ -16,6 +19,9 @@ class PosButton extends StatelessWidget {
       required this.onPressed,
       this.enable = true,
       this.color,
+      this.icon,
+      this.iconColor,
+      this.iconSize = 25,
       this.width = 180.0,
       this.height = 50.0});
 
@@ -29,7 +35,22 @@ class PosButton extends StatelessWidget {
           fixedSize: Size(width, height),
           backgroundColor: color ?? TColors.blue,
         ),
-        child: Text(text),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null)
+              Icon(
+                icon,
+                color: iconColor,
+                size: iconSize,
+              ),
+            if (icon != null)
+              const SizedBox(
+                width: 10.0,
+              ),
+            Text(text),
+          ],
+        ),
       ),
     );
   }

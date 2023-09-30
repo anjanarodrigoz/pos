@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:pos/Pages/main_window.dart';
-import 'package:pos/database/Cart_db_service.dart';
+import 'package:pos/database/cart_db_service.dart';
 import 'package:pos/utils/val.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -16,6 +16,9 @@ void main() async {
   await GetStorage.init(DBVal.comments);
   await GetStorage.init(DBVal.supplyer);
   await GetStorage.init(DBVal.extraCharges);
+  await GetStorage.init(DBVal.supplyerInvoice);
+  await GetStorage.init(DBVal.quatation);
+  await GetStorage.init(DBVal.creditNote);
 
   await windowManager.ensureInitialized();
 

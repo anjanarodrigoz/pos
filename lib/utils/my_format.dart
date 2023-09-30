@@ -25,7 +25,7 @@ class MyFormat {
   }
 
   static String formatDateOne(DateTime dateTime) {
-    final format = DateFormat('dd/MM/yyyy');
+    final format = DateFormat('dd-MM-yyyy');
     return format.format(dateTime);
   }
 
