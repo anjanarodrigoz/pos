@@ -1,9 +1,17 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:pos/database/abstract_db.dart';
 import 'package:pos/utils/val.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
 
 import '../models/customer.dart';
 
-class CustomerDB {
+class CustomerDB implements AbstractDB {
   final _storage = GetStorage(DBVal.customers);
   static final CustomerDB _instance = CustomerDB._internal();
 
@@ -50,8 +58,35 @@ class CustomerDB {
     await storage.write(DBVal.customerId, newId);
   }
 
-  Future<void> eraseAllCustomers() async {
+  @override
+  Future<void> deleteDB() async {
     await _storage.erase();
     await GetStorage().remove(DBVal.customerId);
+  }
+
+  @override
+  Future<Map> backupData() async {
+    final List customerData = await _storage.getValues().toList() ?? [];
+    final lastId = GetStorage().read(DBVal.customerId) ?? '1000';
+
+    return {DBVal.customers: customerData, DBVal.customerId: lastId};
+  }
+
+  @override
+  Future<void> insertData(Map json) async {
+    final List customerData = json[DBVal.customers];
+    final lastId = json[DBVal.customerId];
+
+    for (var data in customerData) {
+      await addCustomer(Customer.fromJson(data));
+    }
+
+    saveLastId(lastId);
+  }
+
+  @override
+  getName() {
+    // TODO: implement getName
+    return DBVal.customers;
   }
 }

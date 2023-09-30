@@ -2,7 +2,9 @@ import 'package:get_storage/get_storage.dart';
 import 'package:pos/models/extra_charges.dart';
 import 'package:pos/utils/val.dart';
 
-class ExtraChargeDB {
+import 'abstract_db.dart';
+
+class ExtraChargeDB implements AbstractDB {
   final _storage = GetStorage(DBVal.extraCharges);
   static final ExtraChargeDB _instance = ExtraChargeDB._internal();
 
@@ -29,5 +31,36 @@ class ExtraChargeDB {
 
   Future<void> deleteExtraCharge(String name) async {
     await _storage.remove(name);
+  }
+
+  @override
+  backupData() async {
+    // TODO: implement backupData
+    final List extraChargeData = await _storage.getValues().toList() ?? [];
+    return {
+      DBVal.extraCharges: extraChargeData,
+    };
+  }
+
+  @override
+  insertData(Map json) async {
+    // TODO: implement insertData
+    final List exatraChargesData = json[DBVal.extraCharges];
+
+    for (var data in exatraChargesData) {
+      await addExtraCharge(ExtraCharges.fromJson(data));
+    }
+  }
+
+  @override
+  getName() {
+    // TODO: implement getName
+    return DBVal.extraCharges;
+  }
+
+  @override
+  deleteDB() async {
+    // TODO: implement deleteDB
+    await _storage.erase();
   }
 }

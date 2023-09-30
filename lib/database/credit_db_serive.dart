@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:get_storage/get_storage.dart';
 import 'package:pos/utils/val.dart';
-import '../models/invoice.dart'; // Assuming you have an Invoice model
+import '../models/invoice.dart';
+import 'abstract_db.dart'; // Assuming you have an Invoice model
 
-class CreditNoteDB {
+class CreditNoteDB implements AbstractDB {
   final _storage = GetStorage(DBVal.creditNote);
   static final CreditNoteDB _instance = CreditNoteDB._internal();
 
@@ -49,7 +50,8 @@ class CreditNoteDB {
     await storage.write(DBVal.creditNoteId, newId);
   }
 
-  Future<void> eraseAllInvoices() async {
+  @override
+  Future<void> deleteDB() async {
     await _storage.erase();
     await GetStorage().remove(DBVal.creditNoteId);
   }
@@ -67,5 +69,31 @@ class CreditNoteDB {
     });
 
     yield* streamController.stream;
+  }
+
+  @override
+  Future<Map> backupData() async {
+    final List creditData = await _storage.getValues().toList() ?? [];
+    final lastId = GetStorage().read(DBVal.creditNoteId) ?? '1000';
+
+    return {DBVal.creditNote: creditData, DBVal.creditNoteId: lastId};
+  }
+
+  @override
+  Future<void> insertData(Map json) async {
+    final List creditData = json[DBVal.creditNote];
+    final lastId = json[DBVal.creditNoteId];
+
+    for (var data in creditData) {
+      await addInvoice(Invoice.fromJson(data));
+    }
+
+    saveLastId(lastId);
+  }
+
+  @override
+  getName() {
+    // TODO: implement getName
+    return DBVal.creditNote;
   }
 }

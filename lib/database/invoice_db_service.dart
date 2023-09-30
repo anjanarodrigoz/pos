@@ -7,9 +7,10 @@ import 'package:pos/models/payment.dart';
 import 'package:pos/utils/alert_message.dart';
 import 'package:pos/utils/val.dart';
 import '../models/cart.dart';
-import '../models/invoice.dart'; // Assuming you have an Invoice model
+import '../models/invoice.dart';
+import 'abstract_db.dart'; // Assuming you have an Invoice model
 
-class InvoiceDB {
+class InvoiceDB implements AbstractDB {
   final _storage = GetStorage(DBVal.invoice);
   static final InvoiceDB _instance = InvoiceDB._internal();
 
@@ -77,7 +78,8 @@ class InvoiceDB {
     await storage.write(DBVal.invoiceId, newId);
   }
 
-  Future<void> eraseAllInvoices() async {
+  @override
+  Future<void> deleteDB() async {
     await _storage.erase();
     await GetStorage().remove(DBVal.invoiceId);
   }
@@ -139,5 +141,30 @@ class InvoiceDB {
 
       await updateInvoice(invoice);
     }
+  }
+
+  @override
+  Future<Map> backupData() async {
+    final List invoiceData = await _storage.getValues().toList() ?? [];
+    final lastId = GetStorage().read(DBVal.invoiceId) ?? '1000';
+
+    return {DBVal.invoice: invoiceData, DBVal.invoiceId: lastId};
+  }
+
+  @override
+  Future<void> insertData(Map json) async {
+    final List invoiceData = json[DBVal.invoice];
+    final lastId = json[DBVal.invoiceId];
+
+    for (var data in invoiceData) {
+      await addInvoice(Invoice.fromJson(data));
+    }
+
+    saveLastId(lastId);
+  }
+
+  @override
+  String getName() {
+    return DBVal.invoice;
   }
 }

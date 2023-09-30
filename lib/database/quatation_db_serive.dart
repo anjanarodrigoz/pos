@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:get_storage/get_storage.dart';
 import 'package:pos/utils/val.dart';
-import '../models/invoice.dart'; // Assuming you have an Invoice model
+import '../models/invoice.dart';
+import 'abstract_db.dart'; // Assuming you have an Invoice model
 
-class QuotationDB {
+class QuotationDB implements AbstractDB {
   final _storage = GetStorage(DBVal.quatation);
   static final QuotationDB _instance = QuotationDB._internal();
 
@@ -49,7 +50,8 @@ class QuotationDB {
     await storage.write(DBVal.quatationId, newId);
   }
 
-  Future<void> eraseAllInvoices() async {
+  @override
+  Future<void> deleteDB() async {
     await _storage.erase();
     await GetStorage().remove(DBVal.quatationId);
   }
@@ -67,5 +69,31 @@ class QuotationDB {
     });
 
     yield* streamController.stream;
+  }
+
+  @override
+  Future<Map> backupData() async {
+    final List quotData = await _storage.getValues().toList() ?? [];
+    final lastId = GetStorage().read(DBVal.quatationId) ?? '1000';
+
+    return {DBVal.quatation: quotData, DBVal.quatationId: lastId};
+  }
+
+  @override
+  Future<void> insertData(Map json) async {
+    final List invoiceData = json[DBVal.quatation];
+    final lastId = json[DBVal.quatationId];
+
+    for (var data in invoiceData) {
+      await addInvoice(Invoice.fromJson(data));
+    }
+
+    saveLastId(lastId);
+  }
+
+  @override
+  getName() {
+    // TODO: implement getName
+    return DBVal.quatation;
   }
 }

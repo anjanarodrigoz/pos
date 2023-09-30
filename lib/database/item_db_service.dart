@@ -4,8 +4,9 @@ import 'package:pos/utils/val.dart';
 
 import '../models/cart.dart';
 import '../models/item.dart';
+import 'abstract_db.dart';
 
-class ItemDB {
+class ItemDB implements AbstractDB {
   final _storage = GetStorage(DBVal.items);
   static final ItemDB _instance = ItemDB._internal();
 
@@ -90,8 +91,35 @@ class ItemDB {
     return true;
   }
 
-  Future<void> eraseAllItems() async {
+  @override
+  Future<void> deleteDB() async {
     await _storage.erase();
     await GetStorage().remove(DBVal.itemId);
+  }
+
+  @override
+  Future<Map> backupData() async {
+    final List itemData = await _storage.getValues().toList() ?? [];
+    final lastId = GetStorage().read(DBVal.itemId) ?? '1000';
+
+    return {DBVal.items: itemData, DBVal.itemId: lastId};
+  }
+
+  @override
+  Future<void> insertData(Map json) async {
+    final List itemData = json[DBVal.items];
+    final lastId = json[DBVal.itemId];
+
+    for (var data in itemData) {
+      await addItem(Item.fromJson(data));
+    }
+
+    saveItemId(lastId);
+  }
+
+  @override
+  getName() {
+    // TODO: implement getName
+    return DBVal.items;
   }
 }

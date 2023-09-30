@@ -3,8 +3,9 @@ import 'package:pos/models/supplyer.dart';
 import 'package:pos/utils/val.dart';
 
 import '../models/supplyer.dart';
+import 'abstract_db.dart';
 
-class SupplyerDB {
+class SupplyerDB implements AbstractDB {
   final _storage = GetStorage(DBVal.supplyer);
   static final SupplyerDB _instance = SupplyerDB._internal();
 
@@ -62,8 +63,35 @@ class SupplyerDB {
     await storage.write(DBVal.supplyerId, newId);
   }
 
-  Future<void> eraseAllSupplyers() async {
+  @override
+  Future<void> deleteDB() async {
     await _storage.erase();
     await GetStorage().remove(DBVal.supplyerId);
+  }
+
+  @override
+  Future<Map> backupData() async {
+    final List supplyerData = await _storage.getValues().toList() ?? [];
+    final lastId = GetStorage().read(DBVal.supplyerId) ?? '1000';
+
+    return {DBVal.supplyer: supplyerData, DBVal.supplyerId: lastId};
+  }
+
+  @override
+  Future<void> insertData(Map json) async {
+    final List supplyerData = json[DBVal.supplyer];
+    final lastId = json[DBVal.supplyerId];
+
+    for (var data in supplyerData) {
+      await addSupplyer(Supplyer.fromJson(data));
+    }
+
+    saveLastId(lastId);
+  }
+
+  @override
+  getName() {
+    // TODO: implement getName
+    return DBVal.supplyer;
   }
 }

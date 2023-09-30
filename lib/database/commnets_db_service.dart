@@ -2,7 +2,9 @@ import 'package:get_storage/get_storage.dart';
 import 'package:pos/models/extra_charges.dart';
 import 'package:pos/utils/val.dart';
 
-class CommentsDB {
+import 'abstract_db.dart';
+
+class CommentsDB implements AbstractDB {
   final _storage = GetStorage(DBVal.comments);
   static final CommentsDB _instance = CommentsDB._internal();
 
@@ -29,6 +31,37 @@ class CommentsDB {
 
   Future<void> deleteComment(String name) async {
     await _storage.remove(name);
+  }
+
+  @override
+  backupData() async {
+    // TODO: implement backupData
+    final List commentData = await _storage.getValues().toList() ?? [];
+    return {
+      DBVal.comments: commentData,
+    };
+  }
+
+  @override
+  insertData(Map json) async {
+    // TODO: implement insertData
+    final List commentData = json[DBVal.comments];
+
+    for (var data in commentData) {
+      await addComments(Comment.fromJson(data));
+    }
+  }
+
+  @override
+  getName() {
+    // TODO: implement getName
+    return DBVal.comments;
+  }
+
+  @override
+  deleteDB() async {
+    // TODO: implement deleteDB
+    await _storage.erase();
   }
 }
 

@@ -5,6 +5,7 @@ import 'package:pos/Pages/credit_note_manager/all_credit_note_page.dart';
 import 'package:pos/Pages/credit_note_manager/credit_draft_page.dart';
 import 'package:pos/Pages/invoice_draft_manager/invoice_customer_select.dart';
 import 'package:pos/Pages/quotation_manager/all_quotation_invoice.dart';
+import 'package:pos/controllers/credit_draft_controller.dart';
 import 'package:pos/controllers/quote_draft_controller.dart';
 import 'package:pos/database/credit_db_serive.dart';
 import 'package:pos/enums/enums.dart';
@@ -44,7 +45,7 @@ class CreditNotePage extends StatelessWidget {
           title: Text('Credit Note #$invoiceId'),
           leading: IconButton(
               onPressed: () {
-                Get.offAll(AllQuotesPage());
+                Get.offAll(AllCreditNotePage());
               },
               icon: const Icon(Icons.arrow_back)),
         ),
@@ -146,7 +147,7 @@ class CreditNotePage extends StatelessWidget {
   }
 
   openEditInvoice() {
-    Get.put(QuoteDraftController(
+    Get.put(CreditDraftController(
         customer: Customer(
             id: invoice.customerId,
             firstName: invoice.customerName,
