@@ -53,6 +53,7 @@ dependencies:
   encrypt: ^5.0.2
   flutter_highlight: ^0.7.0
   flutter_archive: ^5.0.0
+  syncfusion_flutter_datepicker: ^22.2.12
 
 dev_dependencies:
   flutter_test:

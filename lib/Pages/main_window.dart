@@ -143,6 +143,6 @@ class _MainWindowState extends State<MainWindow> {
   }
 
   openReport() {
-    Get.offAll(() => const ReportHomePage());
+    Get.offAll(() => ReportHomePage());
   }
 }

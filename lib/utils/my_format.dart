@@ -29,6 +29,11 @@ class MyFormat {
     return format.format(dateTime);
   }
 
+  static String formatDateTwo(DateTime dateTime) {
+    final format = DateFormat('yyyy/MM/dd');
+    return format.format(dateTime);
+  }
+
   static String formatTime(DateTime dateTime) {
     final format = DateFormat('HH:mm aa');
     return format.format(dateTime);
