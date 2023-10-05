@@ -4,7 +4,24 @@ enum InvoiceItemCategory { item, extraChrage, comment, empty }
 
 enum InvoiceType { invoice, supplyInvoice, quotation, creditNote }
 
-enum ReportPaymentFilter { paid, notPaid, all, halfPaid }
+enum ReportPaymentFilter { all, paid, notPaid }
+
+enum ReportType {
+  invoice,
+  creditNote,
+  quote,
+  summery,
+  itemInvoice,
+  itemCreditNote,
+  itemQuote,
+  itemInvoicedItem,
+  supplyInvoice,
+  supplyItem,
+  stockRequired,
+  stockQuantity,
+  customerDetails,
+  outstanding
+}
 
 extension InvoiceTypeCaps on InvoiceType {
   String name() {
@@ -29,17 +46,14 @@ extension InvoiceTypeCaps on InvoiceType {
 extension Lable on ReportPaymentFilter {
   String name() {
     switch (this) {
-      case ReportPaymentFilter.all:
-        return ('All');
-
       case ReportPaymentFilter.paid:
         return ('Paid');
+      case ReportPaymentFilter.all:
+        return ('All');
 
       case ReportPaymentFilter.notPaid:
         return ('Not Paid');
 
-      case ReportPaymentFilter.halfPaid:
-        return ('Half-Paid');
       default:
         return 'Other';
     }

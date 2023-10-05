@@ -1,3 +1,5 @@
+import '../utils/val.dart';
+
 class InvoicedItem {
   static const String itemIdKey = 'itemId';
   static const String nameKey = 'name';
@@ -33,6 +35,11 @@ class InvoicedItem {
     );
   }
 
+  InvoicedItem updateQuantity({required int qty}) {
+    return InvoicedItem(
+        itemId: itemId, name: name, netPrice: netPrice, qty: this.qty + qty);
+  }
+
   Map<String, dynamic> toJson() {
     return {
       itemIdKey: itemId,
@@ -45,4 +52,8 @@ class InvoicedItem {
   }
 
   double get netTotal => netPrice * qty;
+
+  double get gstTotal => (netTotal * Val.gstPrecentage * 100).round() / 100;
+
+  double get total => (netTotal * (1 + Val.gstPrecentage) * 100).round() / 100;
 }

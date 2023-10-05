@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:flutter/src/material/date.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:pos/enums/enums.dart';
 import 'package:pos/utils/val.dart';
 import '../models/invoice.dart';
 import 'abstract_db.dart'; // Assuming you have an Invoice model
@@ -95,5 +97,26 @@ class CreditNoteDB implements AbstractDB {
   getName() {
     // TODO: implement getName
     return DBVal.creditNote;
+  }
+
+  Future<List<Invoice>> searchInvoiceByDate(
+      DateTimeRange dateTimeRange, ReportPaymentFilter paidStatus) async {
+    List<Invoice> allInvoice = await getAllInvoices();
+
+    if (paidStatus != ReportPaymentFilter.all) {
+      bool isPaid = paidStatus == ReportPaymentFilter.paid;
+      return allInvoice
+          .where((element) =>
+              element.createdDate.isAfter(dateTimeRange.start) &&
+              element.createdDate.isBefore(dateTimeRange.end) &&
+              element.isPaid == isPaid)
+          .toList();
+    }
+
+    return allInvoice
+        .where((element) =>
+            element.createdDate.isAfter(dateTimeRange.start) &&
+            element.createdDate.isBefore(dateTimeRange.end))
+        .toList();
   }
 }

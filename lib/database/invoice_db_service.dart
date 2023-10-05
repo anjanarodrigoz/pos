@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:pos/database/item_db_service.dart';
+import 'package:pos/enums/enums.dart';
 import 'package:pos/models/payment.dart';
 import 'package:pos/utils/alert_message.dart';
 import 'package:pos/utils/val.dart';
@@ -23,6 +24,27 @@ class InvoiceDB implements AbstractDB {
   Future<List<Invoice>> getAllInvoices() async {
     final List invoiceData = await _storage.getValues().toList() ?? [];
     return invoiceData.map((data) => Invoice.fromJson(data)).toList();
+  }
+
+  Future<List<Invoice>> searchInvoiceByDate(
+      DateTimeRange dateTimeRange, ReportPaymentFilter paidStatus) async {
+    List<Invoice> allInvoice = await getAllInvoices();
+
+    if (paidStatus != ReportPaymentFilter.all) {
+      bool isPaid = paidStatus == ReportPaymentFilter.paid;
+      return allInvoice
+          .where((element) =>
+              element.createdDate.isAfter(dateTimeRange.start) &&
+              element.createdDate.isBefore(dateTimeRange.end) &&
+              element.isPaid == isPaid)
+          .toList();
+    }
+
+    return allInvoice
+        .where((element) =>
+            element.createdDate.isAfter(dateTimeRange.start) &&
+            element.createdDate.isBefore(dateTimeRange.end))
+        .toList();
   }
 
   Invoice getInvoice(String invoiceId) {
