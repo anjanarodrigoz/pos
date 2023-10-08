@@ -1,3 +1,5 @@
+import '../utils/val.dart';
+
 class ExtraCharges {
   static const String nameKey = 'name';
   static const String qtyKey = 'qty';
@@ -31,6 +33,10 @@ class ExtraCharges {
     );
   }
 
+  ExtraCharges updateQuantity({required int qty}) {
+    return ExtraCharges(name: name, qty: qty + this.qty, price: price);
+  }
+
   Map<String, dynamic> toJson() {
     return {
       nameKey: name,
@@ -39,4 +45,8 @@ class ExtraCharges {
       commentKey: comment,
     };
   }
+
+  double get gstTotal => (netTotal * Val.gstPrecentage * 100).round() / 100;
+
+  double get total => (netTotal * (1 + Val.gstPrecentage) * 100).round() / 100;
 }

@@ -9,7 +9,7 @@ class POSVerifyDialog extends StatefulWidget {
   final String verifyText;
   final Color color;
   final Function()? onClose;
-  final Function(String)? onContinue;
+  final Function()? onContinue;
 
   POSVerifyDialog({
     Key? key,
@@ -17,7 +17,7 @@ class POSVerifyDialog extends StatefulWidget {
     required this.content,
     required this.onContinue,
     this.onClose,
-    this.color = Colors.blue,
+    this.color = Colors.red,
     this.close = 'Close',
     required this.verifyText,
     required this.continueText,
@@ -60,7 +60,7 @@ class _POSVerifyDialogState extends State<POSVerifyDialog> {
           onPressed: () {
             String enteredText = _textController.text.trim();
             if (enteredText == widget.verifyText) {
-              widget.onContinue?.call(enteredText);
+              widget.onContinue?.call();
             } else {
               setState(() {
                 isTextValid = false;

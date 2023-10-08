@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:pos/database/item_db_service.dart';
 import 'package:pos/utils/val.dart';
@@ -46,6 +47,17 @@ class SupplyerInvoiceDB implements AbstractDB {
         extraCharges: [],
         itemList: [],
         comments: ['This invoice has been deleted']));
+  }
+
+  Future<List<SupplyInvoice>> searchInvoiceByDate(
+      DateTimeRange dateTimeRange) async {
+    List<SupplyInvoice> allInvoice = await getAllInvoices();
+
+    return allInvoice
+        .where((element) =>
+            element.createdDate.isAfter(dateTimeRange.start) &&
+            element.createdDate.isBefore(dateTimeRange.end))
+        .toList();
   }
 
   @override

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:pos/database/customer_db_service.dart';
 import 'package:pos/theme/t_colors.dart';
+import 'package:pos/widgets/verify_dialog.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../../models/address.dart';
@@ -90,7 +91,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                     width: 180.0,
                     height: 45.0,
                     color: Colors.red.shade900,
-                    onPressed: _deleteCustomer,
+                    onPressed: () => deleteCustomer(),
                     text: 'Delete'),
               ),
             ],
@@ -466,8 +467,18 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
     }
   }
 
-  Future<void> _deleteCustomer() async {
-    await dbService.deleteCustomer(_customer.id);
-    Get.back();
+  Future<void> deleteCustomer() async {
+    showDialog(
+        context: context,
+        builder: (context) => POSVerifyDialog(
+            title: 'Delete Customer',
+            content: 'Do you want to delete Mr.${_customer.firstName}',
+            onContinue: () async {
+              Get.back();
+              await dbService.deleteCustomer(_customer.id);
+              Get.back();
+            },
+            verifyText: _customer.id,
+            continueText: 'Delete'));
   }
 }

@@ -19,6 +19,8 @@ class Invoice {
   static const String shippingAddressKey = 'shippingAddress';
   static const String gstPrecentageKey = 'gstPrecentage';
   static const String customerMobileKey = 'customerMobile';
+  static const String totalItemkey = 'totalItem';
+  static const String totalExtrakey = 'totalExtra';
   static const String totalKey = 'total';
   static const String netKey = 'netTotal';
   static const String gstKey = 'gstTotal';

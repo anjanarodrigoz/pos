@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 class POSAleartDialog extends StatelessWidget {
-  String title;
-  String content;
-  String close;
-  String textContine;
-  Color color;
-  Function()? onClose;
-  Function()? onCountinue;
+  final String title;
+  final String content;
+  final String close;
+  final String textContine;
+  final Color color;
+  final Function()? onClose;
+  final Function()? onCountinue;
 
-  POSAleartDialog(
+  const POSAleartDialog(
       {super.key,
       required this.title,
       required this.content,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class AlertMessage {
-  static snakMessage(String message, BuildContext context) {
+  static snakMessage(String message, BuildContext context, {int? duration}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -14,7 +14,7 @@ class AlertMessage {
             ),
           ],
         ),
-        duration: const Duration(seconds: 2),
+        duration: Duration(seconds: duration ?? 2),
       ),
     );
   }

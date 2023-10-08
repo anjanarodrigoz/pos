@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:pos/database/customer_db_service.dart';
 import 'package:pos/theme/t_colors.dart';
+import 'package:pos/widgets/verify_dialog.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../../database/supplyer_db_service.dart';
@@ -376,7 +377,16 @@ class _SupplyerViewPageState extends State<SupplyerViewPage> {
   }
 
   Future<void> _deleteSupplyer() async {
-    await dbService.deleteSupplyer(_supplyer.id);
-    Get.back();
+    showDialog(
+        context: context,
+        builder: (context) => POSVerifyDialog(
+            title: 'Delete Supplyer',
+            content: 'Do you want to delete this supplyer',
+            onContinue: () async {
+              await dbService.deleteSupplyer(_supplyer.id);
+              Get.back();
+            },
+            verifyText: _supplyer.id,
+            continueText: 'delete'));
   }
 }

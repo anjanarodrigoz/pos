@@ -13,6 +13,7 @@ import 'package:pos/models/customer.dart';
 import 'package:pos/utils/alert_message.dart';
 import 'package:pos/widgets/alert_dialog.dart';
 import 'package:pos/widgets/pos_button.dart';
+import 'package:pos/widgets/verify_dialog.dart';
 import 'package:window_manager/window_manager.dart';
 import '../../api/pdf_api.dart';
 import '../../api/pdf_invoice_api.dart';
@@ -93,14 +94,15 @@ class CreditNotePage extends StatelessWidget {
   Future<void> deleteInvoice() async {
     showDialog(
         context: context,
-        builder: (context) => POSAleartDialog(
+        builder: (context) => POSVerifyDialog(
               title: 'Delete Invoice #${invoice.invoiceId}',
               content: 'Do you want to delete this invoice?',
-              onCountinue: () async {
+              onContinue: () async {
                 await CreditNoteDB().deleteInvoice(invoice);
                 Get.offAll(AllCreditNotePage());
               },
-              textContine: 'Delete',
+              verifyText: invoice.invoiceId,
+              continueText: 'Delete',
               color: Colors.red,
             ));
   }
