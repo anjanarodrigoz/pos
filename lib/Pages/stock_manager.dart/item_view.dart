@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/widgets/pos_button.dart';
+import 'package:pos/widgets/verify_dialog.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../../database/item_db_service.dart';
@@ -68,8 +69,17 @@ class _ItemViewPageState extends State<ItemViewPage> {
                     color: Colors.red.shade900,
                     text: 'Remove Item',
                     onPressed: () {
-                      dbService.deleteItem(_item.id);
-                      Get.back();
+                      showDialog(
+                          context: context,
+                          builder: (context) => POSVerifyDialog(
+                              title: 'Delete Item',
+                              content: 'Do you want to delete this item?',
+                              onContinue: () async {
+                                await dbService.deleteItem(_item.id);
+                                Get.back();
+                              },
+                              verifyText: _item.id,
+                              continueText: 'delete'));
                     })
               ],
             ),

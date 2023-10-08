@@ -13,7 +13,6 @@ import 'package:pos/models/invoice_item.dart';
 import 'package:pos/models/payment.dart';
 import 'package:pos/models/supply_invoice.dart';
 import 'package:pos/utils/my_format.dart';
-import 'package:pos/widgets/paid_status_widget.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../models/invoice.dart';
 import '../models/item.dart';
@@ -26,6 +25,7 @@ class ReportController extends GetxController {
   RxList<GridColumn> columns = <GridColumn>[].obs;
   RxList<DataGridRow> rows = <DataGridRow>[].obs;
   RxMap<String, String> title = <String, String>{}.obs;
+  bool isRequiredTableSummery = false;
 
   static const createdDateKey = "Date";
   static const invoiceIdKey = "Invoice Id";
@@ -41,7 +41,7 @@ class ReportController extends GetxController {
   static const paykey = "To Pay";
   static const extraTotalKey = "Ex.Charges";
   static const itemTotalKey = "Itm.Charges";
-  static const customerSaleKey = "CUstomer Sale";
+  static const customerSaleKey = "Customer Sale";
   static const receiptsPriceKey = "Receipt Price";
   static const salepriceKey = "Sales Price";
   static const receiptsKey = "Receipts";
@@ -58,6 +58,7 @@ class ReportController extends GetxController {
   static const stateKey = "State";
   static const streetKey = "Street";
   static const outstanigKey = "Days";
+  static const postalCodeKey = "Postal Code";
 
   Future<void> generateReport(
       {required DateTimeRange dateTimeRange,
@@ -114,6 +115,8 @@ class ReportController extends GetxController {
 
   Future<void> generateInvoiceReport(ReportType reportType) async {
     List<Invoice> searchInvoiceList = [];
+
+    isRequiredTableSummery = true;
 
     if (reportType == ReportType.invoice) {
       searchInvoiceList =
@@ -213,6 +216,7 @@ class ReportController extends GetxController {
   */
 
   Future<void> generateSummeryReport() async {
+    isRequiredTableSummery = false;
     List<Invoice> searchInvoiceList =
         await InvoiceDB().searchInvoiceByDate(dateTimeRange, paidStatus);
     if (searchInvoiceList.isEmpty) {
@@ -253,7 +257,7 @@ class ReportController extends GetxController {
             chaques += payment.amount;
 
           case Paymethod.pdCash:
-            cash += payment.amount;
+            chaques += payment.amount;
         }
       }
     }
@@ -314,6 +318,8 @@ class ReportController extends GetxController {
 
   Future<void> generateItemsSummeryReport(reportType) async {
     List searchInvoiceList = [];
+
+    isRequiredTableSummery = true;
 
     if (reportType == ReportType.itemInvoice) {
       searchInvoiceList =
@@ -437,6 +443,7 @@ class ReportController extends GetxController {
   */
 
   Future<void> generateSupplyInvoiceReport() async {
+    isRequiredTableSummery = true;
     List<SupplyInvoice> supplyInvoiceList =
         await SupplyerInvoiceDB().searchInvoiceByDate(dateTimeRange);
 
@@ -518,6 +525,7 @@ class ReportController extends GetxController {
   
    */
   Future<void> generateStockRequiredReport() async {
+    isRequiredTableSummery = false;
     List searchInvoiceList = [];
 
     searchInvoiceList =
@@ -580,6 +588,7 @@ class ReportController extends GetxController {
    */
 
   Future<void> generateStockQuantityReport() async {
+    isRequiredTableSummery = false;
     List<Item> itemList = [];
 
     itemList = await ItemDB().getAllItems();
@@ -624,12 +633,83 @@ class ReportController extends GetxController {
         .toList();
   }
 
+  /*
+  
+  
+  
+  
+  
+  
+  
+  
+   */
+
   Future<void> generateCustomerDetailsReport() async {
+    isRequiredTableSummery = false;
     List<Customer> customersList = await CustomerDB().getAllCustomers();
+
+    if (customersList.isEmpty) {
+      isrecordAvaliable = false;
+      return;
+    }
+
+    isrecordAvaliable = true;
+
+    columns.value = {
+      customerIdKey: customerIdKey,
+      customerNameKey: customerNameKey,
+      customerMobileKey: customerMobileKey,
+      streetKey: streetKey,
+      cityKey: cityKey,
+      stateKey: stateKey,
+      postalCodeKey: postalCodeKey,
+    }
+        .entries
+        .map((e) => GridColumn(
+            allowFiltering: false,
+            columnName: e.key,
+            label: Center(child: Text(e.value))))
+        .toList();
+
+    rows.value = customersList
+        .map((customer) => DataGridRow(
+                cells: {
+              customerIdKey: customer.id,
+              customerNameKey: '${customer.firstName} ${customer.lastName}',
+              customerMobileKey: customer.mobileNumber,
+              streetKey: customer.deliveryAddress == null
+                  ? " "
+                  : customer.deliveryAddress!.street,
+              cityKey: customer.deliveryAddress == null
+                  ? " "
+                  : customer.deliveryAddress!.city,
+              stateKey: customer.deliveryAddress == null
+                  ? " "
+                  : customer.deliveryAddress!.state,
+              postalCodeKey: customer.deliveryAddress == null
+                  ? " "
+                  : customer.deliveryAddress!.postalCode,
+            }
+                    .entries
+                    .map((e) => DataGridCell(columnName: e.key, value: e.value))
+                    .toList()))
+        .toList();
   }
+
+/*
+
+
+
+
+
+
+
+ */
 
   Future<void> generateCustomerOutstandingReport() async {
     List<Invoice> searchInvoiceList = [];
+
+    isRequiredTableSummery = true;
 
     searchInvoiceList = await InvoiceDB()
         .searchInvoiceByDate(dateTimeRange, ReportPaymentFilter.notPaid);

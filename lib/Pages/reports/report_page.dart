@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
@@ -10,8 +9,6 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:syncfusion_flutter_datagrid_export/export.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
-
-import '../../models/invoice.dart';
 
 class ReportPage extends StatefulWidget {
   ReportPage({super.key});
@@ -95,11 +92,105 @@ class _ReportPageState extends State<ReportPage> {
                         text: 'Export',
                         icon: Icons.picture_as_pdf_rounded,
                         onPressed: () async {
+                          late PdfStringFormat format;
                           PdfDocument document = pdfKey.currentState!
                               .exportToPdfDocument(
+                                  exportTableSummaries:
+                                      controller.isRequiredTableSummery,
+                                  headerFooterExport:
+                                      (DataGridPdfHeaderFooterExportDetails
+                                          headerFooterExport) {
+                                    final double width = headerFooterExport
+                                        .pdfPage
+                                        .getClientSize()
+                                        .width;
+                                    final PdfPageTemplateElement header =
+                                        PdfPageTemplateElement(
+                                            Rect.fromLTWH(0, 0, width, 65));
+                                    header.graphics.drawString(
+                                      controller.title.keys.first,
+                                      PdfStandardFont(PdfFontFamily.courier, 12,
+                                          style: PdfFontStyle.bold),
+                                      bounds:
+                                          const Rect.fromLTWH(0, 0, 200, 50),
+                                    );
+
+                                    if (controller.dateTimeRange.start.year !=
+                                        0) {
+                                      header.graphics.drawString(
+                                        'From ${MyFormat.formatDateTwo(controller.dateTimeRange.start)} To ${MyFormat.formatDateTwo(controller.dateTimeRange.end)}',
+                                        PdfStandardFont(
+                                            PdfFontFamily.courier, 8,
+                                            style: PdfFontStyle.regular),
+                                        bounds:
+                                            const Rect.fromLTRB(350, 10, 0, 0),
+                                      );
+                                    }
+                                    header.graphics.drawString(
+                                      controller.title.values.first,
+                                      PdfStandardFont(PdfFontFamily.courier, 8,
+                                          style: PdfFontStyle.regular),
+                                      bounds:
+                                          const Rect.fromLTWH(0, 15, 200, 40),
+                                    );
+                                    headerFooterExport.pdfDocumentTemplate.top =
+                                        header;
+                                  },
                                   fitAllColumnsInOnePage: true,
-                                  cellExport: (details) {},
+                                  cellExport: (details) {
+                                    format = PdfStringFormat(
+                                        alignment: PdfTextAlignment.center,
+                                        lineAlignment:
+                                            PdfVerticalAlignment.middle);
+
+                                    if (details.columnName ==
+                                            ReportController.salepriceKey ||
+                                        details.columnName ==
+                                            ReportController.receiptsPriceKey) {
+                                      format = PdfStringFormat(
+                                          alignment: PdfTextAlignment.right,
+                                          lineAlignment:
+                                              PdfVerticalAlignment.middle);
+                                    }
+
+                                    if (details.columnName ==
+                                            ReportController.customerSaleKey ||
+                                        details.columnName ==
+                                            ReportController.receiptsKey) {
+                                      format = PdfStringFormat(
+                                          alignment: PdfTextAlignment.left,
+                                          lineAlignment:
+                                              PdfVerticalAlignment.middle);
+                                    }
+
+                                    if (details.cellType ==
+                                        DataGridExportCellType
+                                            .tableSummaryRow) {
+                                      if ((details.cellValue as String)
+                                          .isNotEmpty) {
+                                        details.pdfCell.value =
+                                            MyFormat.formatPrice(double.parse(
+                                                details.cellValue as String));
+                                        format = PdfStringFormat(
+                                            alignment: PdfTextAlignment.right,
+                                            lineAlignment:
+                                                PdfVerticalAlignment.middle);
+                                      }
+                                    }
+                                    if (details.cellValue is double) {
+                                      details.pdfCell.value =
+                                          MyFormat.formatPrice(
+                                              details.cellValue as double);
+                                      format = PdfStringFormat(
+                                          alignment: PdfTextAlignment.right,
+                                          lineAlignment:
+                                              PdfVerticalAlignment.middle);
+                                    }
+
+                                    details.pdfCell.stringFormat = format;
+                                  },
                                   autoColumnWidth: true);
+
                           final List<int> bytes = await document.save();
                           File file =
                               await File('DataGrid.pdf').writeAsBytes(bytes);
@@ -170,10 +261,10 @@ class DataSource extends DataGridSource {
       String summaryValue) {
     return Container(
       alignment: Alignment.centerRight,
-      padding: EdgeInsets.symmetric(horizontal: 5.0),
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
       child: Text(
         MyFormat.formatCurrency(double.parse(summaryValue)),
-        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
       ),
     );
   }

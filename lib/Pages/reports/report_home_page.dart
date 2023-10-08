@@ -155,7 +155,7 @@ class ReportHomePage extends StatelessWidget {
                     });
                   }),
             ]),
-            SizedBox(
+            const SizedBox(
               width: 50.0,
             ),
             Expanded(child: ReportPage())

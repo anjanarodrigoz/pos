@@ -8,6 +8,7 @@ import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/utils/val.dart';
 import 'package:pos/widgets/pos_button.dart';
+import 'package:pos/widgets/verify_dialog.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:window_manager/window_manager.dart';
 import '../../models/invoice.dart';
@@ -160,27 +161,17 @@ class _PaymentPageState extends State<PaymentPage> {
   Future<void> removePayment(String invoiceId, String payId) async {
     showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-              title: const Text('Delete Payament'),
-              content: Text(
-                  'Do you want to delete in #$invoiceId invoice #$payId payment?'),
-              actions: [
-                TextButton(
-                    onPressed: () async {
-                      await InvoiceDB()
-                          .removeInvoicePayment(invoiceId, payId, context);
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text(
-                      'Delete',
-                      style: TextStyle(color: Colors.red),
-                    )),
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Cancle')),
-              ],
+        builder: (context) => POSVerifyDialog(
+              title: 'Delete Payament',
+              content:
+                  'Do you want to delete in #$invoiceId invoice #$payId payment?',
+              onContinue: () async {
+                await InvoiceDB()
+                    .removeInvoicePayment(invoiceId, payId, context);
+                Navigator.of(context).pop();
+              },
+              continueText: 'Delete',
+              verifyText: payId,
             ));
   }
 }

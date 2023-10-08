@@ -92,7 +92,7 @@ class _SetupHomePageState extends State<SetupHomePage> {
             title: 'Warning!',
             content:
                 'Your data will be deleted if you continue.\nAre you sure you want to proceed?',
-            onContinue: (string) async {
+            onContinue: () async {
               Get.back();
               await dbContoller.resetDatabase(context);
             },

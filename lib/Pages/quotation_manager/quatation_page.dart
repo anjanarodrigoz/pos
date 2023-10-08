@@ -14,6 +14,7 @@ import 'package:pos/utils/alert_message.dart';
 import 'package:pos/widgets/alert_dialog.dart';
 
 import 'package:pos/widgets/pos_button.dart';
+import 'package:pos/widgets/verify_dialog.dart';
 
 import 'package:window_manager/window_manager.dart';
 import '../../api/pdf_api.dart';
@@ -97,14 +98,15 @@ class QuotationPage extends StatelessWidget {
   Future<void> deleteInvoice() async {
     showDialog(
         context: context,
-        builder: (context) => POSAleartDialog(
+        builder: (context) => POSVerifyDialog(
               title: 'Delete Invoice #${invoice.invoiceId}',
               content: 'Do you want to delete this invoice?',
-              onCountinue: () async {
+              onContinue: () async {
                 await QuotationDB().deleteInvoice(invoice);
                 Get.offAll(AllQuotesPage());
               },
-              textContine: 'Delete',
+              continueText: 'Delete',
+              verifyText: invoice.invoiceId,
               color: Colors.red,
             ));
   }
