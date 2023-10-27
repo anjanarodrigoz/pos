@@ -98,6 +98,8 @@ class ReportController extends GetxController {
         await generateCustomerDetailsReport();
       case ReportType.outstanding:
         await generateCustomerOutstandingReport();
+      case ReportType.stockValue:
+        await generateStockValueReport();
     }
   }
 
@@ -422,8 +424,8 @@ class ReportController extends GetxController {
         itempriceKey: value.price,
         quantityKey: value.qty,
         netKey: value.netTotal,
-        gstKey: value.gstTotal,
-        totalKey: value.total
+        gstKey: value.totalGst,
+        totalKey: value.totalPrice
       }.entries.map((cell) {
         if (cell.key == netKey || cell.key == itempriceKey) {
           return DataGridCell<double>(
@@ -790,6 +792,54 @@ class ReportController extends GetxController {
               }
               return DataGridCell(columnName: cell.key, value: cell.value);
             }).toList()))
+        .toList();
+  }
+
+  Future<void> generateStockValueReport() async {
+    isRequiredTableSummery = true;
+    List<Item> itemList = [];
+
+    itemList = await ItemDB().getAllItems();
+
+    if (itemList.isEmpty) {
+      isrecordAvaliable = false;
+      return;
+    }
+
+    isrecordAvaliable = true;
+
+    columns.value = {
+      itemIdKey: itemIdKey,
+      nameKey: nameKey,
+      quantityKey: quantityKey,
+      priceKey: priceKey,
+      netKey: netKey,
+      gstKey: gstKey,
+      totalKey: totalKey,
+    }
+        .entries
+        .map(
+          (e) => GridColumn(
+              allowFiltering: false,
+              columnName: e.key,
+              label: Center(child: Text(e.value))),
+        )
+        .toList();
+
+    rows.value = itemList
+        .map((item) => DataGridRow(
+                cells: {
+              itemIdKey: item.id,
+              nameKey: item.name,
+              quantityKey: item.qty,
+              priceKey: item.price,
+              netKey: item.netStock,
+              gstKey: item.gstStock,
+              totalKey: item.totalStock
+            }
+                    .entries
+                    .map((e) => DataGridCell(columnName: e.key, value: e.value))
+                    .toList()))
         .toList();
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -5,11 +7,13 @@ import 'package:pos/Pages/invoice_draft_manager/invoice_customer_select.dart';
 import 'package:pos/Pages/invoice_manager/invoice_edit_page.dart';
 import 'package:pos/Pages/invoice_manager/save_invoice_page.dart';
 import 'package:pos/Pages/invoice_manager/search_invoice_page.dart';
+import 'package:pos/api/email_sender.dart';
 import 'package:pos/database/invoice_db_service.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/payment.dart';
 import 'package:pos/utils/alert_message.dart';
 import 'package:pos/widgets/alert_dialog.dart';
+import 'package:pos/widgets/pos_appbar.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/pos_text_form_field.dart';
 import 'package:pos/widgets/verify_dialog.dart';
@@ -17,6 +21,7 @@ import 'package:window_manager/window_manager.dart';
 import '../../api/pdf_api.dart';
 import '../../api/pdf_invoice_api.dart';
 import '../../controllers/invoice_edit_controller.dart';
+import '../../controllers/size_controller.dart';
 import '../../models/invoice.dart';
 import '../../theme/t_colors.dart';
 import '../main_window.dart';
@@ -44,125 +49,113 @@ class _InvoicePageState extends State<InvoicePage> {
 
   @override
   Widget build(BuildContext context) {
-    WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1300, 800), size: Size(1300, 800), center: true);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
-
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: TColors.blue,
-        title: const Text('Invoice Page'),
-        leading: IconButton(
-            onPressed: () {
-              Get.offAll(const MainWindow());
-            },
-            icon: const Icon(Icons.arrow_back)),
-      ),
+      appBar: const PosAppBar(title: 'Invoice Page'),
       body: Row(
         children: [
           /*
             // Menu items
             */
 
-          Container(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Column(
-                children: [
-                  PosButton(
-                    onPressed: () => openNewInvoice(context),
-                    text: '+ New invoice',
-                  ),
-                  PosButton(
-                    onPressed: () => searchInvoices(),
-                    text: 'Search invoice',
-                  ),
-                  PosButton(
-                    onPressed: () => openOldInvoice(),
-                    text: 'Edit',
-                  ),
-                  PosButton(
-                    onPressed: () => openCopyInvoice(),
-                    text: 'Copy',
-                  ),
-                  PosButton(
-                    onPressed: () => printInvoice(context),
-                    text: 'Print',
-                  ),
-                  PosButton(
-                    onPressed: () => payAmout(),
-                    text: 'Pay',
-                    color: Colors.green,
-                  ),
-                  SizedBox(
-                    height: 50,
-                  ),
-                  PosButton(
-                    onPressed: () => deleteInvoice(),
-                    text: 'Remove',
-                    color: Colors.red.shade400,
-                  ),
-                  SizedBox(height: 150),
-                  Card(
-                    color: TColors.blue,
-                    elevation: 5.0,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            IconButton(
-                              color: Colors.white,
-                              icon: Icon(
-                                  Icons.keyboard_double_arrow_left_rounded),
-                              onPressed: () {
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Column(
+              children: [
+                PosButton(
+                  onPressed: () => openNewInvoice(context),
+                  text: '+ New invoice',
+                ),
+                PosButton(
+                  onPressed: () => searchInvoices(),
+                  text: 'Search invoice',
+                ),
+                PosButton(
+                  onPressed: () => openOldInvoice(),
+                  text: 'Edit',
+                ),
+                PosButton(
+                  onPressed: () => openCopyInvoice(),
+                  text: 'Copy',
+                ),
+                PosButton(
+                  onPressed: () => printInvoice(context),
+                  text: 'Print',
+                ),
+                PosButton(
+                  onPressed: () => sendEmail(),
+                  text: 'Email',
+                ),
+                PosButton(
+                  onPressed: () => payAmout(),
+                  text: 'Pay',
+                  color: Colors.green,
+                ),
+                const SizedBox(
+                  height: 50,
+                ),
+                PosButton(
+                  onPressed: () => deleteInvoice(),
+                  text: 'Remove',
+                  color: Colors.red.shade400,
+                ),
+                const SizedBox(height: 150),
+                Card(
+                  color: TColors.blue,
+                  elevation: 5.0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(
+                            color: Colors.white,
+                            icon: const Icon(
+                                Icons.keyboard_double_arrow_left_rounded),
+                            onPressed: () {
+                              searchInvoiceId = null;
+                              index.value = invoiceList.length - 1;
+                              invoice = invoiceList[index.value];
+                            },
+                          ),
+                          IconButton(
+                            color: Colors.white,
+                            icon: const Icon(Icons.keyboard_arrow_left_rounded),
+                            onPressed: () {
+                              if (index.value < invoiceList.length - 1) {
                                 searchInvoiceId = null;
-                                index.value = invoiceList.length - 1;
+                                index.value += 1;
                                 invoice = invoiceList[index.value];
-                              },
-                            ),
-                            IconButton(
-                              color: Colors.white,
-                              icon: Icon(Icons.keyboard_arrow_left_rounded),
-                              onPressed: () {
-                                if (index.value < invoiceList.length - 1) {
-                                  searchInvoiceId = null;
-                                  index.value += 1;
-                                  invoice = invoiceList[index.value];
-                                }
-                              },
-                            ),
-                            IconButton(
-                              color: Colors.white,
-                              icon: Icon(Icons.keyboard_arrow_right_rounded),
-                              onPressed: () {
-                                if (index.value != 0) {
-                                  searchInvoiceId = null;
-                                  index.value -= 1;
-                                  invoice = invoiceList[index.value];
-                                }
-                              },
-                            ),
-                            IconButton(
-                              color: Colors.white,
-                              icon: Icon(
-                                  Icons.keyboard_double_arrow_right_rounded),
-                              onPressed: () {
+                              }
+                            },
+                          ),
+                          IconButton(
+                            color: Colors.white,
+                            icon:
+                                const Icon(Icons.keyboard_arrow_right_rounded),
+                            onPressed: () {
+                              if (index.value != 0) {
                                 searchInvoiceId = null;
-                                index.value = 0;
+                                index.value -= 1;
                                 invoice = invoiceList[index.value];
-                              },
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
+                              }
+                            },
+                          ),
+                          IconButton(
+                            color: Colors.white,
+                            icon: const Icon(
+                                Icons.keyboard_double_arrow_right_rounded),
+                            onPressed: () {
+                              searchInvoiceId = null;
+                              index.value = 0;
+                              invoice = invoiceList[index.value];
+                            },
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                )
+              ],
             ),
           ),
           StreamBuilder(
@@ -223,6 +216,7 @@ class _InvoicePageState extends State<InvoicePage> {
     final pdfFile =
         await PdfInvoiceApi.generateInvoicePDF(invoiceList[index.value]);
     PdfApi.openFile(pdfFile);
+    //await PdfInvoiceApi.printPdf(invoiceList[index.value]);
   }
 
   Future<void> deleteInvoice() async {
@@ -269,7 +263,7 @@ class _InvoicePageState extends State<InvoicePage> {
                 children: [
                   Text(
                     'To Pay: \$${invoice.toPay.toStringAsFixed(2)}',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 20),
                   PosTextFormField(
@@ -280,7 +274,7 @@ class _InvoicePageState extends State<InvoicePage> {
                                 paymentAmountController.value.text.length),
                     controller: paymentAmountController,
                     keyboardType:
-                        TextInputType.numberWithOptions(decimal: true),
+                        const TextInputType.numberWithOptions(decimal: true),
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))
                     ],
@@ -360,5 +354,9 @@ class _InvoicePageState extends State<InvoicePage> {
             );
           });
     }
+  }
+
+  sendEmail() async {
+    await EmailSender.sendEmail('kk', context);
   }
 }

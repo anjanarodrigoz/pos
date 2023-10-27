@@ -15,7 +15,8 @@ class PaidStatus extends StatelessWidget {
         borderRadius: BorderRadius.circular(8.0), // Adjust the radius as needed
       ),
       child: SizedBox(
-        width: 80.0,
+        width: 70.0,
+        height: 30.0,
         child: Align(
           alignment: Alignment.center,
           child: Padding(
@@ -23,8 +24,9 @@ class PaidStatus extends StatelessWidget {
             child: Text(
               isPaid ? 'Paid' : 'Pending',
               style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: isPaid ? Colors.green.shade900 : TColors.blue),
+                  fontWeight: FontWeight.w700,
+                  color: isPaid ? Colors.green.shade900 : TColors.blue,
+                  fontSize: 12.0),
             ),
           ),
         ),

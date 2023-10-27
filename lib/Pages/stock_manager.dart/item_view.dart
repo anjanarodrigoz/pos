@@ -3,7 +3,6 @@ import 'package:get/route_manager.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/verify_dialog.dart';
-import 'package:window_manager/window_manager.dart';
 
 import '../../database/item_db_service.dart';
 import '../../models/item.dart';
@@ -36,177 +35,156 @@ class _ItemViewPageState extends State<ItemViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1150, 800), size: Size(1150, 800), center: true);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
     return Scaffold(
         appBar: AppBar(
+          toolbarHeight: 40.0,
           title: Text(
             '${_item.name} - # ${_item.id}',
             style: TStyle.titleBarStyle,
           ),
         ),
-        body: Row(
-          children: [
-            Column(
-              children: [
-                PosButton(
-                    enable: !isEditMode,
-                    text: 'Edit Item',
-                    onPressed: () {
-                      setState(() {
-                        isEditMode = true;
-                      });
-                    }),
-                PosButton(
-                    enable: isEditMode,
-                    text: 'Update Item',
-                    onPressed: _saveItemDetails),
-                PosButton(
-                    color: Colors.red.shade900,
-                    text: 'Remove Item',
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) => POSVerifyDialog(
-                              title: 'Delete Item',
-                              content: 'Do you want to delete this item?',
-                              onContinue: () async {
-                                await dbService.deleteItem(_item.id);
-                                Get.back();
-                              },
-                              verifyText: _item.id,
-                              continueText: 'delete'));
-                    })
-              ],
-            ),
-            Flexible(
-                child: SingleChildScrollView(
-                    child: Form(
-                        key: _formKey,
+        body: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Form(
+                    key: _formKey,
+                    child: Column(children: [
+                      Card(
+                        elevation: 5.0,
                         child: Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Column(children: [
-                              Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Column(
-                                      children: [
-                                        Card(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(20.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  '- Item Details -',
-                                                  style: TextStyle(
-                                                      color:
-                                                          Colors.grey.shade500),
-                                                ),
-                                                const SizedBox(
-                                                  height: 20.0,
-                                                ),
-                                                PosTextFormField(
-                                                  enable: isEditMode,
-                                                  labelText: 'Item Name',
-                                                  initialValue: _item.name,
-                                                  onSaved: (value) =>
-                                                      _item.name = value!,
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Please enter item name';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                                PosTextFormField(
-                                                  enable: isEditMode,
-                                                  initialValue:
-                                                      _item.description,
-                                                  labelText: 'Description',
-                                                  onSaved: (value) =>
-                                                      _item.description = value,
-                                                ),
-                                                PosTextFormField(
-                                                  enable: isEditMode,
-                                                  initialValue: _item.comment,
-                                                  labelText: 'Comment',
-                                                  onSaved: (value) =>
-                                                      _item.comment = value,
-                                                ),
-                                                // Add more TextFormField widgets for other customer properties
-                                                PosTextFormField(
-                                                  enable: isEditMode,
-                                                  initialValue:
-                                                      MyFormat.formatPrice(
-                                                          _item.price),
-                                                  labelText: 'Price',
-                                                  validator: (value) =>
-                                                      validatePrice(value),
-                                                  onSaved: (value) => _item
-                                                          .price =
-                                                      value == null
-                                                          ? 0.0
-                                                          : double.parse(value),
-                                                ),
-                                                PosTextFormField(
-                                                    enable: isEditMode,
-                                                    initialValue:
-                                                        MyFormat.formatPrice(
-                                                            _item.priceTwo),
-                                                    labelText: 'Price Two',
-                                                    onSaved: (value) =>
-                                                        _item.priceTwo =
-                                                            validateOtherPrice(
-                                                                value)),
-                                                PosTextFormField(
-                                                    enable: isEditMode,
-                                                    initialValue:
-                                                        MyFormat.formatPrice(
-                                                            _item.priceThree),
-                                                    labelText: 'Price Three',
-                                                    onSaved: (value) =>
-                                                        _item.priceThree =
-                                                            validateOtherPrice(
-                                                                value)),
-                                                PosTextFormField(
-                                                    enable: isEditMode,
-                                                    initialValue:
-                                                        MyFormat.formatPrice(
-                                                            _item.priceFour),
-                                                    labelText: 'Price Four',
-                                                    onSaved: (value) =>
-                                                        _item.priceFour =
-                                                            validateOtherPrice(
-                                                                value)),
-                                                PosTextFormField(
-                                                    enable: isEditMode,
-                                                    initialValue:
-                                                        MyFormat.formatPrice(
-                                                            _item.priceFive),
-                                                    labelText: 'Price Five',
-                                                    onSaved: (value) {
-                                                      _item.priceFive =
-                                                          validateOtherPrice(
-                                                              value);
-                                                    }),
+                          padding: const EdgeInsets.all(20.0),
+                          child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Column(
+                                    children: [
+                                      PosTextFormField(
+                                        enable: isEditMode,
+                                        labelText: 'Item Name',
+                                        initialValue: _item.name,
+                                        onSaved: (value) => _item.name = value!,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please enter item name';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      PosTextFormField(
+                                        enable: isEditMode,
+                                        initialValue: _item.description,
+                                        labelText: 'Description',
+                                        onSaved: (value) =>
+                                            _item.description = value,
+                                      ),
+                                      PosTextFormField(
+                                        enable: isEditMode,
+                                        initialValue: _item.comment,
+                                        labelText: 'Comment',
+                                        onSaved: (value) =>
+                                            _item.comment = value,
+                                      ),
+                                      // Add more TextFormField widgets for other customer properties
 
-                                                // Add more TextFormField widgets for other customer properties
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ])
-                            ]))))),
-          ],
+                                      // Add more TextFormField widgets for other customer properties
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Column(
+                                    children: [
+                                      PosTextFormField(
+                                        enable: isEditMode,
+                                        initialValue:
+                                            MyFormat.formatPrice(_item.price),
+                                        labelText: 'Price',
+                                        validator: (value) =>
+                                            validatePrice(value),
+                                        onSaved: (value) => _item.price =
+                                            value == null
+                                                ? 0.0
+                                                : double.parse(value),
+                                      ),
+                                      PosTextFormField(
+                                          enable: isEditMode,
+                                          initialValue: MyFormat.formatPrice(
+                                              _item.priceTwo),
+                                          labelText: 'Price Two',
+                                          onSaved: (value) => _item.priceTwo =
+                                              validateOtherPrice(value)),
+                                      PosTextFormField(
+                                          enable: isEditMode,
+                                          initialValue: MyFormat.formatPrice(
+                                              _item.priceThree),
+                                          labelText: 'Price Three',
+                                          onSaved: (value) => _item.priceThree =
+                                              validateOtherPrice(value)),
+                                      PosTextFormField(
+                                          enable: isEditMode,
+                                          initialValue: MyFormat.formatPrice(
+                                              _item.priceFour),
+                                          labelText: 'Price Four',
+                                          onSaved: (value) => _item.priceFour =
+                                              validateOtherPrice(value)),
+                                      PosTextFormField(
+                                          enable: isEditMode,
+                                          initialValue: MyFormat.formatPrice(
+                                              _item.priceFive),
+                                          labelText: 'Price Five',
+                                          onSaved: (value) {
+                                            _item.priceFive =
+                                                validateOtherPrice(value);
+                                          }),
+                                    ],
+                                  ),
+                                ),
+                              ]),
+                        ),
+                      )
+                    ])),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  PosButton(
+                      color: Colors.red.shade900,
+                      text: 'Remove Item',
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) => POSVerifyDialog(
+                                title: 'Delete Item',
+                                content: 'Do you want to delete this item?',
+                                onContinue: () async {
+                                  await dbService.deleteItem(_item.id);
+                                  Get.back();
+                                },
+                                verifyText: _item.id,
+                                continueText: 'delete'));
+                      }),
+                  PosButton(
+                      enable: !isEditMode,
+                      text: 'Edit Item',
+                      onPressed: () {
+                        setState(() {
+                          isEditMode = true;
+                        });
+                      }),
+                  PosButton(
+                      enable: isEditMode,
+                      text: 'Update Item',
+                      onPressed: _saveItemDetails),
+                ],
+              ),
+            ],
+          ),
         ));
   }
 

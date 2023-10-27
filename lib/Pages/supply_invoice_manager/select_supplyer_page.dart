@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:pos/Pages/supply_invoice_manager/supply_all_invoice.dart';
 import 'package:pos/Pages/supplyer_manager/supplyer_form.dart';
 import 'package:pos/Pages/main_window.dart';
 import 'package:pos/database/supplyer_db_service.dart';
@@ -11,7 +12,6 @@ import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/val.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:window_manager/window_manager.dart';
 import '../../controllers/suppy_invoice_draft_controller.dart';
 import '../../models/supplyer.dart';
 import 'supplyer_invoice_draft_page.dart';
@@ -53,19 +53,13 @@ class _SelectSupplyerPageState extends State<SelectSupplyerPage> {
 
   @override
   Widget build(BuildContext context) {
-    WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1150, 800), size: Size(1150, 800), center: true);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
-
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 40.0,
         backgroundColor: TColors.blue,
         leading: IconButton(
             onPressed: () {
-              Get.offAll(const MainWindow());
+              Get.offAll(SupplyAllInvoice());
             },
             icon: Icon(Icons.arrow_back_outlined)),
         title: Text(
@@ -83,12 +77,13 @@ class _SelectSupplyerPageState extends State<SelectSupplyerPage> {
                 gridLinesVisibility: GridLinesVisibility.both,
                 headerGridLinesVisibility: GridLinesVisibility.both,
                 allowFiltering: true,
+                rowHeight: 30.0,
                 allowColumnsResizing: true,
                 showFilterIconOnHover: true,
                 columnWidthMode: ColumnWidthMode.auto,
                 source: supplyerDataSource,
                 selectionMode: SelectionMode.single,
-                onCellTap: ((details) async {
+                onCellDoubleTap: ((details) async {
                   if (details.rowColumnIndex.rowIndex != 0) {
                     int selectedRowIndex = details.rowColumnIndex.rowIndex - 1;
                     var row = supplyerDataSource.effectiveRows
@@ -96,6 +91,10 @@ class _SelectSupplyerPageState extends State<SelectSupplyerPage> {
 
                     supplyer =
                         SupplyerDB().getSupplyer(row.getCells()[0].value);
+
+                    Get.put(SupplyInvoiceDraftController(
+                        supplyer: supplyer, copyInvoice: widget.supplyInvoice));
+                    Get.offAll(SupplyInvoiceDraftPage());
                   }
                 }),
                 columns: [
@@ -128,21 +127,6 @@ class _SelectSupplyerPageState extends State<SelectSupplyerPage> {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(right: 30.0, bottom: 10.0),
-              child: IconButton(
-                  icon: Icon(
-                    Icons.arrow_circle_right_rounded,
-                    size: 45,
-                  ),
-                  color: Colors.blue,
-                  splashRadius: 20.0,
-                  onPressed: () {
-                    Get.put(SupplyInvoiceDraftController(
-                        supplyer: supplyer, copyInvoice: widget.supplyInvoice));
-                    Get.offAll(SupplyInvoiceDraftPage());
-                  }),
-            )
           ],
         ),
       ),
@@ -191,8 +175,11 @@ class SupplyerDataSource extends DataGridSource {
         cells: row.getCells().map<Widget>((e) {
       return Container(
         alignment: Alignment.center,
-        padding: EdgeInsets.all(8.0),
-        child: Text(e.value.toString()),
+        padding: EdgeInsets.all(4.0),
+        child: Text(
+          e.value.toString(),
+          style: const TextStyle(fontSize: 13.0),
+        ),
       );
     }).toList());
   }

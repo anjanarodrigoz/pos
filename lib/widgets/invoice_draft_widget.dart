@@ -52,7 +52,7 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
   Widget build(BuildContext context) {
     this.context = context;
     return Container(
-      width: 1100,
+      width: MediaQuery.of(context).size.width - 200,
       padding: EdgeInsets.all(10.0),
       child: Column(
         children: [
@@ -374,7 +374,7 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
                         controller: qtyController,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
+                          FilteringTextInputFormatter.allow(RegExp(r'^-?\d*'))
                         ],
                       ),
                     ],
@@ -542,7 +542,7 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
                         controller: qtyController,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
+                          FilteringTextInputFormatter.allow(RegExp(r'^-?\d*'))
                         ],
                       ),
                     ],

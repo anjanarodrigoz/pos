@@ -68,8 +68,8 @@ class SupplyerInvoiceDB implements AbstractDB {
 
   String generateInvoiceId() {
     final storage = GetStorage();
-    final lastId = storage.read(DBVal.supplyerInvoiceId) ?? '1000';
-    final lastNumber = int.tryParse(lastId) ?? 1000;
+    final lastId = storage.read(DBVal.supplyerInvoiceId) ?? '0';
+    final lastNumber = int.tryParse(lastId) ?? 0;
 
     final nextNumber = lastNumber + 1;
     return '$nextNumber';
@@ -98,7 +98,7 @@ class SupplyerInvoiceDB implements AbstractDB {
   @override
   Future<Map> backupData() async {
     final List supplyerInvoiceData = await _storage.getValues().toList() ?? [];
-    final lastId = GetStorage().read(DBVal.supplyerInvoiceId) ?? '1000';
+    final lastId = GetStorage().read(DBVal.supplyerInvoiceId) ?? '0';
 
     return {
       DBVal.supplyerInvoice: supplyerInvoiceData,

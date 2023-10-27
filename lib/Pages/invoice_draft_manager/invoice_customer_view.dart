@@ -51,9 +51,10 @@ class _InvoiceCustomerViewPageState extends State<InvoiceCustomerViewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 40.0,
         title: Text(
           '${_customer.firstName} ${_customer.lastName} - #${_customer.id}',
-          style: TStyle.titleBarStyle,
+          style: const TextStyle(fontSize: 13.0),
         ),
       ),
       body: Container(
@@ -335,7 +336,7 @@ class _InvoiceCustomerViewPageState extends State<InvoiceCustomerViewPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(right: 30.0, bottom: 10.0),
+              padding: const EdgeInsets.only(right: 30.0, bottom: 30.0),
               child: IconButton(
                   icon: Icon(
                     Icons.arrow_circle_right_rounded,

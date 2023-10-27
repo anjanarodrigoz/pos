@@ -1,3 +1,5 @@
+import '../utils/val.dart';
+
 class Item {
   static const String idKey = 'id';
   static const String nameKey = 'name';
@@ -106,4 +108,12 @@ class Item {
       lastOutDateKey: lastOutDate?.toIso8601String(),
     };
   }
+
+  get netStock => double.parse((price * qty).toStringAsFixed(2));
+
+  get gstStock =>
+      double.parse((price * Val.gstPrecentage * qty).toStringAsFixed(2));
+
+  get totalStock =>
+      double.parse((price * Val.gstTotalPrecentage * qty).toStringAsFixed(2));
 }

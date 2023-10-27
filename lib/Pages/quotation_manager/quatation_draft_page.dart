@@ -15,7 +15,6 @@ import 'package:pos/widgets/comments_widget.dart';
 import 'package:pos/widgets/extra_charge_widget.dart';
 import 'package:pos/widgets/invoice_draft_widget.dart';
 import 'package:pos/widgets/item_select_widget.dart';
-import 'package:window_manager/window_manager.dart';
 import '../../models/invoice.dart';
 import '../../theme/t_colors.dart';
 import '../../utils/my_format.dart';
@@ -32,6 +31,7 @@ class QuoteDraftPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 40.0,
         title: Obx(() => Text(
               'Draft Quote - #${_controller.invoiceId.value}',
               style: TStyle.titleBarStyle,

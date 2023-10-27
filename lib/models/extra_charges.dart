@@ -22,8 +22,6 @@ class ExtraCharges {
     id = '${DateTime.now().millisecondsSinceEpoch}';
   }
 
-  double get netTotal => price * qty;
-
   factory ExtraCharges.fromJson(Map<String, dynamic> json) {
     return ExtraCharges(
       name: json[nameKey],
@@ -46,7 +44,14 @@ class ExtraCharges {
     };
   }
 
-  double get gstTotal => (netTotal * Val.gstPrecentage * 100).round() / 100;
+  double get gst => (price * Val.gstPrecentage);
 
-  double get total => (netTotal * (1 + Val.gstPrecentage) * 100).round() / 100;
+  double get totalGst => gst * qty;
+
+  double get netTotal => price * qty;
+
+  double get itemPrice =>
+      double.parse((price * Val.gstTotalPrecentage).toStringAsFixed(2));
+
+  double get totalPrice => itemPrice * qty;
 }

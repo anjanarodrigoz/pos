@@ -8,7 +8,6 @@ import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/utils/val.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:window_manager/window_manager.dart';
 
 class InvoiceSearchPage extends StatefulWidget {
   const InvoiceSearchPage({super.key});
@@ -44,15 +43,9 @@ class _InvoiceSearchPageState extends State<InvoiceSearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1150, 800), size: Size(1150, 800), center: true);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
-
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 40.0,
         backgroundColor: TColors.blue,
         leading: IconButton(
             onPressed: () {
@@ -66,15 +59,16 @@ class _InvoiceSearchPageState extends State<InvoiceSearchPage> {
       ),
       body: Container(
         padding: EdgeInsets.all(20.0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           SizedBox(
-            height: 30.0,
+            height: 20.0,
           ),
           Expanded(
             child: SfDataGrid(
               gridLinesVisibility: GridLinesVisibility.both,
               headerGridLinesVisibility: GridLinesVisibility.both,
               allowFiltering: true,
+              rowHeight: 30.0,
               allowColumnsResizing: true,
               showFilterIconOnHover: true,
               columnWidthMode: ColumnWidthMode.auto,
@@ -167,8 +161,11 @@ class InvoiceDataSource extends DataGridSource {
       if (e.columnName == Invoice.createdDateKey) {
         return Container(
           alignment: Alignment.center,
-          padding: EdgeInsets.all(8.0),
-          child: Text(MyFormat.formatDate(e.value)),
+          padding: const EdgeInsets.all(4.0),
+          child: Text(
+            MyFormat.formatDate(e.value),
+            style: const TextStyle(fontSize: 13.0),
+          ),
         );
       }
 
@@ -178,15 +175,21 @@ class InvoiceDataSource extends DataGridSource {
           e.columnName == Invoice.paykey) {
         return Container(
           alignment: Alignment.centerRight,
-          padding: EdgeInsets.all(8.0),
-          child: Text(MyFormat.formatCurrency(e.value)),
+          padding: const EdgeInsets.all(4.0),
+          child: Text(
+            MyFormat.formatCurrency(e.value),
+            style: const TextStyle(fontSize: 13.0),
+          ),
         );
       }
 
       return Container(
         alignment: Alignment.center,
-        padding: EdgeInsets.all(8.0),
-        child: Text(e.value.toString()),
+        padding: const EdgeInsets.all(4.0),
+        child: Text(
+          e.value.toString(),
+          style: const TextStyle(fontSize: 13.0),
+        ),
       );
     }).toList());
   }

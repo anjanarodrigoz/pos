@@ -19,12 +19,13 @@ void main() async {
   await GetStorage.init(DBVal.supplyerInvoice);
   await GetStorage.init(DBVal.quatation);
   await GetStorage.init(DBVal.creditNote);
-
-  await windowManager.ensureInitialized();
+  await GetStorage.init(DBVal.store);
 
   final storage = CartDB();
 
   await storage.resetCart();
+
+  await windowManager.ensureInitialized();
 
   runApp(const MyApp());
 }
@@ -36,8 +37,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: MainWindow(),
-    );
+        debugShowCheckedModeBanner: false, home: MainWindow());
   }
 }

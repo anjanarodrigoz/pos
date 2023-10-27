@@ -88,63 +88,60 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
           )
         ],
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              SfDataGrid(
-                gridLinesVisibility: GridLinesVisibility.both,
-                headerGridLinesVisibility: GridLinesVisibility.both,
-                allowFiltering: true,
-                allowColumnsResizing: true,
-                showFilterIconOnHover: true,
-                columnWidthMode: ColumnWidthMode.auto,
-                source: itemDataSource,
-                onCellTap: ((details) {
-                  if (details.rowColumnIndex.rowIndex != 0) {
-                    int selectedRowIndex = details.rowColumnIndex.rowIndex - 1;
-                    var row = itemDataSource.effectiveRows
-                        .elementAt(selectedRowIndex);
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Expanded(
+          child: SfDataGrid(
+            gridLinesVisibility: GridLinesVisibility.both,
+            headerGridLinesVisibility: GridLinesVisibility.both,
+            allowFiltering: true,
+            allowColumnsResizing: true,
+            showFilterIconOnHover: true,
+            columnWidthMode: ColumnWidthMode.auto,
+            source: itemDataSource,
+            onCellTap: ((details) {
+              if (details.rowColumnIndex.rowIndex != 0) {
+                int selectedRowIndex = details.rowColumnIndex.rowIndex - 1;
+                var row =
+                    itemDataSource.effectiveRows.elementAt(selectedRowIndex);
 
-                    addItemtoList(row.getCells()[0].value.toString());
-                  }
-                }),
-                columns: [
-                  GridColumn(
-                      columnName: Item.idKey,
-                      label: Center(child: const Text('Item ID'))),
-                  GridColumn(
-                      columnName: Item.nameKey,
-                      label: Center(child: const Text('Item Name'))),
-                  GridColumn(
-                      columnName: Item.qtyKey,
-                      label: Center(child: const Text('Qty'))),
-                  GridColumn(
-                      columnName: Item.priceKey,
-                      label: Center(child: const Text('Price'))),
-                  GridColumn(
-                      columnName: Item.priceTwoKey,
-                      label: Center(child: const Text('Price 02'))),
-                  GridColumn(
-                      columnName: Item.priceThreeKey,
-                      label: Center(child: const Text('Price 03'))),
-                  GridColumn(
-                      columnName: Item.priceFourKey,
-                      label: Center(child: const Text('Price 04'))),
-                  GridColumn(
-                      columnName: Item.priceFiveKey,
-                      label: Center(child: const Text('Price 05'))),
-                  GridColumn(
-                      columnName: Item.lastInDateKey,
-                      label: Center(child: const Text('Last In Date'))),
-                  GridColumn(
-                      columnName: Item.lastOutDateKey,
-                      label: Center(child: const Text('Last Out Date'))),
+                addItemtoList(row.getCells()[0].value.toString());
+              }
+            }),
+            columns: [
+              GridColumn(
+                  columnName: Item.idKey,
+                  label: Center(child: const Text('Item ID'))),
+              GridColumn(
+                  columnName: Item.nameKey,
+                  label: Center(child: const Text('Item Name'))),
+              GridColumn(
+                  columnName: Item.qtyKey,
+                  label: Center(child: const Text('Qty'))),
+              GridColumn(
+                  columnName: Item.priceKey,
+                  label: Center(child: const Text('Price'))),
+              GridColumn(
+                  columnName: Item.priceTwoKey,
+                  label: Center(child: const Text('Price 02'))),
+              GridColumn(
+                  columnName: Item.priceThreeKey,
+                  label: Center(child: const Text('Price 03'))),
+              GridColumn(
+                  columnName: Item.priceThreeKey,
+                  label: Center(child: const Text('Price 04'))),
+              GridColumn(
+                  columnName: Item.priceThreeKey,
+                  label: Center(child: const Text('Price 05'))),
+              GridColumn(
+                  columnName: Item.priceThreeKey,
+                  label: Center(child: const Text('Last In Date'))),
 
-                  // Add more columns as needed
-                ],
-              ),
+              GridColumn(
+                  columnName: Item.priceThreeKey,
+                  label: Center(child: const Text('Last Out Date'))),
+
+              // Add more columns as needed
             ],
           ),
         ),
@@ -236,8 +233,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                       ),
                       PosTextFormField(
                         inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\-?\d*'))
+                          FilteringTextInputFormatter.allow(RegExp(r'^-?\d*'))
                         ],
                         width: 100.0,
                         labelText: 'Quantity',

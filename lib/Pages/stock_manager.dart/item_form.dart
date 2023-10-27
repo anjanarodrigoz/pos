@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:pos/widgets/pos_button.dart';
-import 'package:window_manager/window_manager.dart';
 
 import '../../database/item_db_service.dart';
 import '../../models/item.dart';
@@ -24,14 +23,9 @@ class _ItemFormPageState extends State<ItemFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1150, 800), size: Size(1150, 800), center: true);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
     return Scaffold(
         appBar: AppBar(
+          toolbarHeight: 40.0,
           title: Text(
             'New Item',
             style: TStyle.titleBarStyle,
@@ -45,110 +39,126 @@ class _ItemFormPageState extends State<ItemFormPage> {
                         key: _formKey,
                         child: Padding(
                             padding: const EdgeInsets.all(20.0),
-                            child: Column(children: [
-                              Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Column(
+                            child: Card(
+                              elevation: 5.0,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: Text(
+                                      '- Item Details -',
+                                      style: TextStyle(
+                                          color: Colors.grey.shade500),
+                                    ),
+                                  ),
+                                  Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
                                       children: [
-                                        Card(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(20.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  '- Item Details -',
-                                                  style: TextStyle(
-                                                      color:
-                                                          Colors.grey.shade500),
-                                                ),
-                                                const SizedBox(
-                                                  height: 20.0,
-                                                ),
-                                                PosTextFormField(
-                                                  labelText: 'Item Id',
-                                                  onSaved: (value) =>
-                                                      _item.id = value!,
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Please enter item id';
-                                                    }
+                                        Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              PosTextFormField(
+                                                labelText: 'Item Id',
+                                                onSaved: (value) =>
+                                                    _item.id = value!,
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'Please enter item id';
+                                                  }
 
-                                                    return null;
-                                                  },
-                                                ),
-                                                PosTextFormField(
-                                                  labelText: 'Item Name',
-                                                  onSaved: (value) =>
-                                                      _item.name = value!,
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Please enter item name';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                                PosTextFormField(
-                                                  labelText: 'Description',
-                                                  onSaved: (value) =>
-                                                      _item.description = value,
-                                                ),
-                                                PosTextFormField(
-                                                  labelText: 'Comment',
-                                                  onSaved: (value) =>
-                                                      _item.comment = value,
-                                                ),
-                                                // Add more TextFormField widgets for other customer properties
-                                                PosTextFormField(
-                                                  labelText: 'Price',
-                                                  validator: (value) =>
-                                                      validatePrice(value),
-                                                  onSaved: (value) => _item
-                                                          .price =
-                                                      value == null
-                                                          ? 0.0
-                                                          : double.parse(value),
-                                                ),
-                                                PosTextFormField(
-                                                    labelText: 'Price Two',
-                                                    onSaved: (value) =>
-                                                        _item.priceTwo =
-                                                            validateOtherPrice(
-                                                                value)),
-                                                PosTextFormField(
-                                                    labelText: 'Price Three',
-                                                    onSaved: (value) =>
-                                                        _item.priceThree =
-                                                            validateOtherPrice(
-                                                                value)),
-                                                PosTextFormField(
-                                                    labelText: 'Price Four',
-                                                    onSaved: (value) =>
-                                                        _item.priceFour =
-                                                            validateOtherPrice(
-                                                                value)),
-                                                PosTextFormField(
-                                                    labelText: 'Price Five',
-                                                    onSaved: (value) {
-                                                      _item.priceFive =
-                                                          validateOtherPrice(
-                                                              value);
-                                                    }),
+                                                  return null;
+                                                },
+                                              ),
+                                              PosTextFormField(
+                                                labelText: 'Item Name',
+                                                onSaved: (value) =>
+                                                    _item.name = value!,
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'Please enter item name';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                              PosTextFormField(
+                                                labelText: 'Description',
+                                                onSaved: (value) =>
+                                                    _item.description = value,
+                                              ),
+                                              PosTextFormField(
+                                                labelText: 'Comment',
+                                                onSaved: (value) =>
+                                                    _item.comment = value,
+                                              ),
+                                              // Add more TextFormField widgets for other customer properties
 
-                                                // Add more TextFormField widgets for other customer properties
-                                              ],
-                                            ),
+                                              // Add more TextFormField widgets for other customer properties
+                                            ],
                                           ),
                                         ),
-                                      ],
+                                        Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Column(
+                                            children: [
+                                              PosTextFormField(
+                                                labelText: 'Price',
+                                                validator: (value) =>
+                                                    validatePrice(value),
+                                                onSaved: (value) =>
+                                                    _item.price = value == null
+                                                        ? 0.0
+                                                        : double.parse(value),
+                                              ),
+                                              PosTextFormField(
+                                                  labelText: 'Price Two',
+                                                  onSaved: (value) =>
+                                                      _item.priceTwo =
+                                                          validateOtherPrice(
+                                                              value)),
+                                              PosTextFormField(
+                                                  labelText: 'Price Three',
+                                                  onSaved: (value) =>
+                                                      _item.priceThree =
+                                                          validateOtherPrice(
+                                                              value)),
+                                              PosTextFormField(
+                                                  labelText: 'Price Four',
+                                                  onSaved: (value) =>
+                                                      _item.priceFour =
+                                                          validateOtherPrice(
+                                                              value)),
+                                              PosTextFormField(
+                                                  labelText: 'Price Five',
+                                                  onSaved: (value) {
+                                                    _item.priceFive =
+                                                        validateOtherPrice(
+                                                            value);
+                                                  }),
+                                            ],
+                                          ),
+                                        ),
+                                      ]),
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: PosButton(
+                                          text: 'Save Item',
+                                          onPressed: _saveItemDetails),
                                     ),
-                                  ])
-                            ]))))),
-            PosButton(text: 'Save Item', onPressed: _saveItemDetails)
+                                  )
+                                ],
+                              ),
+                            ))))),
           ],
         ));
   }
