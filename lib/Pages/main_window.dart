@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
@@ -9,7 +12,7 @@ import 'package:pos/Pages/quotation_manager/all_quotation_invoice.dart';
 import 'package:pos/Pages/setup/setup_home_page.dart';
 import 'package:pos/Pages/stock_manager.dart/stock_page.dart';
 import 'package:pos/Pages/supplyer_manager/supplyer_page.dart';
-import 'package:pos/database/customer_db_service.dart';
+import 'package:pos/controllers/size_controller.dart';
 import 'package:window_manager/window_manager.dart';
 import '../theme/t_colors.dart';
 import 'invoice_manager/invoice_page.dart';
@@ -28,26 +31,22 @@ class _MainWindowState extends State<MainWindow> {
 
   @override
   Widget build(BuildContext context) {
-    WindowOptions windowOptions = const WindowOptions(
-        size: Size(460, 380),
-        minimumSize: Size(460, 380),
-        maximumSize: Size(460, 380),
+    if (Platform.isWindows || Platform.isMacOS) {
+      WindowOptions windowOptions = const WindowOptions(
+        size: Size(500, 400),
         center: true,
-        titleBarStyle: TitleBarStyle.hidden,
-        windowButtonVisibility: false);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
+        skipTaskbar: false,
+      );
+      windowManager.waitUntilReadyToShow(windowOptions, () async {
+        await windowManager.show();
+        await windowManager.focus();
+      });
+    }
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
       key: _scaffoldKey,
       body: Column(
         children: [
-          Container(
-            color: TColors.blue,
-            height: 40.0,
-          ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             child: Column(
@@ -98,7 +97,7 @@ class _MainWindowState extends State<MainWindow> {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          fixedSize: Size(200, 50.0),
+          fixedSize: const Size(200, 50.0),
           backgroundColor: TColors.blue,
         ),
         child: Text(text),
@@ -107,42 +106,75 @@ class _MainWindowState extends State<MainWindow> {
   }
 
   Future<void> openNewWindow() async {
+    await windowResizer();
+
     Get.offAll(() => InvoicePage());
   }
 
-  openCustomerManager() {
+  openCustomerManager() async {
+    await windowResizer();
+
     Get.offAll(() => const CustomerPage());
   }
 
-  openStockManager() {
+  openStockManager() async {
+    await windowResizer(width: 900, height: 750);
+
     Get.offAll(() => const StockPage());
   }
 
-  openSupplyerManager() {
+  openSupplyerManager() async {
+    await windowResizer();
+
     Get.offAll(() => SupplyerPage());
   }
 
-  openPaymentManager() {
+  openPaymentManager() async {
+    await windowResizer();
+
     Get.offAll(() => const PaymentPage());
   }
 
-  openSupplyInvoiceManager() {
+  openSupplyInvoiceManager() async {
+    await windowResizer();
+
     Get.offAll(() => SupplyAllInvoice());
   }
 
-  openQuoteManager() {
+  openQuoteManager() async {
+    await windowResizer();
+
     Get.offAll(() => AllQuotesPage());
   }
 
-  openCreditNoteManager() {
+  openCreditNoteManager() async {
+    await windowResizer();
+
     Get.offAll(() => AllCreditNotePage());
   }
 
-  backupFile() {
+  backupFile() async {
+    await windowResizer(width: 900, height: 600);
+
     Get.offAll(() => const SetupHomePage());
   }
 
-  openReport() {
-    Get.offAll(() => ReportHomePage());
+  openReport() async {
+    await windowResizer();
+    Get.offAll(() => const ReportHomePage());
+  }
+
+  Future<void> windowResizer({double? width, double? height}) async {
+    if (Platform.isWindows || Platform.isMacOS) {
+      WindowOptions windowOptions = WindowOptions(
+        size: Size(width ?? 1250, height ?? 750),
+        center: true,
+        skipTaskbar: false,
+      );
+      windowManager.waitUntilReadyToShow(windowOptions, () async {
+        await windowManager.show();
+        await windowManager.focus();
+      });
+    }
   }
 }

@@ -7,10 +7,10 @@ import 'package:pos/models/address.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/utils/val.dart';
+import 'package:pos/widgets/pos_appbar.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/verify_dialog.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:window_manager/window_manager.dart';
 import '../../models/invoice.dart';
 import '../../models/payment.dart';
 import '../../models/payment.dart';
@@ -49,26 +49,8 @@ class _PaymentPageState extends State<PaymentPage> {
 
   @override
   Widget build(BuildContext context) {
-    WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1150, 800), size: Size(1150, 800), center: true);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
-
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: TColors.blue,
-        leading: IconButton(
-            onPressed: () {
-              Get.offAll(const MainWindow());
-            },
-            icon: Icon(Icons.arrow_back_outlined)),
-        title: Text(
-          'Payments',
-          style: TStyle.titleBarStyle,
-        ),
-      ),
+      appBar: const PosAppBar(title: 'Payments'),
       body: Container(
         padding: EdgeInsets.all(20.0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -77,6 +59,7 @@ class _PaymentPageState extends State<PaymentPage> {
               gridLinesVisibility: GridLinesVisibility.both,
               headerGridLinesVisibility: GridLinesVisibility.both,
               allowFiltering: true,
+              rowHeight: 30.0,
               allowColumnsResizing: true,
               showFilterIconOnHover: true,
               columnWidthMode: ColumnWidthMode.auto,
@@ -211,28 +194,40 @@ class PaymentDataSource extends DataGridSource {
       if (e.columnName == Payment.dateKey) {
         return Container(
           alignment: Alignment.center,
-          padding: EdgeInsets.all(8.0),
-          child: Text(MyFormat.formatDateOne(e.value)),
+          padding: const EdgeInsets.all(4.0),
+          child: Text(
+            MyFormat.formatDateOne(e.value),
+            style: const TextStyle(fontSize: 13.0),
+          ),
         );
       }
       if (e.columnName == Payment.timeKey) {
         return Container(
           alignment: Alignment.center,
-          padding: EdgeInsets.all(8.0),
-          child: Text(MyFormat.formatTime(e.value)),
+          padding: const EdgeInsets.all(4.0),
+          child: Text(
+            MyFormat.formatTime(e.value),
+            style: const TextStyle(fontSize: 13.0),
+          ),
         );
       }
       if (e.columnName == Payment.amountKey) {
         return Container(
           alignment: Alignment.centerRight,
-          padding: EdgeInsets.all(8.0),
-          child: Text(MyFormat.formatCurrency(e.value)),
+          padding: const EdgeInsets.all(4.0),
+          child: Text(
+            MyFormat.formatCurrency(e.value),
+            style: const TextStyle(fontSize: 13.0),
+          ),
         );
       }
       return Container(
         alignment: Alignment.center,
-        padding: EdgeInsets.all(8.0),
-        child: Text(e.value.toString()),
+        padding: const EdgeInsets.all(4.0),
+        child: Text(
+          e.value.toString(),
+          style: const TextStyle(fontSize: 13.0),
+        ),
       );
     }).toList());
   }

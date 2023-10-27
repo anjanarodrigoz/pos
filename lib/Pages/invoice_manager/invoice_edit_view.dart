@@ -47,8 +47,8 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
   Widget build(BuildContext context) {
     this.context = context;
     return Container(
-      width: 1100,
-      padding: EdgeInsets.all(10.0),
+      width: MediaQuery.of(context).size.width - 200,
+      padding: const EdgeInsets.all(10.0),
       child: Column(
         children: [
           Card(
@@ -391,7 +391,7 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                         controller: qtyController,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
+                          FilteringTextInputFormatter.allow(RegExp(r'^-?\d*'))
                         ],
                       ),
                     ],
@@ -546,7 +546,7 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                         controller: qtyController,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
+                          FilteringTextInputFormatter.allow(RegExp(r'^-?\d*'))
                         ],
                       ),
                     ],

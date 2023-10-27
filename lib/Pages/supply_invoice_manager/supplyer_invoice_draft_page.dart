@@ -8,7 +8,6 @@ import 'package:pos/widgets/comments_widget.dart';
 import 'package:pos/widgets/extra_charge_widget.dart';
 import 'package:pos/widgets/item_select_widget.dart';
 import 'package:pos/widgets/pos_text_form_field.dart';
-import 'package:window_manager/window_manager.dart';
 import '../../controllers/suppy_invoice_draft_controller.dart';
 import '../../theme/t_colors.dart';
 import '../../widgets/pos_button.dart';
@@ -24,12 +23,6 @@ class SupplyInvoiceDraftPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     this.context = context;
-    WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1200, 800), size: Size(1200, 800), center: true);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Show the dialog
@@ -38,6 +31,7 @@ class SupplyInvoiceDraftPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 40.0,
         title: Obx(() => Text(
               'Draft Invoice - #${_controller.invoiceId.value}',
               style: TStyle.titleBarStyle,

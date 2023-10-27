@@ -131,9 +131,8 @@ class ExtraChargeDialog extends StatelessWidget {
                     width: 100.0,
                     labelText: 'Quantity',
                     controller: qtyController,
-                    keyboardType: TextInputType.number,
                     inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
+                      FilteringTextInputFormatter.allow(RegExp(r'^-?\d*'))
                     ],
                   ),
                 ],

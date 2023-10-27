@@ -1,21 +1,16 @@
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pos/database/customer_db_service.dart';
+import 'package:pos/Pages/setup/backup_page.dart';
+import 'package:pos/Pages/setup/company_details_page.dart';
 import 'package:pos/database/main_db.dart';
 import 'package:pos/theme/t_colors.dart';
+import 'package:pos/widgets/pos_appbar.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/pos_text_form_field.dart';
-import 'package:pos/widgets/progressing_dot.dart';
+import 'package:pos/widgets/rounded_icon_button.dart';
 import 'package:pos/widgets/verify_dialog.dart';
-import 'package:window_manager/window_manager.dart';
-import 'package:flutter_highlight/flutter_highlight.dart';
-import 'package:flutter_highlight/themes/github.dart';
 
-import '../../widgets/deleteing_animation.dart';
-import '../main_window.dart';
+import 'email_setup_page.dart';
 
 class SetupHomePage extends StatefulWidget {
   const SetupHomePage({super.key});
@@ -25,91 +20,61 @@ class SetupHomePage extends StatefulWidget {
 }
 
 class _SetupHomePageState extends State<SetupHomePage> {
-  dynamic data;
+  @override
+  void initState() {
+    super.initState();
+    displayWidget = const CompanyDetailsPage();
+  }
+
+  Widget? displayWidget;
   TextEditingController controller = TextEditingController();
-  MainDB dbContoller = Get.put(MainDB());
+
   @override
   Widget build(BuildContext context) {
-    WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(500, 500), size: Size(700, 500), center: true);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
     return Scaffold(
-      appBar: AppBar(
-          leading: IconButton(
-              onPressed: () {
-                Get.offAll(const MainWindow());
-              },
-              icon: Icon(Icons.arrow_back_outlined)),
-          backgroundColor: TColors.blue,
-          title: const Text('Setup')),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
+        appBar: const PosAppBar(title: 'Setup'),
+        body: Row(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                PosButton(
-                    icon: Icons.backup_rounded,
-                    text: 'Backup Data',
-                    onPressed: () async {
-                      await dbContoller.backupDBFile(context);
-                      data = '';
-                      setState(() {});
-                    }),
-                PosButton(
-                    icon: Icons.restore_page_rounded,
-                    text: 'Upload Data',
-                    onPressed: () async {
-                      await dbContoller.readDBFile(context);
-                      setState(() {});
-                    }),
-                PosButton(
-                    color: Colors.red.shade800,
-                    icon: Icons.restore_from_trash,
-                    text: 'Delete Database',
-                    onPressed: () async {
-                      await verify();
-                    }),
-              ],
+            Container(
+              color: Colors.grey.shade200,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 30.0,
+                    ),
+                    RoundedIconButton(
+                        icon: Icons.business,
+                        onPressed: () {
+                          displayWidget = const CompanyDetailsPage();
+                          setState(() {});
+                        }),
+                    RoundedIconButton(
+                        icon: Icons.storage,
+                        onPressed: () {
+                          displayWidget = const BackupPage();
+                          setState(() {});
+                        }),
+                    RoundedIconButton(
+                        icon: Icons.email_rounded,
+                        onPressed: () {
+                          displayWidget = const EmailSetupPage();
+                          setState(() {});
+                        }),
+                  ],
+                ),
+              ),
             ),
-            showContent()
+            const SizedBox(
+              width: 5.0,
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width - 62,
+              height: MediaQuery.of(context).size.height,
+              child: displayWidget,
+            )
           ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> verify() async {
-    showDialog(
-        context: context,
-        builder: ((context) => POSVerifyDialog(
-            color: Colors.red.shade900,
-            continueText: 'Delete',
-            title: 'Warning!',
-            content:
-                'Your data will be deleted if you continue.\nAre you sure you want to proceed?',
-            onContinue: () async {
-              Get.back();
-              await dbContoller.resetDatabase(context);
-            },
-            verifyText: 'DELETE MY ALL DATA')));
-  }
-
-  Widget showContent() {
-    return Expanded(
-      child: Container(
-        margin: EdgeInsets.all(40),
-        width: double.maxFinite,
-        child: Obx(() {
-          return Column(
-            children: dbContoller.content.value,
-          );
-        }),
-      ),
-    );
+        ));
   }
 }

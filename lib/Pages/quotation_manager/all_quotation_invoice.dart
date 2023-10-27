@@ -11,9 +11,9 @@ import 'package:pos/enums/enums.dart';
 import 'package:pos/models/invoice.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/my_format.dart';
+import 'package:pos/widgets/pos_appbar.dart';
 
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:window_manager/window_manager.dart';
 
 import '../../widgets/pos_button.dart';
 
@@ -27,30 +27,12 @@ class AllQuotesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1300, 800), size: Size(1300, 800), center: true);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
-
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: TColors.blue,
-        leading: IconButton(
-            onPressed: () {
-              Get.offAll(const MainWindow());
-            },
-            icon: Icon(Icons.arrow_back_outlined)),
-        title: Text(
-          'Quatation',
-          style: TStyle.titleBarStyle,
-        ),
-      ),
+      appBar: const PosAppBar(title: 'Quatation'),
       body: Container(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          SizedBox(
+          const SizedBox(
             height: 10.0,
           ),
           PosButton(
@@ -86,6 +68,7 @@ class AllQuotesPage extends StatelessWidget {
                       gridLinesVisibility: GridLinesVisibility.both,
                       headerGridLinesVisibility: GridLinesVisibility.both,
                       allowFiltering: true,
+                      rowHeight: 30.0,
                       allowColumnsResizing: true,
                       showFilterIconOnHover: true,
                       columnWidthMode: ColumnWidthMode.auto,
@@ -125,9 +108,6 @@ class AllQuotesPage extends StatelessWidget {
                         GridColumn(
                             columnName: Invoice.totalKey,
                             label: Center(child: const Text('Total'))),
-                        GridColumn(
-                            columnName: Invoice.paykey,
-                            label: Center(child: const Text('Out Standing'))),
 
                         // Add more columns as needed
                       ],
@@ -158,7 +138,6 @@ class InvoiceDataSource extends DataGridSource {
               DataGridCell(columnName: Invoice.netKey, value: e.totalNetPrice),
               DataGridCell(columnName: Invoice.gstKey, value: e.totalGstPrice),
               DataGridCell(columnName: Invoice.totalKey, value: e.total),
-              DataGridCell(columnName: Invoice.paykey, value: e.toPay),
             ]))
         .toList();
   }
@@ -174,26 +153,27 @@ class InvoiceDataSource extends DataGridSource {
       if (e.columnName == Invoice.createdDateKey) {
         return Container(
           alignment: Alignment.center,
-          padding: EdgeInsets.all(8.0),
-          child: Text(MyFormat.formatDate(e.value)),
+          padding: EdgeInsets.all(4.0),
+          child: Text(MyFormat.formatDate(e.value),
+              style: const TextStyle(fontSize: 13.0)),
         );
       }
 
       if (e.columnName == Invoice.netKey ||
           e.columnName == Invoice.gstKey ||
-          e.columnName == Invoice.totalKey ||
-          e.columnName == Invoice.paykey) {
+          e.columnName == Invoice.totalKey) {
         return Container(
           alignment: Alignment.centerRight,
-          padding: EdgeInsets.all(8.0),
-          child: Text(MyFormat.formatCurrency(e.value)),
+          padding: EdgeInsets.all(4.0),
+          child: Text(MyFormat.formatCurrency(e.value),
+              style: const TextStyle(fontSize: 13.0)),
         );
       }
 
       return Container(
         alignment: Alignment.center,
-        padding: EdgeInsets.all(8.0),
-        child: Text(e.value.toString()),
+        padding: EdgeInsets.all(4.0),
+        child: Text(e.value.toString(), style: const TextStyle(fontSize: 13.0)),
       );
     }).toList());
   }

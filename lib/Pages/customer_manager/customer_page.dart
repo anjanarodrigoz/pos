@@ -9,7 +9,6 @@ import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/val.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:window_manager/window_manager.dart';
 
 import '../../models/customer.dart';
 import 'customer_view.dart';
@@ -48,18 +47,20 @@ class _CustomerPageState extends State<CustomerPage> {
 
   @override
   Widget build(BuildContext context) {
-    WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1150, 800), size: Size(1150, 800), center: true);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
+    // WindowOptions windowOptions = const WindowOptions(
+    //     windowButtonVisibility: true,
+    //     center: true,
+    //     titleBarStyle: TitleBarStyle.normal);
+    // windowManager.waitUntilReadyToShow(windowOptions, () async {
+    //   await windowManager.show();
+    //   await windowManager.maximize();
+    // });
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: TColors.blue,
         leading: IconButton(
-            onPressed: () {
+            onPressed: () async {
               Get.offAll(const MainWindow());
             },
             icon: Icon(Icons.arrow_back_outlined)),
@@ -87,6 +88,7 @@ class _CustomerPageState extends State<CustomerPage> {
               allowColumnsResizing: true,
               showFilterIconOnHover: true,
               columnWidthMode: ColumnWidthMode.auto,
+              rowHeight: 30.0,
               source: customerDataSource,
               onCellTap: ((details) {
                 if (details.rowColumnIndex.rowIndex != 0) {
@@ -171,13 +173,15 @@ class CustomerDataSource extends DataGridSource {
 
   @override
   DataGridRowAdapter? buildRow(DataGridRow row) {
-    // TODO: implement buildRow
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((e) {
       return Container(
         alignment: Alignment.center,
-        padding: EdgeInsets.all(8.0),
-        child: Text(e.value.toString()),
+        padding: const EdgeInsets.all(4.0),
+        child: Text(
+          e.value.toString(),
+          style: const TextStyle(fontSize: 13.0),
+        ),
       );
     }).toList());
   }

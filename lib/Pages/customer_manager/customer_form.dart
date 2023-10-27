@@ -4,7 +4,6 @@ import 'package:pos/database/customer_db_service.dart';
 import 'package:pos/models/address.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:pos/widgets/pos_button.dart';
-import 'package:window_manager/window_manager.dart';
 
 import '../../models/customer.dart';
 import '../../widgets/pos_text_form_field.dart';
@@ -45,15 +44,9 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1150, 800), size: Size(1150, 800), center: true);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
-
     return Scaffold(
       appBar: AppBar(
+          toolbarHeight: 40.0,
           leading: IconButton(
             onPressed: () {
               Get.back();
@@ -95,7 +88,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                                           style: TextStyle(
                                               color: Colors.grey.shade500),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 20.0,
                                         ),
                                         PosTextFormField(
@@ -168,7 +161,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                                 ),
                               ],
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 20.0,
                             ),
                             Column(
@@ -188,7 +181,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                                               style: TextStyle(
                                                   color: Colors.grey.shade500),
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 20.0,
                                             ),
                                             PosTextFormField(
@@ -229,7 +222,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 20.0,
                                     ),
                                     Card(
@@ -242,7 +235,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                                               style: TextStyle(
                                                   color: Colors.grey.shade500),
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 20.0,
                                             ),
                                             PosTextFormField(
@@ -281,7 +274,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                                     ),
                                   ],
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 5.0,
                                 ),
                                 Card(
@@ -320,7 +313,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(right: 30.0),
+              padding: const EdgeInsets.only(right: 30.0, bottom: 10.0),
               child: PosButton(
                   width: 200.0,
                   onPressed: _saveCustomerDetails,

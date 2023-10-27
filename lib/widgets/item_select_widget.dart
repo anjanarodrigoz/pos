@@ -91,57 +91,60 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-              SfDataGrid(
-                gridLinesVisibility: GridLinesVisibility.both,
-                headerGridLinesVisibility: GridLinesVisibility.both,
-                allowFiltering: true,
-                allowColumnsResizing: true,
-                showFilterIconOnHover: true,
-                columnWidthMode: ColumnWidthMode.auto,
-                source: itemDataSource,
-                onCellTap: ((details) {
-                  if (details.rowColumnIndex.rowIndex != 0) {
-                    int selectedRowIndex = details.rowColumnIndex.rowIndex - 1;
-                    var row = itemDataSource.effectiveRows
-                        .elementAt(selectedRowIndex);
+              Expanded(
+                child: SfDataGrid(
+                  gridLinesVisibility: GridLinesVisibility.both,
+                  headerGridLinesVisibility: GridLinesVisibility.both,
+                  rowHeight: 30.0,
+                  allowFiltering: true,
+                  allowColumnsResizing: true,
+                  showFilterIconOnHover: true,
+                  columnWidthMode: ColumnWidthMode.auto,
+                  source: itemDataSource,
+                  onCellTap: ((details) {
+                    if (details.rowColumnIndex.rowIndex != 0) {
+                      int selectedRowIndex =
+                          details.rowColumnIndex.rowIndex - 1;
+                      var row = itemDataSource.effectiveRows
+                          .elementAt(selectedRowIndex);
 
-                    addItemtoList(row.getCells()[0].value.toString());
-                  }
-                }),
-                columns: [
-                  GridColumn(
-                      columnName: Item.idKey,
-                      label: Center(child: const Text('Item ID'))),
-                  GridColumn(
-                      columnName: Item.nameKey,
-                      label: Center(child: const Text('Item Name'))),
-                  GridColumn(
-                      columnName: Item.qtyKey,
-                      label: Center(child: const Text('Qty'))),
-                  GridColumn(
-                      columnName: Item.priceKey,
-                      label: Center(child: const Text('Price'))),
-                  GridColumn(
-                      columnName: Item.priceTwoKey,
-                      label: Center(child: const Text('Price 02'))),
-                  GridColumn(
-                      columnName: Item.priceThreeKey,
-                      label: Center(child: const Text('Price 03'))),
-                  GridColumn(
-                      columnName: Item.priceFourKey,
-                      label: Center(child: const Text('Price 04'))),
-                  GridColumn(
-                      columnName: Item.priceFiveKey,
-                      label: Center(child: const Text('Price 05'))),
-                  GridColumn(
-                      columnName: Item.lastInDateKey,
-                      label: Center(child: const Text('Last In Date'))),
-                  GridColumn(
-                      columnName: Item.lastOutDateKey,
-                      label: Center(child: const Text('Last Out Date'))),
-
-                  // Add more columns as needed
-                ],
+                      addItemtoList(row.getCells()[0].value.toString());
+                    }
+                  }),
+                  columns: [
+                    GridColumn(
+                        columnName: Item.idKey,
+                        label: Center(child: const Text('Item ID'))),
+                    GridColumn(
+                        columnName: Item.nameKey,
+                        label: Center(child: const Text('Item Name'))),
+                    GridColumn(
+                        columnName: Item.qtyKey,
+                        label: Center(child: const Text('Qty'))),
+                    GridColumn(
+                        columnName: Item.priceKey,
+                        label: Center(child: const Text('Price'))),
+                    GridColumn(
+                        columnName: Item.priceTwoKey,
+                        label: Center(child: const Text('Price 02'))),
+                    GridColumn(
+                        columnName: Item.priceThreeKey,
+                        label: Center(child: const Text('Price 03'))),
+                    GridColumn(
+                        columnName: Item.priceThreeKey,
+                        label: Center(child: const Text('Price 04'))),
+                    GridColumn(
+                        columnName: Item.priceThreeKey,
+                        label: Center(child: const Text('Price 05'))),
+                    GridColumn(
+                        columnName: Item.priceThreeKey,
+                        label: Center(child: const Text('Last In Date'))),
+                    GridColumn(
+                        columnName: Item.priceThreeKey,
+                        label: Center(child: const Text('Last Out Date'))),
+                    // Add more columns as needed
+                  ],
+                ),
               ),
             ],
           ),
@@ -188,8 +191,8 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
                         width: 100.0,
                         labelText: 'Net price',
                         controller: netPriceController,
-                        keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
                               RegExp(r'^\d*\.?\d*')),
@@ -198,8 +201,7 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
                           if (value.isNotEmpty) {
                             net = double.parse(value);
                             double totalWithGST = (net *
-                                (1 +
-                                    Val.gstTotalPrecentage)); // Assuming GST is 10%
+                                Val.gstTotalPrecentage); // Assuming GST is 10%
                             totalPriceController.text =
                                 totalWithGST.toStringAsFixed(2);
                           } else {
@@ -235,8 +237,7 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
                       ),
                       PosTextFormField(
                         inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\-?\d*'))
+                          FilteringTextInputFormatter.allow(RegExp(r'^-?\d*'))
                         ],
                         width: 100.0,
                         labelText: 'Quantity',

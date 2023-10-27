@@ -21,6 +21,7 @@ class CreditDraftPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 40.0,
         title: Obx(() => Text(
               'Credit Note - #${_controller.invoiceId.value}',
               style: TStyle.titleBarStyle,

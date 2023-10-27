@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class TColors {
-  static Color blue = const Color(0xff094E8C);
+  static const Color blue = const Color(0xff094E8C);
   static Color blue1 = const Color(0xff2B55EA);
   static Color blue2 = const Color(0xffB5C9FD);
   static Color green = const Color(0xff0E820C);

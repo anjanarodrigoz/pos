@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:get_storage/get_storage.dart';
 import 'package:pos/models/supplyer.dart';
 import 'package:pos/utils/val.dart';
@@ -22,14 +24,18 @@ class SupplyerDB implements AbstractDB {
   }
 
   Stream<List<Supplyer>> getStreamAllSupplyer() async* {
-    List supplyerData = await _storage.getValues().toList() ?? [];
-
+    StreamController<List<Supplyer>> streamController =
+        StreamController<List<Supplyer>>();
+    List<Supplyer> supplyerList = await getAllSupplyers();
+    streamController.add(supplyerList);
     _storage.listen(() async {
-      supplyerData.clear();
-      supplyerData = await _storage.getValues().toList() ?? [];
+      supplyerList.clear();
+
+      supplyerList = await getAllSupplyers();
+      streamController.add(supplyerList);
     });
 
-    yield supplyerData.map((data) => Supplyer.fromJson(data)).toList();
+    yield* streamController.stream;
   }
 
   Supplyer getSupplyer(String supplyerId) {
@@ -51,8 +57,8 @@ class SupplyerDB implements AbstractDB {
 
   static String generateSupplyerId() {
     final storage = GetStorage();
-    final lastId = storage.read(DBVal.supplyerId) ?? '1000';
-    final lastNumber = int.tryParse(lastId) ?? 1000;
+    final lastId = storage.read(DBVal.supplyerId) ?? '0';
+    final lastNumber = int.tryParse(lastId) ?? 0;
 
     final nextNumber = lastNumber + 1;
     return '$nextNumber';
@@ -72,7 +78,7 @@ class SupplyerDB implements AbstractDB {
   @override
   Future<Map> backupData() async {
     final List supplyerData = await _storage.getValues().toList() ?? [];
-    final lastId = GetStorage().read(DBVal.supplyerId) ?? '1000';
+    final lastId = GetStorage().read(DBVal.supplyerId) ?? '0';
 
     return {DBVal.supplyer: supplyerData, DBVal.supplyerId: lastId};
   }

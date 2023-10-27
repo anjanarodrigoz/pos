@@ -8,7 +8,6 @@ import 'package:pos/enums/enums.dart';
 import 'package:pos/models/extra_charges.dart';
 import 'package:pos/models/supplyer.dart';
 import 'package:pos/utils/alert_message.dart';
-import 'package:window_manager/window_manager.dart';
 import '../../models/invoice_row.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../models/cart.dart';
@@ -48,14 +47,8 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
   Widget build(BuildContext context) {
     this.context = context;
 
-    WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1300, 800), size: Size(1300, 800), center: true);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
     return Container(
-      width: 1100,
+      width: MediaQuery.of(context).size.width - 200,
       padding: const EdgeInsets.all(10.0),
       child: Column(
         children: [
@@ -254,18 +247,15 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
     ];
 
     for (ExtraCharges chrage in extraList) {
-      double gstPrice = (chrage.price * Val.gstPrecentage);
-      double itemPrcie = (chrage.price * Val.gstTotalPrecentage);
-      double totalPrice = (itemPrcie * chrage.qty);
       invoiceData.add(InvoiceRow(
         itemId: {
           extraList.indexOf(chrage): '#${extraList.indexOf(chrage) + 1}'
         },
         itemName: {InvoiceItemCategory.extraChrage: chrage.name},
-        gst: MyFormat.formatCurrency(gstPrice),
+        gst: MyFormat.formatCurrency(chrage.gst),
         netPrice: MyFormat.formatCurrency(chrage.price),
-        itemPrice: MyFormat.formatCurrency(itemPrcie),
-        total: MyFormat.formatCurrency(totalPrice),
+        itemPrice: MyFormat.formatCurrency(chrage.itemPrice),
+        total: MyFormat.formatCurrency(chrage.totalPrice),
         qty: chrage.qty.toString(),
       ));
 
@@ -389,7 +379,7 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
                         controller: qtyController,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
+                          FilteringTextInputFormatter.allow(RegExp(r'^-?\d*'))
                         ],
                       ),
                     ],
@@ -458,7 +448,7 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
         TextEditingController(text: oldExtra.qty.toString());
     TextEditingController nameController =
         TextEditingController(text: oldExtra.name);
-    double net = 0;
+    double net = oldExtra.price;
 
     showDialog(
       context: context,
@@ -557,7 +547,7 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
                         controller: qtyController,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
+                          FilteringTextInputFormatter.allow(RegExp(r'^-?\d*'))
                         ],
                       ),
                     ],

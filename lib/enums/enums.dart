@@ -20,7 +20,8 @@ enum ReportType {
   stockRequired,
   stockQuantity,
   customerDetails,
-  outstanding
+  outstanding,
+  stockValue
 }
 
 extension InvoiceTypeCaps on InvoiceType {

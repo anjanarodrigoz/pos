@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pos/models/invoice_item.dart';
 import 'package:pos/widgets/outstanding_date_widget.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:window_manager/window_manager.dart';
 import '../../data_sources/invoiceDataSource.dart';
 import '../../enums/enums.dart';
 import '../../models/extra_charges.dart';
@@ -42,7 +41,7 @@ class CreditInvoicePage extends StatelessWidget {
     total = invoice.total;
 
     return SizedBox(
-      width: 1100,
+      width: MediaQuery.of(context).size.width - 200,
       child: Column(
         children: [
           Padding(
@@ -148,7 +147,7 @@ class CreditInvoicePage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
-            child: invoiceItemView(),
+            child: invoiceItemView(context),
           )
         ],
       ),
@@ -175,9 +174,10 @@ class CreditInvoicePage extends StatelessWidget {
     );
   }
 
-  invoiceItemView() {
+  invoiceItemView(BuildContext context) {
     return SizedBox(
-      height: 530.0,
+      width: MediaQuery.of(context).size.width - 200,
+      height: MediaQuery.of(context).size.height - 210,
       child: SfDataGrid(
         gridLinesVisibility: GridLinesVisibility.both,
         headerGridLinesVisibility: GridLinesVisibility.both,

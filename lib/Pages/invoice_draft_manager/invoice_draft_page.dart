@@ -27,6 +27,7 @@ class InvoiceDraftPage extends StatelessWidget {
     this.context = context;
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 40,
         title: Obx(() => Text(
               'Draft Invoice - #${_controller.invoiceId.value}',
               style: TStyle.titleBarStyle,

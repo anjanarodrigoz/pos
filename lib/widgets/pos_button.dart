@@ -22,8 +22,8 @@ class PosButton extends StatelessWidget {
       this.icon,
       this.iconColor,
       this.iconSize = 25,
-      this.width = 180.0,
-      this.height = 50.0});
+      this.width = 150.0,
+      this.height = 40.0});
 
   @override
   Widget build(BuildContext context) {

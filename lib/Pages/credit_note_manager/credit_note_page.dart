@@ -14,7 +14,6 @@ import 'package:pos/utils/alert_message.dart';
 import 'package:pos/widgets/alert_dialog.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/verify_dialog.dart';
-import 'package:window_manager/window_manager.dart';
 import '../../api/pdf_api.dart';
 import '../../api/pdf_invoice_api.dart';
 import '../../models/invoice.dart';
@@ -33,15 +32,10 @@ class CreditNotePage extends StatelessWidget {
   Widget build(BuildContext context) {
     this.context = context;
     invoice = CreditNoteDB().getInvoice(invoiceId);
-    WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1300, 800), size: Size(1300, 800), center: true);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
 
     return Scaffold(
         appBar: AppBar(
+          toolbarHeight: 40.0,
           backgroundColor: TColors.blue,
           title: Text('Credit Note #$invoiceId'),
           leading: IconButton(
@@ -51,34 +45,32 @@ class CreditNotePage extends StatelessWidget {
               icon: const Icon(Icons.arrow_back)),
         ),
         body: Row(children: [
-          Container(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Column(
-                children: [
-                  PosButton(
-                    onPressed: () => openEditInvoice(),
-                    text: 'Edit',
-                  ),
-                  PosButton(
-                    onPressed: () => openCopyInvoice(),
-                    text: 'Copy',
-                  ),
-                  PosButton(
-                    onPressed: () => printInvoice(context),
-                    text: 'Print',
-                  ),
-                  const SizedBox(
-                    height: 50,
-                  ),
-                  PosButton(
-                    onPressed: () => deleteInvoice(),
-                    text: 'Remove',
-                    color: Colors.red.shade400,
-                  ),
-                  SizedBox(height: 150),
-                ],
-              ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Column(
+              children: [
+                PosButton(
+                  onPressed: () => openEditInvoice(),
+                  text: 'Edit',
+                ),
+                PosButton(
+                  onPressed: () => openCopyInvoice(),
+                  text: 'Copy',
+                ),
+                PosButton(
+                  onPressed: () => printInvoice(context),
+                  text: 'Print',
+                ),
+                const SizedBox(
+                  height: 50,
+                ),
+                PosButton(
+                  onPressed: () => deleteInvoice(),
+                  text: 'Remove',
+                  color: Colors.red.shade400,
+                ),
+                SizedBox(height: 150),
+              ],
             ),
           ),
           CreditInvoicePage(invoice: invoice)

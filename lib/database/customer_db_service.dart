@@ -46,8 +46,8 @@ class CustomerDB implements AbstractDB {
 
   static String generateCustomerId() {
     final storage = GetStorage();
-    final lastId = storage.read(DBVal.customerId) ?? '1000';
-    final lastNumber = int.tryParse(lastId) ?? 1000;
+    final lastId = storage.read(DBVal.customerId) ?? '0';
+    final lastNumber = int.tryParse(lastId) ?? 0;
 
     final nextNumber = lastNumber + 1;
     return '$nextNumber';
@@ -67,7 +67,7 @@ class CustomerDB implements AbstractDB {
   @override
   Future<Map> backupData() async {
     final List customerData = await _storage.getValues().toList() ?? [];
-    final lastId = GetStorage().read(DBVal.customerId) ?? '1000';
+    final lastId = GetStorage().read(DBVal.customerId) ?? '0';
 
     return {DBVal.customers: customerData, DBVal.customerId: lastId};
   }

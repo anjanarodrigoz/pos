@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
 import 'package:pos/controllers/report_controller.dart';
+import 'package:pos/database/store_db.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:window_manager/window_manager.dart';
 import 'package:syncfusion_flutter_datagrid_export/export.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
@@ -29,13 +29,6 @@ class _ReportPageState extends State<ReportPage> {
   ReportController controller = Get.put(ReportController());
   @override
   Widget build(BuildContext context) {
-    WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1300, 800), size: Size(1300, 800), center: true);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
-
     return Obx(() {
       List<DataGridRow> rows = controller.rows;
       List<GridColumn> columns = controller.columns;
@@ -53,21 +46,22 @@ class _ReportPageState extends State<ReportPage> {
                         Text(
                           MyFormat.formatDateTwo(
                               controller.dateTimeRange.start),
-                          style: TextStyle(fontSize: 14.0),
+                          style: const TextStyle(fontSize: 14.0),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 10,
                         ),
-                        Text(
+                        const Text(
                           "-",
                           style: TextStyle(fontSize: 14.0),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 10,
                         ),
                         Text(
-                          MyFormat.formatDateTwo(controller.dateTimeRange.end),
-                          style: TextStyle(fontSize: 14.0),
+                          MyFormat.formatDateTwo(controller.dateTimeRange.end
+                              .subtract(const Duration(days: 1))),
+                          style: const TextStyle(fontSize: 14.0),
                         ),
                       ],
                     ),
@@ -108,31 +102,53 @@ class _ReportPageState extends State<ReportPage> {
                                         PdfPageTemplateElement(
                                             Rect.fromLTWH(0, 0, width, 65));
                                     header.graphics.drawString(
+                                        StoreDB().getStore().companyName,
+                                        PdfStandardFont(
+                                            PdfFontFamily.courier, 15,
+                                            style: PdfFontStyle.bold),
+                                        bounds:
+                                            const Rect.fromLTRB(350, 0, 2, 0));
+                                    header.graphics.drawString(
+                                      StoreDB().getStore().slogan,
+                                      PdfStandardFont(PdfFontFamily.courier, 8,
+                                          style: PdfFontStyle.regular),
+                                      bounds:
+                                          const Rect.fromLTRB(350, 15, 2, 0),
+                                    );
+                                    header.graphics.drawString(
                                       controller.title.keys.first,
                                       PdfStandardFont(PdfFontFamily.courier, 12,
                                           style: PdfFontStyle.bold),
                                       bounds:
                                           const Rect.fromLTWH(0, 0, 200, 50),
                                     );
-
-                                    if (controller.dateTimeRange.start.year !=
-                                        0) {
-                                      header.graphics.drawString(
-                                        'From ${MyFormat.formatDateTwo(controller.dateTimeRange.start)} To ${MyFormat.formatDateTwo(controller.dateTimeRange.end)}',
-                                        PdfStandardFont(
-                                            PdfFontFamily.courier, 8,
-                                            style: PdfFontStyle.regular),
-                                        bounds:
-                                            const Rect.fromLTRB(350, 10, 0, 0),
-                                      );
-                                    }
                                     header.graphics.drawString(
                                       controller.title.values.first,
                                       PdfStandardFont(PdfFontFamily.courier, 8,
                                           style: PdfFontStyle.regular),
                                       bounds:
-                                          const Rect.fromLTWH(0, 15, 200, 40),
+                                          const Rect.fromLTWH(0, 10, 200, 40),
                                     );
+                                    header.graphics.drawString(
+                                      'Created Date : ${MyFormat.formatDateOne(DateTime.now())}',
+                                      PdfStandardFont(PdfFontFamily.courier, 8,
+                                          style: PdfFontStyle.regular),
+                                      bounds:
+                                          const Rect.fromLTWH(0, 20, 200, 40),
+                                    );
+
+                                    if (controller.dateTimeRange.start.year !=
+                                        0) {
+                                      header.graphics.drawString(
+                                        'From ${MyFormat.formatDateTwo(controller.dateTimeRange.start)} To ${MyFormat.formatDateTwo(controller.dateTimeRange.end.subtract(const Duration(days: 1)))}',
+                                        PdfStandardFont(
+                                            PdfFontFamily.courier, 8,
+                                            style: PdfFontStyle.regular),
+                                        bounds:
+                                            const Rect.fromLTWH(0, 30, 200, 40),
+                                      );
+                                    }
+
                                     headerFooterExport.pdfDocumentTemplate.top =
                                         header;
                                   },

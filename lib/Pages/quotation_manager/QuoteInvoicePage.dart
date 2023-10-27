@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pos/models/invoice_item.dart';
 import 'package:pos/widgets/outstanding_date_widget.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:window_manager/window_manager.dart';
 import '../../data_sources/invoiceDataSource.dart';
 import '../../enums/enums.dart';
 import '../../models/extra_charges.dart';
@@ -20,19 +19,30 @@ class QuoteInvoicePage extends StatelessWidget {
   QuoteInvoicePage({super.key, required this.invoice});
 
   final ScrollController controller = ScrollController();
+
   final ScrollController controller2 = ScrollController();
+
   List<ExtraCharges> extraList = [];
+
   List<String> comments = [];
+
   double gstPrecentage = Val.gstPrecentage;
+
   List<InvoicedItem> invoicedItemList = [];
+
   double totalNetPrice = 0;
+
   double totalGstPrice = 0;
+
   double total = 0;
+
+  late BuildContext context;
 
   InvoiceDataSource invoiceDataSource = InvoiceDataSource(invoiceData: []);
 
   @override
   Widget build(BuildContext context) {
+    this.context = context;
     gstPrecentage = invoice.gstPrecentage;
     extraList = invoice.extraCharges ?? [];
     invoicedItemList = invoice.itemList;
@@ -42,7 +52,7 @@ class QuoteInvoicePage extends StatelessWidget {
     total = invoice.total;
 
     return SizedBox(
-      width: 1100,
+      width: MediaQuery.of(context).size.width - 200,
       child: Column(
         children: [
           Padding(
@@ -177,7 +187,8 @@ class QuoteInvoicePage extends StatelessWidget {
 
   invoiceItemView() {
     return SizedBox(
-      height: 530.0,
+      width: MediaQuery.of(context).size.width - 200,
+      height: MediaQuery.of(context).size.height - 250,
       child: SfDataGrid(
         gridLinesVisibility: GridLinesVisibility.both,
         headerGridLinesVisibility: GridLinesVisibility.both,

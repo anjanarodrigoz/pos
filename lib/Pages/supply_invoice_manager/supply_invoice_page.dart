@@ -14,7 +14,6 @@ import 'package:pos/widgets/alert_dialog.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/verify_dialog.dart';
 
-import 'package:window_manager/window_manager.dart';
 import '../../api/pdf_api.dart';
 import '../../api/pdf_invoice_api.dart';
 
@@ -31,15 +30,10 @@ class SupplyInvoicePage extends StatelessWidget {
   Widget build(BuildContext context) {
     this.context = context;
     invoice = SupplyerInvoiceDB().getInvoice(invoiceId);
-    WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1300, 800), size: Size(1300, 800), center: true);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
 
     return Scaffold(
         appBar: AppBar(
+          toolbarHeight: 40.0,
           backgroundColor: TColors.blue,
           title: Text('Supplyer Invoice #$invoiceId'),
           leading: IconButton(

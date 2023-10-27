@@ -14,6 +14,7 @@ class Val {
 }
 
 class DBVal {
+  static const String store = 'Store';
   static const String cart = 'Cart';
   static const String customers = 'Customers';
   static const String customerId = 'customer_id';

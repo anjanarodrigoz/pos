@@ -7,22 +7,21 @@ import 'package:pos/theme/t_colors.dart';
 import 'package:pos/widgets/filter_dialog.dart';
 import 'package:pos/widgets/paid_status_widget.dart';
 import 'package:pos/widgets/pos_button.dart';
-import 'package:window_manager/window_manager.dart';
 
-class ReportHomePage extends StatelessWidget {
-  ReportHomePage({super.key});
-  late BuildContext context;
+class ReportHomePage extends StatefulWidget {
+  const ReportHomePage({super.key});
+
+  @override
+  State<ReportHomePage> createState() => _ReportHomePageState();
+}
+
+class _ReportHomePageState extends State<ReportHomePage> {
+  late final BuildContext context;
+  final double width = 200.00;
 
   @override
   Widget build(BuildContext context) {
     this.context = context;
-
-    WindowOptions windowOptions = const WindowOptions(
-        minimumSize: Size(1300, 800), size: Size(1300, 800), center: true);
-
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-    });
 
     return Scaffold(
       appBar: AppBar(
@@ -35,7 +34,7 @@ class ReportHomePage extends StatelessWidget {
         leading: IconButton(
           iconSize: 20.0,
           icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () {
+          onPressed: () async {
             Get.offAll(const MainWindow());
           },
         ),
@@ -48,6 +47,7 @@ class ReportHomePage extends StatelessWidget {
           children: [
             Column(children: [
               PosButton(
+                  width: width,
                   text: 'Transcation Summary',
                   onPressed: () {
                     showReportTypes({
@@ -55,6 +55,10 @@ class ReportHomePage extends StatelessWidget {
                         showFilterDialog(ReportType.invoice,
                             {'Transcation Summary': 'Invoice'},
                             showPaidStatus: true);
+                      },
+                      'Turnover Summery Report': () {
+                        showFilterDialog(
+                            ReportType.summery, {'Transcation Summary': ''});
                       },
                       'Credit Note Report': () {
                         showFilterDialog(ReportType.creditNote,
@@ -64,13 +68,10 @@ class ReportHomePage extends StatelessWidget {
                         showFilterDialog(ReportType.quote,
                             {'Transcation Summary': 'Quotation'});
                       },
-                      'Turnover Summery Report': () {
-                        showFilterDialog(
-                            ReportType.summery, {'Transcation Summary': ''});
-                      }
                     });
                   }),
               PosButton(
+                  width: width,
                   text: 'Transcation Items',
                   onPressed: () {
                     showReportTypes({
@@ -101,6 +102,7 @@ class ReportHomePage extends StatelessWidget {
                     });
                   }),
               PosButton(
+                  width: width,
                   text: 'Stock',
                   onPressed: () {
                     showReportTypes({
@@ -116,9 +118,16 @@ class ReportHomePage extends StatelessWidget {
                           {'Stock': 'Stock Quantity'},
                         );
                       },
+                      'Stock value': () {
+                        showFilterDialog(
+                          ReportType.stockValue,
+                          {'Stock': 'Stock Value'},
+                        );
+                      },
                     });
                   }),
               PosButton(
+                  width: width,
                   text: 'Supply Transcation',
                   onPressed: () {
                     showReportTypes({
@@ -137,6 +146,7 @@ class ReportHomePage extends StatelessWidget {
                     });
                   }),
               PosButton(
+                  width: width,
                   text: 'Customer',
                   onPressed: () {
                     showReportTypes({

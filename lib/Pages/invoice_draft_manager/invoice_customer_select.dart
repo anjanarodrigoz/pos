@@ -24,6 +24,7 @@ class InvoiceCustomerSelectPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 40.0,
         title: Text(
           'Select Customer',
           style: TStyle.titleBarStyle,
@@ -37,56 +38,59 @@ class InvoiceCustomerSelectPage extends StatelessWidget {
               customerList = snapshot.data ?? [];
               customerDataSource =
                   CustomerDataSource(customersData: customerList);
-              return SfDataGrid(
-                selectionMode: SelectionMode.single,
-                controller: _dataGridController,
-                gridLinesVisibility: GridLinesVisibility.both,
-                headerGridLinesVisibility: GridLinesVisibility.both,
-                allowFiltering: true,
-                allowColumnsResizing: true,
-                showFilterIconOnHover: true,
-                columnWidthMode: ColumnWidthMode.auto,
-                onCellDoubleTap: (details) {
-                  String cusId = customerDataSource.effectiveRows
-                      .elementAt(details.rowColumnIndex.rowIndex - 1)
-                      .getCells()[0]
-                      .value;
+              return Center(
+                child: SfDataGrid(
+                  selectionMode: SelectionMode.single,
+                  controller: _dataGridController,
+                  gridLinesVisibility: GridLinesVisibility.both,
+                  headerGridLinesVisibility: GridLinesVisibility.both,
+                  allowFiltering: true,
+                  rowHeight: 30.0,
+                  allowColumnsResizing: true,
+                  showFilterIconOnHover: true,
+                  columnWidthMode: ColumnWidthMode.auto,
+                  onCellDoubleTap: (details) {
+                    String cusId = customerDataSource.effectiveRows
+                        .elementAt(details.rowColumnIndex.rowIndex - 1)
+                        .getCells()[0]
+                        .value;
 
-                  Get.to(InvoiceCustomerViewPage(
-                    invoiceType: invoiceType,
-                    cusId: cusId,
-                    invoice: invoice,
-                  ));
-                },
-                source: customerDataSource,
-                columns: [
-                  GridColumn(
-                      columnName: Customer.idKey,
-                      label: Center(child: const Text('ID'))),
-                  GridColumn(
-                      columnName: Customer.firstNameKey,
-                      label: Center(child: const Text('First Name'))),
-                  GridColumn(
-                      columnName: Customer.lastNameKey,
-                      label: Center(child: const Text('Last Name'))),
-                  GridColumn(
-                      columnName: Customer.mobileNumberKey,
-                      label: Center(child: const Text('Mobile Number'))),
-                  GridColumn(
-                      columnName: Customer.emailKey,
-                      label: Center(child: const Text('Email'))),
-                  GridColumn(
-                      columnName: Address.areaCodeKey,
-                      label: Center(child: const Text('Area Code'))),
-                  GridColumn(
-                      columnName: Address.cityKey,
-                      label: Center(child: const Text('City'))),
-                  GridColumn(
-                      columnName: Address.postalCodeKey,
-                      label: Center(child: const Text('Postal Code'))),
+                    Get.to(InvoiceCustomerViewPage(
+                      invoiceType: invoiceType,
+                      cusId: cusId,
+                      invoice: invoice,
+                    ));
+                  },
+                  source: customerDataSource,
+                  columns: [
+                    GridColumn(
+                        columnName: Customer.idKey,
+                        label: Center(child: const Text('ID'))),
+                    GridColumn(
+                        columnName: Customer.firstNameKey,
+                        label: Center(child: const Text('First Name'))),
+                    GridColumn(
+                        columnName: Customer.lastNameKey,
+                        label: Center(child: const Text('Last Name'))),
+                    GridColumn(
+                        columnName: Customer.mobileNumberKey,
+                        label: Center(child: const Text('Mobile Number'))),
+                    GridColumn(
+                        columnName: Customer.emailKey,
+                        label: Center(child: const Text('Email'))),
+                    GridColumn(
+                        columnName: Address.areaCodeKey,
+                        label: Center(child: const Text('Area Code'))),
+                    GridColumn(
+                        columnName: Address.cityKey,
+                        label: Center(child: const Text('City'))),
+                    GridColumn(
+                        columnName: Address.postalCodeKey,
+                        label: Center(child: const Text('Postal Code'))),
 
-                  // Add more columns as needed
-                ],
+                    // Add more columns as needed
+                  ],
+                ),
               );
             }),
       ),

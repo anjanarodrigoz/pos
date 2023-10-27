@@ -28,12 +28,13 @@ class InvoiceEditPage extends StatelessWidget {
     this.context = context;
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 40.0,
         title: Text(
           'Edit Invoice - #${_controller.invoice.invoiceId}',
           style: TStyle.titleBarStyle,
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () async {
             await back();
           },

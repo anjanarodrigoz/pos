@@ -53,41 +53,35 @@ class ItemDB implements AbstractDB {
   }
 
   Future<void> getItemFromStock(String itemId, int qty) async {
-    Item itme = getItem(itemId) ??
-        Item(
-            id: itemId,
-            price: 0.00,
-            name: 'Deleted Item',
-            description: 'Deleted item return from invoice');
-    final updatedItem = itme.copyWith(qty: itme.qty - qty);
-    await updateItem(updatedItem);
+    Item? itme = getItem(itemId);
+
+    if (itme != null) {
+      final updatedItem = itme.copyWith(qty: itme.qty - qty);
+      await updateItem(updatedItem);
+    }
   }
 
   Future<bool> returnFromCart(List<Cart> cartList) async {
-    cartList.forEach((cart) async {
-      Item itme = getItem(cart.itemId) ??
-          Item(
-              id: cart.itemId,
-              price: 0.00,
-              name: cart.name,
-              description: 'Deleted item return from invoice');
-      final updatedItem = itme.copyWith(qty: itme.qty + cart.qty);
-      await updateItem(updatedItem);
-    });
+    for (Cart cart in cartList) {
+      Item? item = getItem(cart.itemId);
+
+      if (item != null) {
+        final updatedItem = item.copyWith(qty: item.qty + cart.qty);
+        await updateItem(updatedItem);
+      }
+    }
     return true;
   }
 
   Future<bool> copyItemsInInvoice(List<Cart> cartList) async {
-    cartList.forEach((cart) async {
-      Item itme = getItem(cart.itemId) ??
-          Item(
-              id: cart.itemId,
-              price: 0.00,
-              name: cart.name,
-              description: 'Deleted item return from invoice');
-      final updatedItem = itme.copyWith(qty: itme.qty - cart.qty);
-      await updateItem(updatedItem);
-    });
+    for (Cart cart in cartList) {
+      Item? item = getItem(cart.itemId);
+
+      if (item != null) {
+        final updatedItem = item.copyWith(qty: item.qty - cart.qty);
+        await updateItem(updatedItem);
+      }
+    }
     return true;
   }
 
