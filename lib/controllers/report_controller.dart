@@ -842,4 +842,10 @@ class ReportController extends GetxController {
                     .toList()))
         .toList();
   }
+
+  bool checkDate() {
+    return (dateTimeRange.end.difference(dateTimeRange.start).inDays) == 1
+        ? true
+        : false;
+  }
 }

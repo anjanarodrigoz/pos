@@ -95,6 +95,7 @@ class SupplyInvoiceDraftController extends GetxController {
         .toList();
 
     SupplyInvoice invoice = SupplyInvoice(
+        email: supplyer.email ?? '',
         referenceId: referenceId.value,
         supplyerMobile: supplyer.mobileNumber,
         invoiceId: invoiceId.value,

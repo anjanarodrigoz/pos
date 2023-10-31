@@ -16,6 +16,7 @@ import 'package:pos/widgets/alert_dialog.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/verify_dialog.dart';
 
+import '../../api/email_sender.dart';
 import '../../api/pdf_api.dart';
 import '../../api/pdf_invoice_api.dart';
 
@@ -63,8 +64,16 @@ class QuotationPage extends StatelessWidget {
                     text: 'Copy',
                   ),
                   PosButton(
-                    onPressed: () => printInvoice(context),
+                    onPressed: () async => await PdfInvoiceApi.printInvoice(
+                        invoice,
+                        invoiceType: InvoiceType.quotation),
                     text: 'Print',
+                  ),
+                  PosButton(
+                    onPressed: () async =>
+                        await EmailSender.showEmailSendingDialog(
+                            context, invoice, InvoiceType.quotation),
+                    text: 'Email',
                   ),
                   const SizedBox(
                     height: 50,
@@ -81,12 +90,6 @@ class QuotationPage extends StatelessWidget {
           ),
           QuoteInvoicePage(invoice: invoice)
         ]));
-  }
-
-  Future<void> printInvoice(context) async {
-    final pdfFile = await PdfInvoiceApi.generateInvoicePDF(invoice,
-        invoiceType: InvoiceType.quotation);
-    PdfApi.openFile(pdfFile);
   }
 
   Future<void> deleteInvoice() async {

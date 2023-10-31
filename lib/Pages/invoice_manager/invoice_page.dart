@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -12,19 +10,16 @@ import 'package:pos/database/invoice_db_service.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/payment.dart';
 import 'package:pos/utils/alert_message.dart';
-import 'package:pos/widgets/alert_dialog.dart';
 import 'package:pos/widgets/pos_appbar.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/pos_text_form_field.dart';
 import 'package:pos/widgets/verify_dialog.dart';
-import 'package:window_manager/window_manager.dart';
-import '../../api/pdf_api.dart';
+
 import '../../api/pdf_invoice_api.dart';
 import '../../controllers/invoice_edit_controller.dart';
-import '../../controllers/size_controller.dart';
+
 import '../../models/invoice.dart';
 import '../../theme/t_colors.dart';
-import '../main_window.dart';
 
 class InvoicePage extends StatefulWidget {
   String? searchInvoiceId;
@@ -78,11 +73,15 @@ class _InvoicePageState extends State<InvoicePage> {
                   text: 'Copy',
                 ),
                 PosButton(
-                  onPressed: () => printInvoice(context),
+                  onPressed: () async => await PdfInvoiceApi.printInvoice(
+                      invoice,
+                      invoiceType: InvoiceType.invoice),
                   text: 'Print',
                 ),
                 PosButton(
-                  onPressed: () => sendEmail(),
+                  onPressed: () async =>
+                      await EmailSender.showEmailSendingDialog(
+                          context, invoice, InvoiceType.invoice),
                   text: 'Email',
                 ),
                 PosButton(
@@ -212,13 +211,6 @@ class _InvoicePageState extends State<InvoicePage> {
     Get.to(InvoiceEditPage());
   }
 
-  Future<void> printInvoice(context) async {
-    final pdfFile =
-        await PdfInvoiceApi.generateInvoicePDF(invoiceList[index.value]);
-    PdfApi.openFile(pdfFile);
-    //await PdfInvoiceApi.printPdf(invoiceList[index.value]);
-  }
-
   Future<void> deleteInvoice() async {
     if (invoice.isPaid == true) {
       AlertMessage.snakMessage(
@@ -336,7 +328,7 @@ class _InvoicePageState extends State<InvoicePage> {
   }
 
   void searchInvoices() {
-    Get.to(InvoiceSearchPage());
+    Get.to(const InvoiceSearchPage());
   }
 
   Future<void> openCopyInvoice() async {
@@ -354,9 +346,5 @@ class _InvoicePageState extends State<InvoicePage> {
             );
           });
     }
-  }
-
-  sendEmail() async {
-    await EmailSender.sendEmail('kk', context);
   }
 }

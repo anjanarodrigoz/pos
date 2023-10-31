@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:get/get.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -17,7 +18,7 @@ import 'pdf_api.dart';
 
 class PdfInvoiceApi {
   static Future<File> generateInvoicePDF(Invoice invoice,
-      {invoiceType = InvoiceType.invoice}) async {
+      {required InvoiceType invoiceType}) async {
     final pdf = Document();
 
     pdf.addPage(MultiPage(
@@ -32,27 +33,24 @@ class PdfInvoiceApi {
       footer: (context) => buildFooter(invoice),
     ));
 
-    return PdfApi.saveDocument(name: 'my_invoice.pdf', pdf: pdf);
+    return PdfApi.saveDocument(
+        name: 'Invoice_${invoice.invoiceId}.pdf', pdf: pdf);
   }
 
-  static Future<void> printPdf(Invoice invoice,
-      {invoiceType = InvoiceType.invoice}) async {
-    final pdf = Document();
+  static Future<void> printInvoice(invoice,
+      {required InvoiceType invoiceType}) async {
+    var pdfFile;
 
-    pdf.addPage(MultiPage(
-      margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-      build: (context) => [
-        buildHeader(invoice, invoiceType),
-        SizedBox(height: 0.5 * PdfPageFormat.cm),
-        buildInvoice(invoice),
-        Spacer(),
-        buildTotal(invoice),
-      ],
-      footer: (context) => buildFooter(invoice),
-    ));
+    if (invoiceType == InvoiceType.supplyInvoice) {
+      pdfFile = await PdfInvoiceApi.generateSupplyInvoicePDF(invoice);
+    } else {
+      pdfFile = await PdfInvoiceApi.generateInvoicePDF(invoice,
+          invoiceType: invoiceType);
+    }
 
     await Printing.layoutPdf(
-        onLayout: (PdfPageFormat format) async => pdf.save());
+        onLayout: (PdfPageFormat format) async =>
+            Uint8List.fromList(await pdfFile.readAsBytes()));
   }
 
   static Future<File> generateSupplyInvoicePDF(SupplyInvoice invoice) async {
@@ -70,7 +68,8 @@ class PdfInvoiceApi {
       footer: (context) => buildSupplyFooter(invoice),
     ));
 
-    return PdfApi.saveDocument(name: 'my_invoice.pdf', pdf: pdf);
+    return PdfApi.saveDocument(
+        name: 'supply_invoice_${invoice.invoiceId}.pdf', pdf: pdf);
   }
 
   static Widget buildHeader(Invoice invoice, invoiceType) => Column(

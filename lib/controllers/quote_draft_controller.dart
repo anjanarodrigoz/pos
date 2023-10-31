@@ -109,6 +109,7 @@ class QuoteDraftController extends GetxController {
         .toList();
 
     Invoice invoice = Invoice(
+        email: customer.email ?? '',
         customerMobile: customer.mobileNumber,
         invoiceId: invoiceId.value,
         createdDate: DateTime.now(),
@@ -138,6 +139,7 @@ class QuoteDraftController extends GetxController {
         .toList();
 
     Invoice invoice = Invoice(
+        email: customer.email ?? '',
         customerMobile: customer.mobileNumber,
         invoiceId: invoiceId.value,
         createdDate: DateTime.now(),

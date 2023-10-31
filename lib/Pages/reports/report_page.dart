@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
@@ -6,6 +7,7 @@ import 'package:pos/controllers/report_controller.dart';
 import 'package:pos/database/store_db.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/widgets/pos_button.dart';
+import 'package:printing/printing.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:syncfusion_flutter_datagrid_export/export.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
@@ -51,18 +53,20 @@ class _ReportPageState extends State<ReportPage> {
                         const SizedBox(
                           width: 10,
                         ),
-                        const Text(
-                          "-",
-                          style: TextStyle(fontSize: 14.0),
-                        ),
+                        if (!controller.checkDate())
+                          const Text(
+                            "-",
+                            style: TextStyle(fontSize: 14.0),
+                          ),
                         const SizedBox(
                           width: 10,
                         ),
-                        Text(
-                          MyFormat.formatDateTwo(controller.dateTimeRange.end
-                              .subtract(const Duration(days: 1))),
-                          style: const TextStyle(fontSize: 14.0),
-                        ),
+                        if (!controller.checkDate())
+                          Text(
+                            MyFormat.formatDateTwo(controller.dateTimeRange.end
+                                .subtract(const Duration(days: 1))),
+                            style: const TextStyle(fontSize: 14.0),
+                          ),
                       ],
                     ),
                     Column(
@@ -140,7 +144,9 @@ class _ReportPageState extends State<ReportPage> {
                                     if (controller.dateTimeRange.start.year !=
                                         0) {
                                       header.graphics.drawString(
-                                        'From ${MyFormat.formatDateTwo(controller.dateTimeRange.start)} To ${MyFormat.formatDateTwo(controller.dateTimeRange.end.subtract(const Duration(days: 1)))}',
+                                        controller.checkDate()
+                                            ? 'From ${MyFormat.formatDateTwo(controller.dateTimeRange.start)} '
+                                            : 'From ${MyFormat.formatDateTwo(controller.dateTimeRange.start)}  To ${MyFormat.formatDateTwo(controller.dateTimeRange.end.subtract(const Duration(days: 1)))}',
                                         PdfStandardFont(
                                             PdfFontFamily.courier, 8,
                                             style: PdfFontStyle.regular),
@@ -208,9 +214,10 @@ class _ReportPageState extends State<ReportPage> {
                                   autoColumnWidth: true);
 
                           final List<int> bytes = await document.save();
-                          File file =
-                              await File('DataGrid.pdf').writeAsBytes(bytes);
-                          ReportPage.openFile(file);
+                          await Printing.layoutPdf(
+                              onLayout: (format) async =>
+                                  Uint8List.fromList(bytes));
+
                           document.dispose();
                         }),
                   ],

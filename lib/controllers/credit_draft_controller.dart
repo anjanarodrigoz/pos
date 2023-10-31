@@ -110,6 +110,7 @@ class CreditDraftController extends GetxController {
         .toList();
 
     Invoice invoice = Invoice(
+        email: customer.email ?? '',
         customerMobile: customer.mobileNumber,
         invoiceId: invoiceId.value,
         createdDate: DateTime.now(),
@@ -139,6 +140,7 @@ class CreditDraftController extends GetxController {
         .toList();
 
     Invoice invoice = Invoice(
+        email: customer.email ?? '',
         customerMobile: customer.mobileNumber,
         invoiceId: invoiceId.value,
         createdDate: DateTime.now(),

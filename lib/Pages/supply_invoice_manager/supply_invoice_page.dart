@@ -6,8 +6,10 @@ import 'package:pos/Pages/invoice_draft_manager/invoice_customer_select.dart';
 import 'package:pos/Pages/supply_invoice_manager/select_supplyer_page.dart';
 import 'package:pos/Pages/supply_invoice_manager/supply_all_invoice.dart';
 import 'package:pos/Pages/supply_invoice_manager/supply_save_invoice_page.dart';
+import 'package:pos/api/email_sender.dart';
 
 import 'package:pos/database/supplyer_invoice_db_service.dart';
+import 'package:pos/enums/enums.dart';
 
 import 'package:pos/utils/alert_message.dart';
 import 'package:pos/widgets/alert_dialog.dart';
@@ -47,30 +49,36 @@ class SupplyInvoicePage extends StatelessWidget {
             // Menu items
             */
 
-          Container(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Column(
-                children: [
-                  PosButton(
-                    onPressed: () => openCopyInvoice(),
-                    text: 'Copy',
-                  ),
-                  PosButton(
-                    onPressed: () => printInvoice(context),
-                    text: 'Print',
-                  ),
-                  SizedBox(
-                    height: 50,
-                  ),
-                  PosButton(
-                    onPressed: () => deleteInvoice(),
-                    text: 'Remove',
-                    color: Colors.red.shade400,
-                  ),
-                  SizedBox(height: 150),
-                ],
-              ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Column(
+              children: [
+                PosButton(
+                  onPressed: () => openCopyInvoice(),
+                  text: 'Copy',
+                ),
+                PosButton(
+                  onPressed: () async => await PdfInvoiceApi.printInvoice(
+                      invoice,
+                      invoiceType: InvoiceType.supplyInvoice),
+                  text: 'Print',
+                ),
+                PosButton(
+                  onPressed: () async =>
+                      await EmailSender.showEmailSendingDialog(
+                          context, invoice, InvoiceType.supplyInvoice),
+                  text: 'Email',
+                ),
+                const SizedBox(
+                  height: 50,
+                ),
+                PosButton(
+                  onPressed: () => deleteInvoice(),
+                  text: 'Remove',
+                  color: Colors.red.shade400,
+                ),
+                SizedBox(height: 150),
+              ],
             ),
           ),
           SupplySaveInvoicePage(invoice: invoice)

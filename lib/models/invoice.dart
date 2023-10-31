@@ -25,6 +25,7 @@ class Invoice {
   static const String netKey = 'netTotal';
   static const String gstKey = 'gstTotal';
   static const String paykey = 'toPay';
+  static const String emailkey = 'email';
 
   final String invoiceId;
   final DateTime createdDate;
@@ -34,6 +35,7 @@ class Invoice {
   String customerName;
   String customerMobile;
   double gstPrecentage;
+  String email;
   List<InvoicedItem> itemList;
   List<ExtraCharges>? extraCharges;
   DateTime? closeDate;
@@ -51,6 +53,7 @@ class Invoice {
   Duration outStandingDates = const Duration(days: 0);
 
   Invoice({
+    required this.email,
     required this.customerMobile,
     required this.invoiceId,
     required this.createdDate,
@@ -77,6 +80,7 @@ class Invoice {
     String? customerName,
     String? customerMobile,
     double? gstPrecentage,
+    String? email,
     List<InvoicedItem>? itemList,
     List<ExtraCharges>? extraCharges,
     DateTime? closeDate,
@@ -88,6 +92,7 @@ class Invoice {
     return Invoice(
       invoiceId: invoiceId,
       createdDate: createdDate,
+      email: email ?? this.email,
       isPaid: isPaid ?? this.isPaid,
       isDeleted: isDeleted ?? this.isDeleted,
       customerId: customerId ?? this.customerId,
@@ -106,6 +111,7 @@ class Invoice {
 
   Map<String, dynamic> toJson() {
     return {
+      email: email,
       customerMobileKey: customerMobile,
       gstPrecentageKey: gstPrecentage,
       invoiceIdKey: invoiceId,
@@ -126,6 +132,7 @@ class Invoice {
 
   factory Invoice.fromJson(Map<String, dynamic> json) {
     return Invoice(
+      email: json[emailkey] ?? '',
       customerMobile: json[customerMobileKey],
       gstPrecentage: json[gstPrecentageKey],
       invoiceId: json[invoiceIdKey],

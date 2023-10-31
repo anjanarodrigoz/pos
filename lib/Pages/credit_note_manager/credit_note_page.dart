@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:pdf/pdf.dart';
 import 'package:pos/Pages/credit_note_manager/all_credit_note_page.dart';
 import 'package:pos/Pages/credit_note_manager/credit_draft_page.dart';
 import 'package:pos/Pages/invoice_draft_manager/invoice_customer_select.dart';
@@ -14,6 +17,8 @@ import 'package:pos/utils/alert_message.dart';
 import 'package:pos/widgets/alert_dialog.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/verify_dialog.dart';
+import 'package:printing/printing.dart';
+import '../../api/email_sender.dart';
 import '../../api/pdf_api.dart';
 import '../../api/pdf_invoice_api.dart';
 import '../../models/invoice.dart';
@@ -58,8 +63,16 @@ class CreditNotePage extends StatelessWidget {
                   text: 'Copy',
                 ),
                 PosButton(
-                  onPressed: () => printInvoice(context),
+                  onPressed: () async => await PdfInvoiceApi.printInvoice(
+                      invoice,
+                      invoiceType: InvoiceType.creditNote),
                   text: 'Print',
+                ),
+                PosButton(
+                  onPressed: () async =>
+                      await EmailSender.showEmailSendingDialog(
+                          context, invoice, InvoiceType.creditNote),
+                  text: 'Email',
                 ),
                 const SizedBox(
                   height: 50,
@@ -75,12 +88,6 @@ class CreditNotePage extends StatelessWidget {
           ),
           CreditInvoicePage(invoice: invoice)
         ]));
-  }
-
-  Future<void> printInvoice(context) async {
-    final pdfFile = await PdfInvoiceApi.generateInvoicePDF(invoice,
-        invoiceType: InvoiceType.creditNote);
-    PdfApi.openFile(pdfFile);
   }
 
   Future<void> deleteInvoice() async {

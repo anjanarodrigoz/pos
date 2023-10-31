@@ -7,6 +7,7 @@ import 'package:pos/controllers/invoice_draft_contorller.dart';
 import 'package:pos/controllers/invoice_edit_controller.dart';
 import 'package:pos/data_sources/invoiceDataSource.dart';
 import 'package:pos/database/cart_db_service.dart';
+import 'package:pos/database/item_db_service.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/customer.dart';
 import 'package:pos/models/extra_charges.dart';
@@ -14,6 +15,7 @@ import 'package:pos/utils/alert_message.dart';
 import '../../models/invoice_row.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../models/cart.dart';
+import '../../models/item.dart';
 import '../../theme/t_colors.dart';
 import '../../utils/my_format.dart';
 import '../../utils/val.dart';
@@ -410,6 +412,13 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
           actions: [
             TextButton(
               onPressed: () async {
+                Item? item = ItemDB().getItem(oldCart.itemId);
+                if (item == null) {
+                  AlertMessage.snakMessage(
+                      'This item can not found in the stock.can\'t updated',
+                      context);
+                  return;
+                }
                 double itemPrice = net;
                 String commnet = commentController.text;
                 int qty = qtyController.text.isEmpty

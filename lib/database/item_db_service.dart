@@ -23,7 +23,8 @@ class ItemDB implements AbstractDB {
   }
 
   Item? getItem(String itemId) {
-    Item? item = Item.fromJson(_storage.read(itemId));
+    var json = _storage.read(itemId);
+    Item? item = json != null ? Item.fromJson(json) : null;
     return item;
   }
 

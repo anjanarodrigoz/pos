@@ -95,14 +95,20 @@ class _FilterDialogState extends State<FilterDialog> {
                 ),
               ],
             ),
-            if (_startDate != null && _endDate != null)
+            if (_startDate != null)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  '${MyFormat.formatDateTwo(_startDate!)} - ${MyFormat.formatDateTwo(_endDate!)}',
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                child: _endDate != null
+                    ? Text(
+                        '${MyFormat.formatDateTwo(_startDate!)} - ${MyFormat.formatDateTwo(_endDate!)}',
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      )
+                    : Text(
+                        MyFormat.formatDateTwo(_startDate!),
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
               ),
             SizedBox(height: 20),
             SizedBox(height: 20),
@@ -142,13 +148,12 @@ class _FilterDialogState extends State<FilterDialog> {
                 child: PosButton(
                     text: 'Generate Report',
                     onPressed: () async {
-                      // _startDate = DateTime(2023, 08, 01);
-                      // _endDate = DateTime(2023, 09, 30);
                       _startDate = _startDate ?? DateTime(0);
-                      _endDate = _endDate ?? DateTime(0);
-                      if (_startDate != null || _endDate != null) {
-                        DateTimeRange dateTimeRange =
-                            DateTimeRange(start: _startDate!, end: _endDate!);
+                      _endDate = _endDate ?? (_startDate ?? DateTime(0));
+                      if (_startDate != null) {
+                        DateTimeRange dateTimeRange = DateTimeRange(
+                            start: _startDate!,
+                            end: _endDate!.add(const Duration(days: 1)));
                         await reportController.generateReport(
                             title: widget.title,
                             dateTimeRange: dateTimeRange,

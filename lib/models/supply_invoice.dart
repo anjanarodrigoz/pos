@@ -17,11 +17,13 @@ class SupplyInvoice {
   static const String totalKey = 'total';
   static const String netKey = 'netTotal';
   static const String gstKey = 'gstTotal';
+  static const String emailKey = 'email';
 
   final String invoiceId;
   final DateTime createdDate;
   String supplyerId;
   String? referenceId;
+  String email;
   String supplyerName;
   String supplyerMobile;
   double gstPrecentage;
@@ -36,6 +38,7 @@ class SupplyInvoice {
   double total = 0.0;
 
   SupplyInvoice({
+    required this.email,
     required this.supplyerMobile,
     required this.invoiceId,
     required this.createdDate,
@@ -62,8 +65,10 @@ class SupplyInvoice {
     DateTime? closeDate,
     List<String>? comments,
     Address? billingAddress,
+    String? email,
   }) {
     return SupplyInvoice(
+      email: email ?? this.email,
       referenceId: realInvoiceId,
       invoiceId: invoiceId,
       createdDate: createdDate,
@@ -80,6 +85,7 @@ class SupplyInvoice {
 
   Map<String, dynamic> toJson() {
     return {
+      email: email,
       supplyerMobileKey: supplyerMobile,
       gstPrecentageKey: gstPrecentage,
       invoiceIdKey: invoiceId,
@@ -96,6 +102,7 @@ class SupplyInvoice {
 
   factory SupplyInvoice.fromJson(Map<String, dynamic> json) {
     return SupplyInvoice(
+      email: json[emailKey] ?? '',
       supplyerMobile: json[supplyerMobileKey],
       gstPrecentage: json[gstPrecentageKey],
       invoiceId: json[invoiceIdKey],
