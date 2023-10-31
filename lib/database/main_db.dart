@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:archive/archive.dart';
+import 'package:archive/archive_io.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
@@ -14,7 +16,6 @@ import 'package:pos/database/quatation_db_serive.dart';
 import 'package:pos/database/supplyer_db_service.dart';
 import 'package:pos/database/supplyer_invoice_db_service.dart';
 import 'package:pos/utils/alert_message.dart';
-import 'package:flutter_archive/flutter_archive.dart';
 import 'package:pos/widgets/progressing_dot.dart';
 
 class MainDB extends GetxController {
@@ -54,10 +55,24 @@ class MainDB extends GetxController {
       final zipFile = File(filePath!);
       final destinationDir = Directory.current;
 
+      final archive = ZipDecoder().decodeBytes(zipFile.readAsBytesSync());
+
+      for (final file in archive) {
+        final filename = file.name;
+        print(filename);
+        if (file.isFile) {
+          final data = file.content as List<int>;
+          File('${destinationDir.path}/$filename')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(data, flush: true);
+        } else {
+          Directory('${destinationDir.path}/$filename').create(recursive: true);
+        }
+      }
+
       try {
         content.add(ProgressingDots(text: 'Extracting backup.db file'));
-        await ZipFile.extractToDirectory(
-            zipFile: zipFile, destinationDir: destinationDir);
+
         content.remove(content.last);
 
         for (AbstractDB db in dbList) {
@@ -84,16 +99,7 @@ class MainDB extends GetxController {
     content.clear();
     final List<File> files = [];
     final sourceDir = Directory.current;
-
-    for (AbstractDB db in dbList) {
-      content.add(ProgressingDots(text: 'Creating ${db.getName()}.db file'));
-      final json = await db.backupData();
-      var file = File('${sourceDir.path}/${db.getName()}.json');
-      file.writeAsStringSync(jsonEncode(json));
-      files.add(file);
-      content.remove(content.last);
-      content.add(textWidget('${db.getName()}.db file was created'));
-    }
+    final encoder = ZipFileEncoder();
 
     final result = await FilePicker.platform.saveFile(
       type: FileType.custom,
@@ -104,11 +110,23 @@ class MainDB extends GetxController {
     );
 
     if (result != null) {
-      final zipFile = File(result);
+      encoder.create(result);
       try {
+        for (AbstractDB db in dbList) {
+          content
+              .add(ProgressingDots(text: 'Creating ${db.getName()}.db file'));
+          final json = await db.backupData();
+          var file = File('${sourceDir.path}/${db.getName()}.json');
+          file.writeAsStringSync(jsonEncode(json), flush: true);
+          content.remove(content.last);
+          content.add(textWidget('${db.getName()}.db file was created'));
+          encoder.addFile(file);
+        }
         content.add(ProgressingDots(text: 'Creating backup.db file'));
-        await ZipFile.createFromFiles(
-            sourceDir: sourceDir, files: files, zipFile: zipFile);
+        encoder.close();
+
+        // await ZipFile.createFromFiles(
+        //     sourceDir: sourceDir, files: files, zipFile: zipFile);
         for (AbstractDB db in dbList) {
           var file = File('${sourceDir.path}/${db.getName()}.json');
           await file.delete();
