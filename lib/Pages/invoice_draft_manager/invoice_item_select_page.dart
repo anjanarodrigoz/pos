@@ -133,13 +133,6 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
             GridColumn(
                 columnName: Item.priceFiveKey,
                 label: Center(child: const Text('Price 05'))),
-            GridColumn(
-                columnName: Item.lastInDateKey,
-                label: Center(child: const Text('Last In Date'))),
-
-            GridColumn(
-                columnName: Item.lastOutDateKey,
-                label: Center(child: const Text('Last Out Date'))),
 
             // Add more columns as needed
           ],
@@ -172,7 +165,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
         return AlertDialog(
           title: Text(item.name),
           content: SizedBox(
-            height: 200,
+            height: 250,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -243,7 +236,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                 ),
                 PosTextFormField(
                   width: 400.0,
-                  height: 70.0,
+                  height: 100.0,
                   labelText: 'Comment',
                   controller: commentController,
                 ),
@@ -265,7 +258,8 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
             TextButton(
               onPressed: () async {
                 double itemPrice = net;
-                String commnet = commentController.text;
+                String commnet =
+                    MyFormat.divideStringIntoLines(commentController.text);
                 int qty = qtyController.text.isEmpty
                     ? 0
                     : int.parse(qtyController.text);

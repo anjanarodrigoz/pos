@@ -15,11 +15,12 @@ import '../../models/supply_invoice.dart';
 import 'select_supplyer_page.dart';
 
 class SupplyAllInvoice extends StatelessWidget {
-  SupplyAllInvoice({super.key});
+  bool isRetunManager;
+  SupplyAllInvoice({super.key, this.isRetunManager = false});
 
   List<SupplyInvoice> supplyInvoice = [];
   SupplyInvoiceDataSource invoiceDataSource =
-      SupplyInvoiceDataSource(invoiceData: []);
+      SupplyInvoiceDataSource(invoiceData: [], isRetunManager: false);
 
   @override
   Widget build(BuildContext context) {
@@ -32,18 +33,22 @@ class SupplyAllInvoice extends StatelessWidget {
             height: 10.0,
           ),
           PosButton(
-            text: ' + Add Supply Invoice',
+            text:
+                isRetunManager ? '+ Add Return Note' : ' + Add Supply Invoice',
             onPressed: () {
-              Get.to(SelectSupplyerPage());
+              Get.to(SelectSupplyerPage(isRetunManager: isRetunManager));
             },
             width: 200.0,
           ),
           Expanded(
             child: FutureBuilder(
-                future: SupplyerInvoiceDB().getAllInvoices(),
+                future: isRetunManager
+                    ? SupplyerInvoiceDB().getReturnNotes()
+                    : SupplyerInvoiceDB().getNormalInvoice(),
                 builder: (context, snapshot) {
                   supplyInvoice = snapshot.data ?? [];
                   invoiceDataSource = SupplyInvoiceDataSource(
+                      isRetunManager: isRetunManager,
                       invoiceData: supplyInvoice.reversed.toList());
 
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -52,8 +57,10 @@ class SupplyAllInvoice extends StatelessWidget {
                     );
                   }
                   if (supplyInvoice.isEmpty) {
-                    return const Center(
-                      child: Text('+ Add Supply invoices'),
+                    return Center(
+                      child: Text(isRetunManager
+                          ? '+ Add Return Note'
+                          : '+ Add Supply invoices'),
                     );
                   }
 
@@ -79,6 +86,7 @@ class SupplyAllInvoice extends StatelessWidget {
 
                           Get.to(SupplyInvoicePage(
                             invoiceId: invoiceId,
+                            isReturnManger: isRetunManager,
                           ));
                         }
                       }),
@@ -86,9 +94,10 @@ class SupplyAllInvoice extends StatelessWidget {
                         GridColumn(
                             columnName: Invoice.invoiceIdKey,
                             label: Center(child: const Text('Invoice ID'))),
-                        GridColumn(
-                            columnName: Invoice.invoiceIdKey,
-                            label: Center(child: const Text('Reference ID'))),
+                        if (!isRetunManager)
+                          GridColumn(
+                              columnName: Invoice.invoiceIdKey,
+                              label: Center(child: const Text('Reference ID'))),
                         GridColumn(
                             columnName: Invoice.customerNameKey,
                             label: Center(child: const Text('Supplyer Name'))),
@@ -123,13 +132,15 @@ class SupplyAllInvoice extends StatelessWidget {
 class SupplyInvoiceDataSource extends DataGridSource {
   List<DataGridRow> _customersData = [];
 
-  SupplyInvoiceDataSource({required List<SupplyInvoice> invoiceData}) {
+  SupplyInvoiceDataSource(
+      {required List<SupplyInvoice> invoiceData, required isRetunManager}) {
     _customersData = invoiceData
         .map<DataGridRow>((e) => DataGridRow(cells: [
               DataGridCell(
                   columnName: Invoice.invoiceIdKey, value: e.invoiceId),
-              DataGridCell(
-                  columnName: Invoice.invoiceIdKey, value: e.referenceId),
+              if (!isRetunManager)
+                DataGridCell(
+                    columnName: Invoice.invoiceIdKey, value: e.referenceId),
               DataGridCell(
                   columnName: Invoice.customerNameKey, value: e.supplyerName),
               DataGridCell(

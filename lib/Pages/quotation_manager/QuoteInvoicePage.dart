@@ -200,10 +200,9 @@ class QuoteInvoicePage extends StatelessWidget {
         columns: [
           GridColumn(
               columnName: InvoiceRow.itemIdKey,
-              maximumWidth: 120,
               label: Center(child: const Text('Item ID'))),
           GridColumn(
-              minimumWidth: 500.0,
+              maximumWidth: 300.0,
               columnName: InvoiceRow.nameKey,
               label: Center(child: const Text('Item Name'))),
           GridColumn(
@@ -219,7 +218,6 @@ class QuoteInvoicePage extends StatelessWidget {
               columnName: InvoiceRow.itemPriceKey,
               label: Center(child: const Text('Item Price'))),
           GridColumn(
-              minimumWidth: 120.0,
               columnName: InvoiceRow.totalKey,
               label: Center(child: const Text('Total'))),
 

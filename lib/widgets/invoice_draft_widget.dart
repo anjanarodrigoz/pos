@@ -3,7 +3,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:pos/controllers/credit_draft_controller.dart';
 import 'package:pos/controllers/invoice_draft_contorller.dart';
+import 'package:pos/controllers/quote_draft_controller.dart';
 import 'package:pos/data_sources/invoiceDataSource.dart';
 import 'package:pos/database/cart_db_service.dart';
 import 'package:pos/enums/enums.dart';
@@ -154,7 +156,6 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
               rowHeight: 27.0,
               columnWidthMode: ColumnWidthMode.auto,
               allowSwiping: true,
-              swipeMaxOffset: 80.0,
               onCellDoubleTap: (details) {
                 final row = invoiceDataSource.effectiveRows
                     .elementAt(details.rowColumnIndex.rowIndex - 1);
@@ -177,10 +178,9 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
               columns: [
                 GridColumn(
                     columnName: InvoiceRow.itemIdKey,
-                    maximumWidth: 120,
                     label: Center(child: const Text('Item ID'))),
                 GridColumn(
-                    minimumWidth: 500.0,
+                    maximumWidth: 300.0,
                     columnName: InvoiceRow.nameKey,
                     label: Center(child: const Text('Item Name'))),
                 GridColumn(
@@ -196,7 +196,6 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
                     columnName: InvoiceRow.itemPriceKey,
                     label: Center(child: const Text('Item Price'))),
                 GridColumn(
-                    minimumWidth: 120.0,
                     columnName: InvoiceRow.totalKey,
                     label: Center(child: const Text('Total'))),
 
@@ -310,7 +309,7 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
             ],
           ),
           content: SizedBox(
-            height: 200,
+            height: 250,
             child: Column(
               children: [
                 Padding(
@@ -382,7 +381,7 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
                 ),
                 PosTextFormField(
                   width: 400.0,
-                  height: 60,
+                  height: 100,
                   maxLines: 3,
                   labelText: 'Comment',
                   controller: commentController,
@@ -408,7 +407,8 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
             TextButton(
               onPressed: () async {
                 double itemPrice = net;
-                String commnet = commentController.text;
+                String commnet =
+                    MyFormat.divideStringIntoLines(commentController.text);
                 int qty = qtyController.text.isEmpty
                     ? 0
                     : int.parse(qtyController.text);
@@ -418,8 +418,12 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
                       netPrice: itemPrice,
                       qty: qty,
                       isPostedItem: isDeliveryItem.value);
-                  await CartDB().updateCart(oldCart, newCart);
-                  await invoiceController.updateCart();
+                  if (invoiceController is InvoiceDraftController) {
+                    await CartDB().updateCart(oldCart, newCart);
+                    await invoiceController.updateCart();
+                  } else {
+                    invoiceController.updateCart(newCart: newCart);
+                  }
                 }
                 Navigator.of(context).pop();
               },
@@ -467,7 +471,7 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
             ],
           ),
           content: SizedBox(
-            height: 250,
+            height: 300,
             child: Column(
               children: [
                 PosTextFormField(
@@ -550,7 +554,7 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
                 ),
                 PosTextFormField(
                   width: 400.0,
-                  height: 80.0,
+                  height: 100.0,
                   maxLines: 3,
                   labelText: 'Comment',
                   controller: commentController,
@@ -562,7 +566,8 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
             TextButton(
               onPressed: () async {
                 double itemPrice = net;
-                String commnet = commentController.text;
+                String commnet =
+                    MyFormat.divideStringIntoLines(commentController.text);
                 String name = nameController.text;
                 int qty = qtyController.text.isEmpty
                     ? 0

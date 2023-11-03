@@ -87,11 +87,14 @@ class PdfInvoiceApi {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              buildCustomerAddress(invoice.billingAddress, invoice.customerName,
-                  to: 'Bill To:'),
               buildCustomerAddress(
-                  invoice.shippingAddress, invoice.customerName,
-                  to: 'Ship To:'),
+                invoice.billingAddress,
+                invoice.customerName,
+              ),
+              buildCustomerAddress(
+                invoice.shippingAddress,
+                invoice.customerName,
+              ),
               Column(mainAxisAlignment: MainAxisAlignment.start, children: [
                 buildInvoiceInfo('INVOICE#', invoice.invoiceId),
                 buildInvoiceInfo('CUSTOMER ID#', invoice.customerId),
@@ -112,7 +115,9 @@ class PdfInvoiceApi {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 buildCompanyInfo(),
-                buildTitle(InvoiceType.supplyInvoice)
+                buildTitle(invoice.isReturnNote
+                    ? InvoiceType.returnNote
+                    : InvoiceType.supplyInvoice)
               ]),
           SizedBox(height: 1 * PdfPageFormat.cm),
           Row(
@@ -126,8 +131,11 @@ class PdfInvoiceApi {
               Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    buildInvoiceInfo('INVOICE#', invoice.invoiceId),
-                    buildInvoiceInfo('REF#', invoice.referenceId ?? ''),
+                    buildInvoiceInfo(
+                        invoice.isReturnNote ? 'RETRUN NOTE' : 'INVOICE#',
+                        invoice.invoiceId),
+                    if (!invoice.isReturnNote)
+                      buildInvoiceInfo('REF#', invoice.referenceId ?? ''),
                     buildInvoiceInfo('SUPPLYER ID#', invoice.supplyerId),
                     buildInvoiceInfo('MOBILE NO#', invoice.supplyerMobile),
                     buildInvoiceInfo(
@@ -138,16 +146,15 @@ class PdfInvoiceApi {
         ],
       );
 
-  static Widget buildCustomerAddress(Address? address, String cusName,
-      {String to = ''}) {
+  static Widget buildCustomerAddress(
+    Address? address,
+    String cusName,
+  ) {
     const style = TextStyle(fontSize: 10.0);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (to.isNotEmpty)
-          Text(to,
-              style: TextStyle(fontSize: 10.0, fontWeight: FontWeight.bold)),
         if (address!.street!.isNotEmpty) Text(cusName, style: style),
         Text(address.street!, style: style),
         Text(address.city!, style: style),
@@ -200,6 +207,11 @@ class PdfInvoiceApi {
       );
 
   static Widget buildInvoice(var invoice) {
+    bool isReturnNote = false;
+
+    if (invoice is SupplyInvoice) {
+      isReturnNote = invoice.isReturnNote;
+    }
     final headers = [
       'Item Id',
       'Description',
@@ -214,11 +226,12 @@ class PdfInvoiceApi {
     items.add(['', '', '', '', '', '']);
     items.add(['', '', '', '', '', '']);
     for (InvoicedItem item in invoice.itemList) {
-      final total = item.netTotal * (1 + invoice.gstPrecentage);
+      final total = (isReturnNote ? -item.netTotal : item.netTotal) *
+          (1 + invoice.gstPrecentage);
       items.add([
         item.isPostedItem ? 'P${item.itemId}' : item.itemId,
         item.name,
-        '${item.qty}',
+        isReturnNote ? '${-item.qty}' : '${item.qty}',
         (item.netPrice.toStringAsFixed(2)),
         ((item.netPrice * invoice.gstPrecentage).toStringAsFixed(2)),
         (total.toStringAsFixed(2)),
@@ -304,9 +317,14 @@ class PdfInvoiceApi {
   }
 
   static Widget buildTotal(var invoice) {
-    final netTotal = invoice.totalNetPrice;
-    final vat = invoice.totalGstPrice;
-    final total = invoice.total;
+    bool isReturnNote = false;
+    if (invoice is SupplyInvoice) {
+      isReturnNote = invoice.isReturnNote;
+    }
+    final netTotal =
+        isReturnNote ? -invoice.totalNetPrice : invoice.totalNetPrice;
+    final vat = isReturnNote ? -invoice.totalGstPrice : invoice.totalGstPrice;
+    final total = isReturnNote ? -invoice.total : invoice.total;
 
     return Container(
       alignment: Alignment.centerRight,
@@ -338,9 +356,6 @@ class PdfInvoiceApi {
                   value: MyFormat.formatCurrency(total),
                   unite: true,
                 ),
-                SizedBox(height: 2 * PdfPageFormat.mm),
-                Container(height: 1, color: PdfColors.grey400),
-                SizedBox(height: 0.5 * PdfPageFormat.mm),
               ],
             ),
           ),

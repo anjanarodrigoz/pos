@@ -51,12 +51,7 @@ class PosTextFormField extends StatelessWidget {
         height: height,
         child: TextFormField(
           obscureText: obscureText,
-          onTap: onTap ??
-              (controller != null
-                  ? () => controller?.selection = TextSelection(
-                      baseOffset: 0,
-                      extentOffset: controller!.value.text.length)
-                  : null),
+          onTap: onTap,
           keyboardType: keyboardType,
           onChanged: onChanged,
           enabled: enable,

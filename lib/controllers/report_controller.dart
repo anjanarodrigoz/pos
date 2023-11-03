@@ -100,6 +100,8 @@ class ReportController extends GetxController {
         await generateCustomerOutstandingReport();
       case ReportType.stockValue:
         await generateStockValueReport();
+      case ReportType.retrunNotes:
+        await generateReturnNoteReport();
     }
   }
 
@@ -847,5 +849,88 @@ class ReportController extends GetxController {
     return (dateTimeRange.end.difference(dateTimeRange.start).inDays) == 1
         ? true
         : false;
+  }
+
+  /*
+  
+  
+  
+  
+   */
+
+  generateReturnNoteReport() async {
+    isRequiredTableSummery = true;
+    List<SupplyInvoice> supplyInvoiceList = await SupplyerInvoiceDB()
+        .searchInvoiceByDate(dateTimeRange, isReturnNote: true);
+
+    if (supplyInvoiceList.isEmpty) {
+      isrecordAvaliable = false;
+      return;
+    }
+
+    isrecordAvaliable = true;
+
+    columns.value = {
+      createdDateKey: createdDateKey,
+      invoiceIdKey: invoiceIdKey,
+      supplyerNameKey: supplyerNameKey,
+      supplyerIdKey: supplyerIdKey,
+      supplyerMobileKey: supplyerMobileKey,
+      netKey: netKey,
+      gstKey: gstKey,
+      totalKey: totalKey,
+    }.entries.map(
+      (e) {
+        if (e.key == supplyerIdKey || e.key == supplyerNameKey) {
+          return GridColumn(
+              allowFiltering: true,
+              columnName: e.key,
+              label: Center(child: Text(e.value)));
+        }
+
+        if (e.key == netKey || e.key == gstKey || e.key == totalKey) {
+          return GridColumn(
+              width: 100.0,
+              allowFiltering: false,
+              columnName: e.key,
+              label: Center(child: Text(e.value)));
+        }
+
+        return GridColumn(
+            allowFiltering: false,
+            columnName: e.key,
+            label: Center(child: Text(e.value)));
+      },
+    ).toList();
+
+    rows.value = supplyInvoiceList
+        .map((invoice) => {
+              createdDateKey: invoice.createdDate,
+              invoiceIdKey: invoice.invoiceId,
+              supplyerNameKey: invoice.supplyerName,
+              supplyerIdKey: invoice.supplyerId,
+              supplyerMobileKey: invoice.supplyerMobile,
+              netKey: invoice.totalNetPrice,
+              gstKey: invoice.totalGstPrice,
+              totalKey: invoice.total,
+            })
+        .toList()
+        .map((e) => DataGridRow(
+                cells: e.entries.map((cell) {
+              if (cell.key == netKey) {
+                return DataGridCell<double>(
+                    columnName: cell.key,
+                    value: double.parse(
+                        (cell.value as double).toStringAsFixed(2)));
+              }
+
+              if (cell.value is DateTime) {
+                return DataGridCell(
+                    columnName: cell.key,
+                    value: MyFormat.formatDateTwo(cell.value as DateTime));
+              }
+              return DataGridCell(columnName: cell.key, value: cell.value);
+            }).toList()))
+        .toList();
   }
 }

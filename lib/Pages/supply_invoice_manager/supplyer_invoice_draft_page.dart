@@ -26,14 +26,14 @@ class SupplyInvoiceDraftPage extends StatelessWidget {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Show the dialog
-      openDailog();
+      if (!_controller.isRetunManager) openDailog();
     });
 
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 40.0,
         title: Obx(() => Text(
-              'Draft Invoice - #${_controller.invoiceId.value}',
+              'Draft ${_controller.isRetunManager ? 'Return Invoice' : 'Supply Invoice'} - #${_controller.invoiceId.value}',
               style: TStyle.titleBarStyle,
             )),
       ),
@@ -67,12 +67,14 @@ class SupplyInvoiceDraftPage extends StatelessWidget {
                     onPressed: () {
                       addComments();
                     }),
-                SizedBox(height: 50.0),
+                const SizedBox(height: 50.0),
                 PosButton(
                   text: 'Close Draft',
                   onPressed: () async {
                     Get.delete<SupplyInvoiceDraftController>();
-                    Get.offAll(SupplyAllInvoice());
+                    Get.offAll(SupplyAllInvoice(
+                      isRetunManager: _controller.isRetunManager,
+                    ));
                   },
                 ),
                 PosButton(
@@ -144,7 +146,10 @@ class SupplyInvoiceDraftPage extends StatelessWidget {
 
   Future<void> saveDraftInvoice() async {
     await _controller.saveInvoice();
-    Get.offAll(SupplyAllInvoice());
+
+    Get.offAll(SupplyAllInvoice(
+      isRetunManager: _controller.isRetunManager,
+    ));
   }
 
   void openDailog() {

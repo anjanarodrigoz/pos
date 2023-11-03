@@ -131,12 +131,7 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
             GridColumn(
                 columnName: Item.priceFiveKey,
                 label: Center(child: const Text('Price 05'))),
-            GridColumn(
-                columnName: Item.lastInDateKey,
-                label: Center(child: const Text('Last In Date'))),
-            GridColumn(
-                columnName: Item.lastOutDateKey,
-                label: Center(child: const Text('Last Out Date'))),
+
             // Add more columns as needed
           ],
         ),
@@ -239,7 +234,8 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
                 ),
                 PosTextFormField(
                   width: 400.0,
-                  height: 70.0,
+                  height: 100.0,
+                  maxLines: 3,
                   labelText: 'Comment',
                   controller: commentController,
                 ),
@@ -249,7 +245,8 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
               TextButton(
                 onPressed: () async {
                   double itemPrice = net;
-                  String commnet = commentController.text;
+                  String commnet =
+                      MyFormat.divideStringIntoLines(commentController.text);
                   int qty = qtyController.text.isEmpty
                       ? 0
                       : int.parse(qtyController.text);
@@ -259,6 +256,7 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
                         name: item.name,
                         netPrice: itemPrice,
                         qty: qty,
+                        cartId: Cart.generateUniqueItemId(),
                         comment: commnet);
                     invoiceController.cartList.add(cartItem);
                     invoiceController.updateCart();

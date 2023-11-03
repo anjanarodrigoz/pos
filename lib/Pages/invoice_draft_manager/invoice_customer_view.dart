@@ -374,6 +374,8 @@ class _InvoiceCustomerViewPageState extends State<InvoiceCustomerViewPage> {
           Get.put(
               CreditDraftController(customer: _customer, copyInvoice: invoice));
           Get.offAll(CreditDraftPage());
+        case InvoiceType.returnNote:
+        // TODO: Handle this case.
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

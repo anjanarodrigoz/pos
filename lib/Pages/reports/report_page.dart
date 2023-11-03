@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
+import 'package:pos/api/pdf_api.dart';
+import 'package:pos/api/report_pdf.dart';
 import 'package:pos/controllers/report_controller.dart';
 import 'package:pos/database/store_db.dart';
 import 'package:pos/utils/my_format.dart';
@@ -29,11 +31,16 @@ class _ReportPageState extends State<ReportPage> {
   final GlobalKey<SfDataGridState> pdfKey = GlobalKey<SfDataGridState>();
 
   ReportController controller = Get.put(ReportController());
+  DataGridController _dataGridController = DataGridController();
+
+  DataSource _dataSource = DataSource([]);
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
       List<DataGridRow> rows = controller.rows;
       List<GridColumn> columns = controller.columns;
+      _dataSource = DataSource(rows);
 
       return columns.isEmpty
           ? const Center(child: Text('Select Report Type'))
@@ -90,135 +97,33 @@ class _ReportPageState extends State<ReportPage> {
                         text: 'Export',
                         icon: Icons.picture_as_pdf_rounded,
                         onPressed: () async {
-                          late PdfStringFormat format;
-                          PdfDocument document = pdfKey.currentState!
-                              .exportToPdfDocument(
-                                  exportTableSummaries:
-                                      controller.isRequiredTableSummery,
-                                  headerFooterExport:
-                                      (DataGridPdfHeaderFooterExportDetails
-                                          headerFooterExport) {
-                                    final double width = headerFooterExport
-                                        .pdfPage
-                                        .getClientSize()
-                                        .width;
-                                    final PdfPageTemplateElement header =
-                                        PdfPageTemplateElement(
-                                            Rect.fromLTWH(0, 0, width, 65));
-                                    header.graphics.drawString(
-                                        StoreDB().getStore().companyName,
-                                        PdfStandardFont(
-                                            PdfFontFamily.courier, 15,
-                                            style: PdfFontStyle.bold),
-                                        bounds:
-                                            const Rect.fromLTRB(350, 0, 2, 0));
-                                    header.graphics.drawString(
-                                      StoreDB().getStore().slogan,
-                                      PdfStandardFont(PdfFontFamily.courier, 8,
-                                          style: PdfFontStyle.regular),
-                                      bounds:
-                                          const Rect.fromLTRB(350, 15, 2, 0),
-                                    );
-                                    header.graphics.drawString(
-                                      controller.title.keys.first,
-                                      PdfStandardFont(PdfFontFamily.courier, 12,
-                                          style: PdfFontStyle.bold),
-                                      bounds:
-                                          const Rect.fromLTWH(0, 0, 200, 50),
-                                    );
-                                    header.graphics.drawString(
-                                      controller.title.values.first,
-                                      PdfStandardFont(PdfFontFamily.courier, 8,
-                                          style: PdfFontStyle.regular),
-                                      bounds:
-                                          const Rect.fromLTWH(0, 10, 200, 40),
-                                    );
-                                    header.graphics.drawString(
-                                      'Created Date : ${MyFormat.formatDateOne(DateTime.now())}',
-                                      PdfStandardFont(PdfFontFamily.courier, 8,
-                                          style: PdfFontStyle.regular),
-                                      bounds:
-                                          const Rect.fromLTWH(0, 20, 200, 40),
-                                    );
+                          var pdf = await ReportPdf(
+                                  columns: controller.columns.value
+                                      .map((element) => element.columnName)
+                                      .toList(),
+                                  rows: _dataSource.effectiveRows
+                                      .map((DataGridRow row) => row
+                                          .getCells()
+                                          .map((DataGridCell e) =>
+                                              e.value.toString())
+                                          .toList())
+                                      .toList(),
+                                  companyName: StoreDB().getStore().companyName,
+                                  reportType: controller.title.value.keys.first,
+                                  reportTitle:
+                                      controller.title.value.values.first,
+                                  createdDate: DateTime.now(),
+                                  dateTimeRange: controller.dateTimeRange)
+                              .generatePDF();
 
-                                    if (controller.dateTimeRange.start.year !=
-                                        0) {
-                                      header.graphics.drawString(
-                                        controller.checkDate()
-                                            ? 'From ${MyFormat.formatDateTwo(controller.dateTimeRange.start)} '
-                                            : 'From ${MyFormat.formatDateTwo(controller.dateTimeRange.start)}  To ${MyFormat.formatDateTwo(controller.dateTimeRange.end.subtract(const Duration(days: 1)))}',
-                                        PdfStandardFont(
-                                            PdfFontFamily.courier, 8,
-                                            style: PdfFontStyle.regular),
-                                        bounds:
-                                            const Rect.fromLTWH(0, 30, 200, 40),
-                                      );
-                                    }
+                          // final List<int> bytes = await document.save();
+                          // await Printing.layoutPdf(
+                          //     onLayout: (format) async =>
+                          //         Uint8List.fromList(bytes));
 
-                                    headerFooterExport.pdfDocumentTemplate.top =
-                                        header;
-                                  },
-                                  fitAllColumnsInOnePage: true,
-                                  cellExport: (details) {
-                                    format = PdfStringFormat(
-                                        alignment: PdfTextAlignment.center,
-                                        lineAlignment:
-                                            PdfVerticalAlignment.middle);
+                          // document.dispose();
 
-                                    if (details.columnName ==
-                                            ReportController.salepriceKey ||
-                                        details.columnName ==
-                                            ReportController.receiptsPriceKey) {
-                                      format = PdfStringFormat(
-                                          alignment: PdfTextAlignment.right,
-                                          lineAlignment:
-                                              PdfVerticalAlignment.middle);
-                                    }
-
-                                    if (details.columnName ==
-                                            ReportController.customerSaleKey ||
-                                        details.columnName ==
-                                            ReportController.receiptsKey) {
-                                      format = PdfStringFormat(
-                                          alignment: PdfTextAlignment.left,
-                                          lineAlignment:
-                                              PdfVerticalAlignment.middle);
-                                    }
-
-                                    if (details.cellType ==
-                                        DataGridExportCellType
-                                            .tableSummaryRow) {
-                                      if ((details.cellValue as String)
-                                          .isNotEmpty) {
-                                        details.pdfCell.value =
-                                            MyFormat.formatPrice(double.parse(
-                                                details.cellValue as String));
-                                        format = PdfStringFormat(
-                                            alignment: PdfTextAlignment.right,
-                                            lineAlignment:
-                                                PdfVerticalAlignment.middle);
-                                      }
-                                    }
-                                    if (details.cellValue is double) {
-                                      details.pdfCell.value =
-                                          MyFormat.formatPrice(
-                                              details.cellValue as double);
-                                      format = PdfStringFormat(
-                                          alignment: PdfTextAlignment.right,
-                                          lineAlignment:
-                                              PdfVerticalAlignment.middle);
-                                    }
-
-                                    details.pdfCell.stringFormat = format;
-                                  },
-                                  autoColumnWidth: true);
-
-                          final List<int> bytes = await document.save();
-                          await Printing.layoutPdf(
-                              onLayout: (format) async =>
-                                  Uint8List.fromList(bytes));
-
-                          document.dispose();
+                          PdfApi.openFile(pdf);
                         }),
                   ],
                 ),
@@ -230,10 +135,11 @@ class _ReportPageState extends State<ReportPage> {
                     key: pdfKey,
                     allowColumnsResizing: true,
                     rowHeight: 40.0,
+                    controller: _dataGridController,
                     gridLinesVisibility: GridLinesVisibility.both,
                     headerGridLinesVisibility: GridLinesVisibility.both,
                     columnWidthMode: ColumnWidthMode.auto,
-                    source: DataSource(rows),
+                    source: _dataSource,
                     allowFiltering: true,
                     columns: columns,
                     tableSummaryRows: [

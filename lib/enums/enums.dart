@@ -2,7 +2,7 @@ enum DrawerName { largeDrawer, smallDrawer }
 
 enum InvoiceItemCategory { item, extraChrage, comment, empty }
 
-enum InvoiceType { invoice, supplyInvoice, quotation, creditNote }
+enum InvoiceType { invoice, supplyInvoice, quotation, creditNote, returnNote }
 
 enum ReportPaymentFilter { all, paid, notPaid }
 
@@ -21,7 +21,8 @@ enum ReportType {
   stockQuantity,
   customerDetails,
   outstanding,
-  stockValue
+  stockValue,
+  retrunNotes
 }
 
 extension InvoiceTypeCaps on InvoiceType {
@@ -38,6 +39,9 @@ extension InvoiceTypeCaps on InvoiceType {
 
       case InvoiceType.creditNote:
         return ('Credit Note');
+
+      case InvoiceType.returnNote:
+        return ('Return Note');
       default:
         return 'Invoice';
     }

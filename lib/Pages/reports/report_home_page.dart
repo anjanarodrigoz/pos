@@ -134,13 +134,19 @@ class _ReportHomePageState extends State<ReportHomePage> {
                       'Supply Invoice Report': () {
                         showFilterDialog(
                           ReportType.supplyInvoice,
-                          {'Supply Transcation': 'Invoice'},
+                          {'Supply Transcation': 'Supply Invoice'},
                         );
                       },
                       'Supply Item Report': () {
                         showFilterDialog(
                           ReportType.supplyItem,
-                          {'Supply Transcation': 'Items'},
+                          {'Supply Transcation': 'Supply Items'},
+                        );
+                      },
+                      'Supply Return Report': () {
+                        showFilterDialog(
+                          ReportType.retrunNotes,
+                          {'Supply Transcation': 'Return Notes'},
                         );
                       },
                     });

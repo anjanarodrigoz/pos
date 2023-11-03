@@ -74,10 +74,19 @@ class CreditDraftController extends GetxController {
     comments.add(comment);
   }
 
-  void updateCart() async {
+  void updateCart({Cart? newCart}) async {
     cartTotal = 0;
     for (Cart cart in cartList) {
-      cartTotal += cart.netTotal;
+      if (newCart != null) {
+        if (cart.cartId == newCart.cartId) {
+          int index = cartList.indexOf(cart);
+          cartList.remove(cart);
+          cartList.insert(index, newCart);
+          cartTotal += newCart.netTotal;
+        }
+      } else {
+        cartTotal += cart.netTotal;
+      }
     }
     updateTotals();
   }

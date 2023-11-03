@@ -207,8 +207,11 @@ class _InvoicePageState extends State<InvoicePage> {
           'This invoice has been paid and Can not be edited.', context);
       return;
     }
-    Get.put(InvoiceEditController(invoice: invoice));
-    Get.to(InvoiceEditPage());
+
+    final controller = Get.put(InvoiceEditController(invoice: invoice));
+    Get.to(() => InvoiceEditPage(
+          controller: controller,
+        ));
   }
 
   Future<void> deleteInvoice() async {

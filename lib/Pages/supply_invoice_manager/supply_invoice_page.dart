@@ -26,7 +26,9 @@ class SupplyInvoicePage extends StatelessWidget {
   String invoiceId;
   late SupplyInvoice invoice;
   late BuildContext context;
-  SupplyInvoicePage({super.key, required this.invoiceId});
+  bool isReturnManger;
+  SupplyInvoicePage(
+      {super.key, required this.invoiceId, required this.isReturnManger});
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +39,14 @@ class SupplyInvoicePage extends StatelessWidget {
         appBar: AppBar(
           toolbarHeight: 40.0,
           backgroundColor: TColors.blue,
-          title: Text('Supplyer Invoice #$invoiceId'),
+          title: Text(isReturnManger
+              ? 'Return Note #$invoiceId'
+              : 'Supplyer Invoice #$invoiceId'),
           leading: IconButton(
               onPressed: () {
-                Get.offAll(SupplyAllInvoice());
+                Get.offAll(SupplyAllInvoice(
+                  isRetunManager: isReturnManger,
+                ));
               },
               icon: const Icon(Icons.arrow_back)),
         ),
@@ -114,7 +120,10 @@ class SupplyInvoicePage extends StatelessWidget {
           context: context,
           builder: (BuildContext context) {
             return Dialog(
-              child: SelectSupplyerPage(supplyInvoice: invoice),
+              child: SelectSupplyerPage(
+                supplyInvoice: invoice,
+                isRetunManager: isReturnManger,
+              ),
             );
           });
     }

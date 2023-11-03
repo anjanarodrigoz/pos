@@ -45,7 +45,7 @@ class MainDB extends GetxController {
   Future<void> readDBFile(BuildContext context) async {
     content.clear();
     final result = await FilePicker.platform
-        .pickFiles(type: FileType.custom, allowedExtensions: ['db']
+        .pickFiles(type: FileType.custom, allowedExtensions: ['zip', 'db']
             // Specify the allowed file extension
             );
 

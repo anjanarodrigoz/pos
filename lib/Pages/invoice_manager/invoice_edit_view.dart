@@ -1,15 +1,11 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pos/controllers/invoice_draft_contorller.dart';
 import 'package:pos/controllers/invoice_edit_controller.dart';
 import 'package:pos/data_sources/invoiceDataSource.dart';
 import 'package:pos/database/cart_db_service.dart';
 import 'package:pos/database/item_db_service.dart';
 import 'package:pos/enums/enums.dart';
-import 'package:pos/models/customer.dart';
 import 'package:pos/models/extra_charges.dart';
 import 'package:pos/utils/alert_message.dart';
 import '../../models/invoice_row.dart';
@@ -22,8 +18,10 @@ import '../../utils/val.dart';
 import '../../widgets/pos_text_form_field.dart';
 
 class InvoiceEditView extends StatefulWidget {
-  InvoiceEditView({
+  final InvoiceEditController invoiceController;
+  const InvoiceEditView({
     super.key,
+    required this.invoiceController,
   });
 
   @override
@@ -33,7 +31,8 @@ class InvoiceEditView extends StatefulWidget {
 class _InvoiceEditViewState extends State<InvoiceEditView> {
   final ScrollController controller = ScrollController();
   final ScrollController controller2 = ScrollController();
-  late InvoiceEditController invoiceController;
+  late final InvoiceEditController invoiceController;
+
   final dbService = CartDB();
   InvoiceDataSource invoiceDataSource = InvoiceDataSource(invoiceData: []);
   late BuildContext context;
@@ -42,7 +41,7 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    invoiceController = Get.find<InvoiceEditController>();
+    invoiceController = widget.invoiceController;
   }
 
   @override
@@ -84,7 +83,7 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                             const SizedBox(
                               height: 5.0,
                             ),
-                            detailsRowWidget('Customer Name',
+                            detailsRowWidget('mobile',
                                 invoiceController.invoice.customerMobile),
                           ],
                         ),
@@ -155,9 +154,8 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
               headerGridLinesVisibility: GridLinesVisibility.both,
               allowColumnsResizing: true,
               rowHeight: 27.0,
-              columnWidthMode: ColumnWidthMode.auto,
+              columnWidthMode: ColumnWidthMode.fitByCellValue,
               allowSwiping: true,
-              swipeMaxOffset: 80.0,
               onCellDoubleTap: (details) {
                 final row = invoiceDataSource.effectiveRows
                     .elementAt(details.rowColumnIndex.rowIndex - 1);
@@ -180,10 +178,8 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
               columns: [
                 GridColumn(
                     columnName: InvoiceRow.itemIdKey,
-                    maximumWidth: 120,
-                    label: Center(child: const Text('Item ID'))),
+                    label: const Center(child: Text('Item ID'))),
                 GridColumn(
-                    minimumWidth: 500.0,
                     columnName: InvoiceRow.nameKey,
                     label: Center(child: const Text('Item Name'))),
                 GridColumn(
@@ -199,7 +195,6 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                     columnName: InvoiceRow.itemPriceKey,
                     label: Center(child: const Text('Item Price'))),
                 GridColumn(
-                    minimumWidth: 120.0,
                     columnName: InvoiceRow.totalKey,
                     label: Center(child: const Text('Total'))),
 
@@ -329,7 +324,7 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
             ],
           ),
           content: SizedBox(
-            height: 200,
+            height: 250,
             child: Column(
               children: [
                 Padding(
@@ -420,7 +415,8 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                   return;
                 }
                 double itemPrice = net;
-                String commnet = commentController.text;
+                String commnet =
+                    MyFormat.divideStringIntoLines(commentController.text);
                 int qty = qtyController.text.isEmpty
                     ? 0
                     : int.parse(qtyController.text);
@@ -480,7 +476,7 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
             ],
           ),
           content: SizedBox(
-            height: 250,
+            height: 300,
             child: Column(
               children: [
                 PosTextFormField(
@@ -563,7 +559,7 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                 ),
                 PosTextFormField(
                   width: 400.0,
-                  height: 80.0,
+                  height: 100.0,
                   maxLines: 3,
                   labelText: 'Comment',
                   controller: commentController,
@@ -575,7 +571,8 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
             TextButton(
               onPressed: () async {
                 double itemPrice = net;
-                String commnet = commentController.text;
+                String commnet =
+                    MyFormat.divideStringIntoLines(commentController.text);
                 String name = nameController.text;
                 int qty = qtyController.text.isEmpty
                     ? 0
