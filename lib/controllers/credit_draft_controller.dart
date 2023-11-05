@@ -76,6 +76,11 @@ class CreditDraftController extends GetxController {
 
   void updateCart({Cart? newCart}) async {
     cartTotal = 0;
+    if (newCart != null && newCart.qty == 0) {
+      cartList.remove(
+          cartList.where((cart) => cart.cartId == newCart.cartId).first);
+    }
+
     for (Cart cart in cartList) {
       if (newCart != null) {
         if (cart.cartId == newCart.cartId) {

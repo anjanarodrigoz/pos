@@ -69,6 +69,7 @@ class Cart {
         name: item.name,
         netPrice: item.netPrice,
         qty: item.qty,
+        isPostedItem: item.isPostedItem,
         comment: item.comment);
   }
 

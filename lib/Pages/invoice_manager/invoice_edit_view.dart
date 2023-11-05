@@ -226,8 +226,13 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
 
     for (Cart cart in cartList) {
       invoiceData.add(InvoiceRow(
-          itemId: {cartList.indexOf(cart): cart.itemId},
-          itemName: {InvoiceItemCategory.item: cart.name},
+          itemId: {
+            cartList.indexOf(cart):
+                cart.isPostedItem ? 'P${cart.itemId}' : cart.itemId
+          },
+          itemName: {
+            InvoiceItemCategory.item: cart.name
+          },
           gst: MyFormat.formatCurrency(cart.gst),
           netPrice: MyFormat.formatCurrency(cart.netPrice),
           itemPrice: MyFormat.formatCurrency(cart.itemPrice),
@@ -288,7 +293,7 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
     TextEditingController commentController = TextEditingController();
     TextEditingController qtyController = TextEditingController();
     double net = oldCart.netPrice;
-
+    RxBool isDeliveryItem = oldCart.isPostedItem.obs;
     List list = invoiceController.oldCartList
         .where((element) => element.cartId == oldCart.cartId)
         .toList();
@@ -401,6 +406,17 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                   labelText: 'Comment',
                   controller: commentController,
                 ),
+                Row(
+                  children: [
+                    Obx(() => Checkbox(
+                        semanticLabel: 'Delivery Item',
+                        value: isDeliveryItem.value,
+                        onChanged: (onChanged) {
+                          isDeliveryItem.value = onChanged ?? false;
+                        })),
+                    const Text('Delivery Item')
+                  ],
+                )
               ],
             ),
           ),
@@ -422,7 +438,10 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                     : int.parse(qtyController.text);
 
                 Cart newCart = oldCart.copyWith(
-                    comment: commnet, netPrice: itemPrice, qty: qty);
+                    comment: commnet,
+                    netPrice: itemPrice,
+                    qty: qty,
+                    isPostedItem: isDeliveryItem.value);
                 if (list.isNotEmpty) {
                   await CartDB().updateOldCart(list[0], newCart);
                 } else {

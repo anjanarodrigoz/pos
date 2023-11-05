@@ -298,9 +298,15 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
               Text(oldCart.name),
               IconButton(
                   onPressed: () async {
-                    await CartDB().removeItemFromCart(oldCart);
-                    await invoiceController.updateCart();
-                    Navigator.of(context).pop();
+                    if (invoiceController is InvoiceDraftController) {
+                      await CartDB().removeItemFromCart(oldCart);
+                      await invoiceController.updateCart();
+                    } else {
+                      await invoiceController.updateCart(
+                          newCart: oldCart.copyWith(qty: 0));
+                    }
+
+                    Get.back();
                   },
                   icon: Icon(
                     Icons.delete,

@@ -86,6 +86,7 @@ class ReportController extends GetxController {
       case ReportType.itemQuote:
         await generateItemsSummeryReport(reportType);
       case ReportType.itemInvoicedItem:
+        await generateItemInvoiceReport();
       case ReportType.supplyInvoice:
         await generateSupplyInvoiceReport();
       case ReportType.supplyItem:
@@ -933,4 +934,6 @@ class ReportController extends GetxController {
             }).toList()))
         .toList();
   }
+
+  generateItemInvoiceReport() {}
 }

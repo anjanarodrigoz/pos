@@ -151,6 +151,7 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
     TextEditingController totalPriceController = TextEditingController();
     TextEditingController commentController = TextEditingController();
     TextEditingController qtyController = TextEditingController(text: '1');
+    RxBool isDeliveryItem = false.obs;
     double net = item.price;
     netPriceController.text = MyFormat.formatPrice(item.price);
     totalPriceController.text =
@@ -239,6 +240,17 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
                   labelText: 'Comment',
                   controller: commentController,
                 ),
+                Row(
+                  children: [
+                    Obx(() => Checkbox(
+                        semanticLabel: 'Delivery Item',
+                        value: isDeliveryItem.value,
+                        onChanged: (onChanged) {
+                          isDeliveryItem.value = onChanged ?? false;
+                        })),
+                    const Text('Delivery Item')
+                  ],
+                )
               ],
             ),
             actions: [
@@ -256,6 +268,7 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
                         name: item.name,
                         netPrice: itemPrice,
                         qty: qty,
+                        isPostedItem: isDeliveryItem.value,
                         cartId: Cart.generateUniqueItemId(),
                         comment: commnet);
                     invoiceController.cartList.add(cartItem);

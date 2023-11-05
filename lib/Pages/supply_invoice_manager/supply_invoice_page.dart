@@ -69,12 +69,6 @@ class SupplyInvoicePage extends StatelessWidget {
                   onPressed: () async => printInvoice(),
                   text: 'Print',
                 ),
-                // PosButton(
-                //   onPressed: () async =>
-                //       await EmailSender.showEmailSendingDialog(
-                //           context, invoice, InvoiceType.supplyInvoice),
-                //   text: 'Email',
-                // ),
                 const SizedBox(
                   height: 50,
                 ),
@@ -128,7 +122,9 @@ class SupplyInvoicePage extends StatelessWidget {
               content: 'Do you want to delete this invoice?',
               onContinue: () async {
                 await SupplyerInvoiceDB().deleteInvoice(invoice);
-                Get.offAll(SupplyAllInvoice());
+                Get.offAll(SupplyAllInvoice(
+                  isRetunManager: isReturnManger,
+                ));
               },
               continueText: 'Delete',
               verifyText: invoice.invoiceId,
