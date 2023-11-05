@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
+import 'package:pdf/widgets.dart';
 import 'package:pos/database/store_db.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/utils/alert_message.dart';
@@ -13,6 +14,7 @@ import 'dart:developer' as dev;
 import '../models/invoice.dart';
 import '../models/store.dart';
 import '../widgets/emial_sending_widget.dart';
+import 'pdf_api.dart';
 import 'pdf_invoice_api.dart';
 
 class EmailSender {
@@ -144,10 +146,30 @@ ${store.email}
         builder: (context) {
           return EmailSendingDialog(
               email: invoice.email,
-              onPressed: (email) async {
+              onPressed: (email, message) async {
                 await EmailSender.sendEmail(email, context,
                     title: 'Invoice_${invoice.invoiceId}',
                     body: EmailSender.emailBody(invoice, invoiceType),
+                    attachment: [FileAttachment(file)]);
+              });
+        });
+  }
+
+  static Future<void> showReportEmailSending(
+      context, Document pdf, String reportTitle, String reportType) async {
+    File file = await PdfApi.saveDocument(
+        name: '$reportType-$reportTitle.pdf', pdf: pdf);
+
+    showDialog(
+        context: context,
+        builder: (context) {
+          return EmailSendingDialog(
+              email: '',
+              isMessageRequired: true,
+              onPressed: (email, message) async {
+                await EmailSender.sendEmail(email, context,
+                    title: '$reportType-$reportTitle',
+                    body: message,
                     attachment: [FileAttachment(file)]);
               });
         });

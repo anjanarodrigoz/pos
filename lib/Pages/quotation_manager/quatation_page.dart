@@ -15,6 +15,7 @@ import 'package:pos/widgets/alert_dialog.dart';
 
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/verify_dialog.dart';
+import 'package:printing/printing.dart';
 
 import '../../api/email_sender.dart';
 import '../../api/pdf_api.dart';
@@ -23,6 +24,7 @@ import '../../api/pdf_invoice_api.dart';
 import '../../models/invoice.dart';
 
 import '../../theme/t_colors.dart';
+import '../../widgets/print_verify.dart';
 import 'QuoteInvoicePage.dart';
 
 class QuotationPage extends StatelessWidget {
@@ -64,17 +66,15 @@ class QuotationPage extends StatelessWidget {
                     text: 'Copy',
                   ),
                   PosButton(
-                    onPressed: () async => await PdfInvoiceApi.printInvoice(
-                        invoice,
-                        invoiceType: InvoiceType.quotation),
+                    onPressed: () async => printInvoice(),
                     text: 'Print',
                   ),
-                  PosButton(
-                    onPressed: () async =>
-                        await EmailSender.showEmailSendingDialog(
-                            context, invoice, InvoiceType.quotation),
-                    text: 'Email',
-                  ),
+                  // PosButton(
+                  //   onPressed: () async =>
+                  //       await EmailSender.showEmailSendingDialog(
+                  //           context, invoice, InvoiceType.quotation),
+                  //   text: 'Email',
+                  // ),
                   const SizedBox(
                     height: 50,
                   ),
@@ -159,5 +159,27 @@ class QuotationPage extends StatelessWidget {
         wantToUpdate: true,
         copyInvoice: invoice));
     Get.offAll(QuoteDraftPage());
+  }
+
+  void printInvoice() async {
+    Invoice oldInvoice = invoice.copyWith();
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: PrintVerify(
+              invoice: oldInvoice,
+              onPrintPressed: (Printer printer, Invoice invoice) async {
+                await PdfInvoiceApi.printInvoice(invoice,
+                    printer: printer, invoiceType: InvoiceType.quotation);
+              },
+              onEmailPressed: (Invoice invoice) async {
+                await EmailSender.showEmailSendingDialog(
+                    context, invoice, InvoiceType.quotation);
+              },
+            ),
+          );
+        });
   }
 }

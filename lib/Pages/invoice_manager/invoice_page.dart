@@ -6,6 +6,7 @@ import 'package:pos/Pages/invoice_manager/invoice_edit_page.dart';
 import 'package:pos/Pages/invoice_manager/save_invoice_page.dart';
 import 'package:pos/Pages/invoice_manager/search_invoice_page.dart';
 import 'package:pos/api/email_sender.dart';
+import 'package:pos/api/printer_manager.dart';
 import 'package:pos/database/invoice_db_service.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/payment.dart';
@@ -13,7 +14,9 @@ import 'package:pos/utils/alert_message.dart';
 import 'package:pos/widgets/pos_appbar.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/pos_text_form_field.dart';
+import 'package:pos/widgets/print_verify.dart';
 import 'package:pos/widgets/verify_dialog.dart';
+import 'package:printing/printing.dart';
 
 import '../../api/pdf_invoice_api.dart';
 import '../../controllers/invoice_edit_controller.dart';
@@ -31,9 +34,10 @@ class InvoicePage extends StatefulWidget {
 
 class _InvoicePageState extends State<InvoicePage> {
   List<Invoice> invoiceList = [];
-  late Invoice invoice;
+  late final Invoice invoice;
   final RxInt index = 0.obs;
   String? searchInvoiceId;
+  int ss = 77;
 
   @override
   void initState() {
@@ -73,17 +77,15 @@ class _InvoicePageState extends State<InvoicePage> {
                   text: 'Copy',
                 ),
                 PosButton(
-                  onPressed: () async => await PdfInvoiceApi.printInvoice(
-                      invoice,
-                      invoiceType: InvoiceType.invoice),
+                  onPressed: () async => printInvoice(),
                   text: 'Print',
                 ),
-                PosButton(
-                  onPressed: () async =>
-                      await EmailSender.showEmailSendingDialog(
-                          context, invoice, InvoiceType.invoice),
-                  text: 'Email',
-                ),
+                // PosButton(
+                //   onPressed: () async =>
+                //       await EmailSender.showEmailSendingDialog(
+                //           context, invoice, InvoiceType.invoice),
+                //   text: 'Email',
+                // ),
                 PosButton(
                   onPressed: () => payAmout(),
                   text: 'Pay',
@@ -349,5 +351,27 @@ class _InvoicePageState extends State<InvoicePage> {
             );
           });
     }
+  }
+
+  void printInvoice() async {
+    Invoice oldInvoice = invoice.copyWith();
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: PrintVerify(
+              invoice: oldInvoice,
+              onPrintPressed: (Printer printer, Invoice invoice) async {
+                await PdfInvoiceApi.printInvoice(invoice,
+                    printer: printer, invoiceType: InvoiceType.invoice);
+              },
+              onEmailPressed: (Invoice invoice) async {
+                await EmailSender.showEmailSendingDialog(
+                    context, invoice, InvoiceType.invoice);
+              },
+            ),
+          );
+        });
   }
 }

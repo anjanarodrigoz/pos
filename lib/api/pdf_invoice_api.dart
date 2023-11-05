@@ -38,17 +38,19 @@ class PdfInvoiceApi {
   }
 
   static Future<void> printInvoice(invoice,
-      {required InvoiceType invoiceType}) async {
+      {required InvoiceType invoiceType, required Printer printer}) async {
     var pdfFile;
 
-    if (invoiceType == InvoiceType.supplyInvoice) {
+    if (invoiceType == InvoiceType.supplyInvoice ||
+        invoiceType == InvoiceType.returnNote) {
       pdfFile = await PdfInvoiceApi.generateSupplyInvoicePDF(invoice);
     } else {
       pdfFile = await PdfInvoiceApi.generateInvoicePDF(invoice,
           invoiceType: invoiceType);
     }
 
-    await Printing.layoutPdf(
+    await Printing.directPrintPdf(
+        printer: printer,
         onLayout: (PdfPageFormat format) async =>
             Uint8List.fromList(await pdfFile.readAsBytes()));
   }

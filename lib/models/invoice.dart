@@ -73,14 +73,6 @@ class Invoice {
     calOtherValues();
   }
 
-  getComments() {
-    return comments;
-  }
-
-  getExtracharges() {
-    return extraCharges;
-  }
-
   Invoice copyWith({
     bool? isPaid,
     bool? isDeleted,

@@ -15,12 +15,14 @@ import 'package:pos/utils/alert_message.dart';
 import 'package:pos/widgets/alert_dialog.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/verify_dialog.dart';
+import 'package:printing/printing.dart';
 
 import '../../api/pdf_api.dart';
 import '../../api/pdf_invoice_api.dart';
 
 import '../../models/supply_invoice.dart';
 import '../../theme/t_colors.dart';
+import '../../widgets/supply_print_verify.dart';
 
 class SupplyInvoicePage extends StatelessWidget {
   String invoiceId;
@@ -64,17 +66,15 @@ class SupplyInvoicePage extends StatelessWidget {
                   text: 'Copy',
                 ),
                 PosButton(
-                  onPressed: () async => await PdfInvoiceApi.printInvoice(
-                      invoice,
-                      invoiceType: InvoiceType.supplyInvoice),
+                  onPressed: () async => printInvoice(),
                   text: 'Print',
                 ),
-                PosButton(
-                  onPressed: () async =>
-                      await EmailSender.showEmailSendingDialog(
-                          context, invoice, InvoiceType.supplyInvoice),
-                  text: 'Email',
-                ),
+                // PosButton(
+                //   onPressed: () async =>
+                //       await EmailSender.showEmailSendingDialog(
+                //           context, invoice, InvoiceType.supplyInvoice),
+                //   text: 'Email',
+                // ),
                 const SizedBox(
                   height: 50,
                 ),
@@ -83,7 +83,7 @@ class SupplyInvoicePage extends StatelessWidget {
                   text: 'Remove',
                   color: Colors.red.shade400,
                 ),
-                SizedBox(height: 150),
+                const SizedBox(height: 150),
               ],
             ),
           ),
@@ -91,9 +91,33 @@ class SupplyInvoicePage extends StatelessWidget {
         ]));
   }
 
-  Future<void> printInvoice(context) async {
-    final pdfFile = await PdfInvoiceApi.generateSupplyInvoicePDF(invoice);
-    PdfApi.openFile(pdfFile);
+  void printInvoice() async {
+    SupplyInvoice oldInvoice = invoice.copyWith();
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: SupplyPrintVerify(
+              invoice: oldInvoice,
+              onEmailPressed: (SupplyInvoice invoice) async {
+                await EmailSender.showEmailSendingDialog(
+                    context,
+                    invoice,
+                    isReturnManger
+                        ? InvoiceType.returnNote
+                        : InvoiceType.supplyInvoice);
+              },
+              onPrintPressed: (Printer printer, SupplyInvoice invoice) async {
+                await PdfInvoiceApi.printInvoice(invoice,
+                    printer: printer,
+                    invoiceType: isReturnManger
+                        ? InvoiceType.returnNote
+                        : InvoiceType.supplyInvoice);
+              },
+            ),
+          );
+        });
   }
 
   Future<void> deleteInvoice() async {

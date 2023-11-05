@@ -33,7 +33,7 @@ class ReportPdf {
     this.dateTimeRange,
   }) {}
 
-  Future<File> generatePDF() async {
+  Future<Document> generatePDF() async {
     final pdf = Document();
 
     pdf.addPage(MultiPage(
@@ -43,11 +43,10 @@ class ReportPdf {
         SizedBox(height: 0.5 * PdfPageFormat.cm),
         buildTable(),
         Spacer(),
-        //buildTotal(invoice),
       ],
     ));
 
-    return PdfApi.saveDocument(name: '$reportType.pdf', pdf: pdf);
+    return pdf;
   }
 
   Widget buildHeader() => Column(
@@ -117,6 +116,20 @@ class ReportPdf {
     int extrtotal = columns.indexOf(ReportController.extraTotalKey);
     int itemtotal = columns.indexOf(ReportController.itemTotalKey);
 
+    List<int> prices = [
+      net,
+      gst,
+      total,
+      outstanding,
+      toPay,
+      extrtotal,
+      itemtotal
+    ];
+
+    List<String> summery = createSummeryRow(headers, items) ?? [];
+
+    items.add(summery);
+
     return Table.fromTextArray(
         headers: headers,
         data: items,
@@ -130,6 +143,14 @@ class ReportPdf {
         cellPadding: const EdgeInsets.only(top: 1),
         cellStyle: const TextStyle(fontSize: 7.0),
         cellAlignment: Alignment.center,
+        cellFormat: (index, data) {
+          if (prices.contains(index)) {
+            double? value = double.tryParse(data);
+            return value == null ? data : MyFormat.formatPrice(value);
+          }
+
+          return data;
+        },
         cellAlignments: {
           net: Alignment.centerRight,
           gst: Alignment.centerRight,
@@ -139,5 +160,70 @@ class ReportPdf {
           extrtotal: Alignment.centerRight,
           itemtotal: Alignment.centerRight,
         });
+  }
+
+  List<String>? createSummeryRow(
+      List<String> headers, List<List<String>> items) {
+    double netTotal = 0.0;
+    double gstTotal = 0.0;
+    double totalTotal = 0.0;
+    double toPayTotal = 0.0;
+
+    if (headers.contains(ReportController.netKey)) {
+      if (headers.contains(ReportController.paykey)) {
+        for (List<String> data in items) {
+          netTotal += double.parse(
+              data.elementAt(headers.indexOf(ReportController.netKey)));
+          gstTotal += double.parse(
+              data.elementAt(headers.indexOf(ReportController.gstKey)));
+          totalTotal += double.parse(
+              data.elementAt(headers.indexOf(ReportController.totalKey)));
+          toPayTotal += double.parse(
+              data.elementAt(headers.indexOf(ReportController.paykey)));
+        }
+        return headers.map((e) {
+          if (e == ReportController.netKey) {
+            return MyFormat.formatPrice(netTotal);
+          }
+          if (e == ReportController.gstKey) {
+            return MyFormat.formatPrice(gstTotal);
+          }
+          if (e == ReportController.totalKey) {
+            return MyFormat.formatPrice(totalTotal);
+          }
+          if (e == ReportController.paykey) {
+            return MyFormat.formatPrice(toPayTotal);
+          }
+          return '';
+        }).toList();
+      } else {
+        for (List<String> data in items) {
+          netTotal += double.parse(
+              data.elementAt(headers.indexOf(ReportController.netKey)));
+          gstTotal += double.parse(
+              data.elementAt(headers.indexOf(ReportController.gstKey)));
+          totalTotal += double.parse(
+              data.elementAt(headers.indexOf(ReportController.totalKey)));
+        }
+        return headers.map((e) {
+          if (headers.indexOf(e) == 0) {
+            return 'Total';
+          }
+          if (e == ReportController.netKey) {
+            return MyFormat.formatPrice(netTotal);
+          }
+          if (e == ReportController.gstKey) {
+            return MyFormat.formatPrice(gstTotal);
+          }
+          if (e == ReportController.totalKey) {
+            return MyFormat.formatPrice(totalTotal);
+          }
+
+          return '';
+        }).toList();
+      }
+    } else {
+      return null;
+    }
   }
 }

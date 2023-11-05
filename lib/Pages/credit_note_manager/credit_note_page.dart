@@ -23,6 +23,7 @@ import '../../api/pdf_api.dart';
 import '../../api/pdf_invoice_api.dart';
 import '../../models/invoice.dart';
 import '../../theme/t_colors.dart';
+import '../../widgets/print_verify.dart';
 import 'creditInvoicePage.dart';
 
 class CreditNotePage extends StatelessWidget {
@@ -63,17 +64,15 @@ class CreditNotePage extends StatelessWidget {
                   text: 'Copy',
                 ),
                 PosButton(
-                  onPressed: () async => await PdfInvoiceApi.printInvoice(
-                      invoice,
-                      invoiceType: InvoiceType.creditNote),
+                  onPressed: () async => printInvoice(),
                   text: 'Print',
                 ),
-                PosButton(
-                  onPressed: () async =>
-                      await EmailSender.showEmailSendingDialog(
-                          context, invoice, InvoiceType.creditNote),
-                  text: 'Email',
-                ),
+                // PosButton(
+                //   onPressed: () async =>
+                //       await EmailSender.showEmailSendingDialog(
+                //           context, invoice, InvoiceType.creditNote),
+                //   text: 'Email',
+                // ),
                 const SizedBox(
                   height: 50,
                 ),
@@ -157,5 +156,27 @@ class CreditNotePage extends StatelessWidget {
         wantToUpdate: true,
         copyInvoice: invoice));
     Get.offAll(CreditDraftPage());
+  }
+
+  void printInvoice() async {
+    Invoice oldInvoice = invoice.copyWith();
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: PrintVerify(
+              invoice: oldInvoice,
+              onPrintPressed: (Printer printer, Invoice invoice) async {
+                await PdfInvoiceApi.printInvoice(invoice,
+                    printer: printer, invoiceType: InvoiceType.creditNote);
+              },
+              onEmailPressed: (Invoice invoice) async {
+                await EmailSender.showEmailSendingDialog(
+                    context, invoice, InvoiceType.creditNote);
+              },
+            ),
+          );
+        });
   }
 }

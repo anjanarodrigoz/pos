@@ -3,12 +3,15 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
+import 'package:pos/api/email_sender.dart';
 import 'package:pos/api/pdf_api.dart';
+import 'package:pos/api/printer_manager.dart';
 import 'package:pos/api/report_pdf.dart';
 import 'package:pos/controllers/report_controller.dart';
 import 'package:pos/database/store_db.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/widgets/pos_button.dart';
+import 'package:pos/widgets/printer_setup_buttton.dart';
 import 'package:printing/printing.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:syncfusion_flutter_datagrid_export/export.dart';
@@ -97,6 +100,10 @@ class _ReportPageState extends State<ReportPage> {
                         text: 'Export',
                         icon: Icons.picture_as_pdf_rounded,
                         onPressed: () async {
+                          String companyName = StoreDB().getStore().companyName;
+                          String reportType = controller.title.value.keys.first;
+                          String reportTitle =
+                              controller.title.value.values.first;
                           var pdf = await ReportPdf(
                                   columns: controller.columns.value
                                       .map((element) => element.columnName)
@@ -108,22 +115,14 @@ class _ReportPageState extends State<ReportPage> {
                                               e.value.toString())
                                           .toList())
                                       .toList(),
-                                  companyName: StoreDB().getStore().companyName,
-                                  reportType: controller.title.value.keys.first,
-                                  reportTitle:
-                                      controller.title.value.values.first,
+                                  companyName: companyName,
+                                  reportType: reportType,
+                                  reportTitle: reportTitle,
                                   createdDate: DateTime.now(),
                                   dateTimeRange: controller.dateTimeRange)
                               .generatePDF();
 
-                          // final List<int> bytes = await document.save();
-                          // await Printing.layoutPdf(
-                          //     onLayout: (format) async =>
-                          //         Uint8List.fromList(bytes));
-
-                          // document.dispose();
-
-                          PdfApi.openFile(pdf);
+                          await showExport(pdf, reportType, reportTitle);
                         }),
                   ],
                 ),
@@ -172,6 +171,48 @@ class _ReportPageState extends State<ReportPage> {
               ],
             );
     });
+  }
+
+  Future<void> showExport(pdf, String reportType, String reportTitle) async {
+    PrinterManager printerManager = PrinterManager();
+
+    showDialog(
+        context: context,
+        builder: (c) {
+          return AlertDialog(
+            content: Row(
+              children: [
+                PosButton(
+                    text: 'Print',
+                    onPressed: () async {
+                      if (printerManager.printer != null) {
+                        await Printing.directPrintPdf(
+                            printer: printerManager.printer!,
+                            onLayout: (format) async =>
+                                Uint8List.fromList(await pdf.save()));
+                      } else {
+                        showDialog(
+                            context: context,
+                            builder: (c) {
+                              return const AlertDialog(
+                                content: Text('Please setup printer'),
+                              );
+                            });
+                      }
+                    }),
+                PosButton(
+                    text: 'E-mail',
+                    onPressed: () async {
+                      EmailSender.showReportEmailSending(
+                          context, pdf, reportTitle, reportType);
+                    }),
+                PrintSetupButton(onPrinterSelected: (Printer? printer) {
+                  printerManager.printer = printer;
+                })
+              ],
+            ),
+          );
+        });
   }
 }
 
