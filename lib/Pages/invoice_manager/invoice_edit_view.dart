@@ -234,7 +234,7 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
             InvoiceItemCategory.item: cart.name
           },
           gst: MyFormat.formatCurrency(cart.gst),
-          netPrice: MyFormat.formatCurrency(cart.netPrice),
+          netPrice: MyFormat.formatCurrency(cart.price),
           itemPrice: MyFormat.formatCurrency(cart.itemPrice),
           total: MyFormat.formatCurrency(cart.totalPrice),
           qty: cart.qty.toString()));
@@ -292,7 +292,7 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
     TextEditingController totalPriceController = TextEditingController();
     TextEditingController commentController = TextEditingController();
     TextEditingController qtyController = TextEditingController();
-    double net = oldCart.netPrice;
+    double net = oldCart.price;
     RxBool isDeliveryItem = oldCart.isPostedItem.obs;
     List list = invoiceController.oldCartList
         .where((element) => element.cartId == oldCart.cartId)

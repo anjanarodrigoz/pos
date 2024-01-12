@@ -9,7 +9,7 @@ import '../models/invoice_item.dart';
 import '../utils/val.dart';
 
 class InvoiceEditController extends GetxController {
-  late Invoice _invoice;
+  late User _invoice;
   RxList<ExtraCharges> extraList = <ExtraCharges>[].obs;
   RxList<String> comments = <String>[].obs;
   List<Cart> oldCartList = <Cart>[];
@@ -34,7 +34,7 @@ class InvoiceEditController extends GetxController {
     updateExtraTotal();
   }
 
-  Invoice get invoice => _invoice;
+  User get invoice => _invoice;
 
   @override
   void onClose() {
@@ -42,7 +42,7 @@ class InvoiceEditController extends GetxController {
     super.onClose();
   }
 
-  InvoiceEditController({required Invoice invoice}) {
+  InvoiceEditController({required User invoice}) {
     _invoice = invoice;
   }
 
@@ -112,13 +112,13 @@ class InvoiceEditController extends GetxController {
         .map((cart) => InvoicedItem(
             itemId: cart.itemId,
             name: cart.name,
-            netPrice: cart.netPrice,
+            netPrice: cart.price,
             qty: cart.qty,
             comment: cart.comment,
             isPostedItem: cart.isPostedItem))
         .toList();
 
-    Invoice newInvoice = _invoice.copyWith(
+    User newInvoice = _invoice.copyWith(
       customerMobile: _invoice.customerMobile,
       customerId: _invoice.customerId,
       gstPrecentage: Val.gstPrecentage,

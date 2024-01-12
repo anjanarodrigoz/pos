@@ -7,7 +7,7 @@ import 'outstanding_date_widget.dart';
 import 'paid_status_widget.dart';
 
 class InvoiceSummeryCard extends StatelessWidget {
-  final Invoice invoice;
+  final User invoice;
 
   const InvoiceSummeryCard({super.key, required this.invoice});
 
@@ -79,7 +79,7 @@ class InvoiceSummeryCard extends StatelessWidget {
                         ),
                         detailsRowWidget('GST Total',
                             MyFormat.formatCurrency(invoice.totalGstPrice)),
-                        Divider(),
+                        const Divider(),
                         detailsRowWidget(
                             'Total', MyFormat.formatCurrency(invoice.total)),
                       ],
@@ -97,7 +97,7 @@ class InvoiceSummeryCard extends StatelessWidget {
                       children: [
                         detailsRowWidget('Paid',
                             MyFormat.formatCurrency(invoice.paidAmount)),
-                        Divider(),
+                        const Divider(),
                         detailsRowWidget(
                             'Balance', MyFormat.formatCurrency(invoice.toPay)),
                       ],
@@ -141,7 +141,7 @@ class InvoiceSummeryCard extends StatelessWidget {
         ),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
               color: TColors.blue, fontWeight: FontWeight.w600, fontSize: 13.0),
         )
       ],

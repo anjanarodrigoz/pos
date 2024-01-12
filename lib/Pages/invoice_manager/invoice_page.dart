@@ -6,6 +6,7 @@ import 'package:pos/Pages/invoice_manager/invoice_edit_page.dart';
 import 'package:pos/Pages/invoice_manager/save_invoice_page.dart';
 import 'package:pos/Pages/invoice_manager/search_invoice_page.dart';
 import 'package:pos/api/email_sender.dart';
+import 'package:pos/api/pdf_api.dart';
 import 'package:pos/api/printer_manager.dart';
 import 'package:pos/database/invoice_db_service.dart';
 import 'package:pos/enums/enums.dart';
@@ -33,8 +34,8 @@ class InvoicePage extends StatefulWidget {
 }
 
 class _InvoicePageState extends State<InvoicePage> {
-  List<Invoice> invoiceList = [];
-  late final Invoice invoice;
+  List<User> invoiceList = [];
+  late User invoice;
   final RxInt index = 0.obs;
   String? searchInvoiceId;
   int ss = 77;
@@ -80,12 +81,6 @@ class _InvoicePageState extends State<InvoicePage> {
                   onPressed: () async => printInvoice(),
                   text: 'Print',
                 ),
-                // PosButton(
-                //   onPressed: () async =>
-                //       await EmailSender.showEmailSendingDialog(
-                //           context, invoice, InvoiceType.invoice),
-                //   text: 'Email',
-                // ),
                 PosButton(
                   onPressed: () => payAmout(),
                   text: 'Pay',
@@ -175,9 +170,8 @@ class _InvoicePageState extends State<InvoicePage> {
 
                       return SaveInvoiceViewPage(invoice: invoice);
                     })
-                  : const Center(
-                      child: Text('No invoices found'),
-                    );
+                  : const Expanded(
+                      child: Center(child: Text('No invoices found')));
             },
           ),
         ],
@@ -276,7 +270,7 @@ class _InvoicePageState extends State<InvoicePage> {
                       FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))
                     ],
                     labelText: 'Pay amount',
-                    prefixIcon: Icon(Icons.attach_money_outlined),
+                    prefixIcon: const Icon(Icons.attach_money_outlined),
                   ),
                   const SizedBox(height: 20),
                   Obx(
@@ -354,7 +348,7 @@ class _InvoicePageState extends State<InvoicePage> {
   }
 
   void printInvoice() async {
-    Invoice oldInvoice = invoice.copyWith();
+    User oldInvoice = invoice.copyWith();
 
     showDialog(
         context: context,
@@ -362,16 +356,26 @@ class _InvoicePageState extends State<InvoicePage> {
           return Dialog(
             child: PrintVerify(
               invoice: oldInvoice,
-              onPrintPressed: (Printer printer, Invoice invoice) async {
+              onPrintPressed: (Printer printer, User invoice) async {
                 await PdfInvoiceApi.printInvoice(invoice,
                     printer: printer, invoiceType: InvoiceType.invoice);
               },
-              onEmailPressed: (Invoice invoice) async {
+              onEmailPressed: (User invoice) async {
                 await EmailSender.showEmailSendingDialog(
                     context, invoice, InvoiceType.invoice);
+              },
+              onViewPressed: (User invoice) {
+                viewInvoice(invoice);
               },
             ),
           );
         });
+  }
+
+  Future<void> viewInvoice(invoice) async {
+    User oldInvoice = invoice.copyWith();
+    final file = await PdfInvoiceApi.generateInvoicePDF(oldInvoice,
+        invoiceType: InvoiceType.invoice);
+    await PdfApi.openFile(file);
   }
 }

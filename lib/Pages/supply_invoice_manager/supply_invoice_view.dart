@@ -233,7 +233,7 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
           itemId: {cartList.indexOf(cart): itemId},
           itemName: {InvoiceItemCategory.item: cart.name},
           gst: MyFormat.formatCurrency(cart.gst),
-          netPrice: MyFormat.formatCurrency(cart.netPrice),
+          netPrice: MyFormat.formatCurrency(cart.price),
           itemPrice: MyFormat.formatCurrency(cart.itemPrice),
           total: MyFormat.formatCurrency(cart.totalPrice),
           qty: cart.qty.toString()));
@@ -288,7 +288,7 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
     TextEditingController totalPriceController = TextEditingController();
     TextEditingController commentController = TextEditingController();
     TextEditingController qtyController = TextEditingController();
-    double net = oldCart.netPrice;
+    double net = oldCart.price;
     RxBool isDeliveryItem = oldCart.isPostedItem.obs;
     netPriceController.text = MyFormat.formatPrice(net);
     totalPriceController.text =

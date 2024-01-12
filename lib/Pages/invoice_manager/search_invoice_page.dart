@@ -19,7 +19,7 @@ class InvoiceSearchPage extends StatefulWidget {
 class _InvoiceSearchPageState extends State<InvoiceSearchPage> {
   late final _databaseService; // Use your DatabaseService class
 
-  List<Invoice> _invoice = [];
+  List<User> _invoice = [];
   InvoiceDataSource invoiceDataSource = InvoiceDataSource(invoiceData: []);
   Function? disposeListen;
 
@@ -51,16 +51,16 @@ class _InvoiceSearchPageState extends State<InvoiceSearchPage> {
             onPressed: () {
               Get.offAll(InvoicePage());
             },
-            icon: Icon(Icons.arrow_back_outlined)),
+            icon: const Icon(Icons.arrow_back_outlined)),
         title: Text(
           'Search Invoice',
           style: TStyle.titleBarStyle,
         ),
       ),
       body: Container(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          SizedBox(
+          const SizedBox(
             height: 20.0,
           ),
           Expanded(
@@ -87,29 +87,29 @@ class _InvoiceSearchPageState extends State<InvoiceSearchPage> {
               }),
               columns: [
                 GridColumn(
-                    columnName: Invoice.invoiceIdKey,
-                    label: Center(child: const Text('Invoice ID'))),
+                    columnName: User.invoiceIdKey,
+                    label: const Center(child: Text('Invoice ID'))),
                 GridColumn(
-                    columnName: Invoice.customerNameKey,
-                    label: Center(child: const Text('Customer Name'))),
+                    columnName: User.customerNameKey,
+                    label: const Center(child: Text('Customer Name'))),
                 GridColumn(
-                    columnName: Invoice.customerIdKey,
-                    label: Center(child: const Text('Customer ID'))),
+                    columnName: User.customerIdKey,
+                    label: const Center(child: Text('Customer ID'))),
                 GridColumn(
-                    columnName: Invoice.createdDateKey,
-                    label: Center(child: const Text('Created Date'))),
+                    columnName: User.createdDateKey,
+                    label: const Center(child: Text('Created Date'))),
                 GridColumn(
-                    columnName: Invoice.netKey,
-                    label: Center(child: const Text('Net Total'))),
+                    columnName: User.netKey,
+                    label: const Center(child: Text('Net Total'))),
                 GridColumn(
-                    columnName: Invoice.gstKey,
-                    label: Center(child: const Text('GST Total'))),
+                    columnName: User.gstKey,
+                    label: const Center(child: Text('GST Total'))),
                 GridColumn(
-                    columnName: Invoice.totalKey,
-                    label: Center(child: const Text('Total'))),
+                    columnName: User.totalKey,
+                    label: const Center(child: Text('Total'))),
                 GridColumn(
-                    columnName: Invoice.paykey,
-                    label: Center(child: const Text('Out Standing'))),
+                    columnName: User.paykey,
+                    label: const Center(child: Text('Out Standing'))),
 
                 // Add more columns as needed
               ],
@@ -131,21 +131,19 @@ class _InvoiceSearchPageState extends State<InvoiceSearchPage> {
 class InvoiceDataSource extends DataGridSource {
   List<DataGridRow> _customersData = [];
 
-  InvoiceDataSource({required List<Invoice> invoiceData}) {
+  InvoiceDataSource({required List<User> invoiceData}) {
     _customersData = invoiceData
         .map<DataGridRow>((e) => DataGridRow(cells: [
+              DataGridCell(columnName: User.invoiceIdKey, value: e.invoiceId),
               DataGridCell(
-                  columnName: Invoice.invoiceIdKey, value: e.invoiceId),
+                  columnName: User.customerNameKey, value: e.customerName),
+              DataGridCell(columnName: User.customerIdKey, value: e.customerId),
               DataGridCell(
-                  columnName: Invoice.customerNameKey, value: e.customerName),
-              DataGridCell(
-                  columnName: Invoice.customerIdKey, value: e.customerId),
-              DataGridCell(
-                  columnName: Invoice.createdDateKey, value: e.createdDate),
-              DataGridCell(columnName: Invoice.netKey, value: e.totalNetPrice),
-              DataGridCell(columnName: Invoice.gstKey, value: e.totalGstPrice),
-              DataGridCell(columnName: Invoice.totalKey, value: e.total),
-              DataGridCell(columnName: Invoice.paykey, value: e.toPay),
+                  columnName: User.createdDateKey, value: e.createdDate),
+              DataGridCell(columnName: User.netKey, value: e.totalNetPrice),
+              DataGridCell(columnName: User.gstKey, value: e.totalGstPrice),
+              DataGridCell(columnName: User.totalKey, value: e.total),
+              DataGridCell(columnName: User.paykey, value: e.toPay),
             ]))
         .toList();
   }
@@ -158,7 +156,7 @@ class InvoiceDataSource extends DataGridSource {
     // TODO: implement buildRow
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((e) {
-      if (e.columnName == Invoice.createdDateKey) {
+      if (e.columnName == User.createdDateKey) {
         return Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.all(4.0),
@@ -169,10 +167,10 @@ class InvoiceDataSource extends DataGridSource {
         );
       }
 
-      if (e.columnName == Invoice.netKey ||
-          e.columnName == Invoice.gstKey ||
-          e.columnName == Invoice.totalKey ||
-          e.columnName == Invoice.paykey) {
+      if (e.columnName == User.netKey ||
+          e.columnName == User.gstKey ||
+          e.columnName == User.totalKey ||
+          e.columnName == User.paykey) {
         return Container(
           alignment: Alignment.centerRight,
           padding: const EdgeInsets.all(4.0),

@@ -18,7 +18,7 @@ import '../quotation_manager/quatation_draft_page.dart';
 
 class InvoiceCustomerViewPage extends StatefulWidget {
   String cusId;
-  Invoice? invoice;
+  User? invoice;
   InvoiceType invoiceType;
   InvoiceCustomerViewPage(
       {super.key,
@@ -37,7 +37,7 @@ class _InvoiceCustomerViewPageState extends State<InvoiceCustomerViewPage> {
   final Address deliveryAddress = Address();
   final Address postalAddress = Address();
   final dbService = CustomerDB();
-  Invoice? invoice;
+  User? invoice;
 
   @override
   void initState() {
@@ -338,7 +338,7 @@ class _InvoiceCustomerViewPageState extends State<InvoiceCustomerViewPage> {
             Padding(
               padding: const EdgeInsets.only(right: 30.0, bottom: 30.0),
               child: IconButton(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.arrow_circle_right_rounded,
                     size: 45,
                   ),
@@ -379,7 +379,7 @@ class _InvoiceCustomerViewPageState extends State<InvoiceCustomerViewPage> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: const Text('Invalid Value')),
+        const SnackBar(content: Text('Invalid Value')),
       );
     }
   }

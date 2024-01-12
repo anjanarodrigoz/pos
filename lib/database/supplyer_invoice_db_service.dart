@@ -4,9 +4,8 @@ import 'package:get_storage/get_storage.dart';
 import 'package:pos/database/item_db_service.dart';
 import 'package:pos/utils/val.dart';
 import '../models/cart.dart';
-import '../models/invoice.dart';
 import '../models/supply_invoice.dart';
-import 'abstract_db.dart'; // Assuming you have an Invoice model
+import 'abstract_db.dart';
 
 class SupplyerInvoiceDB implements AbstractDB {
   final _storage = GetStorage(DBVal.supplyerInvoice);
@@ -38,6 +37,21 @@ class SupplyerInvoiceDB implements AbstractDB {
     return returnNotes;
   }
 
+  Future<List<SupplyInvoice>> getSupplyInvoice() async {
+    final List invoiceData = await _storage.getValues().toList() ?? [];
+
+    List<SupplyInvoice> returnNotes = [];
+
+    for (var data in invoiceData) {
+      SupplyInvoice invoice = SupplyInvoice.fromJson(data);
+      if (!invoice.isReturnNote) {
+        returnNotes.add(invoice);
+      }
+    }
+
+    return returnNotes;
+  }
+
   Future<List<SupplyInvoice>> getNormalInvoice() async {
     final List invoiceData = await _storage.getValues().toList() ?? [];
 
@@ -61,7 +75,7 @@ class SupplyerInvoiceDB implements AbstractDB {
   Future<void> addInvoice(SupplyInvoice invoice) async {
     List<Cart> cartList =
         invoice.itemList.map((item) => Cart.fromInvoiceItem(item)).toList();
-    await ItemDB().returnFromCart(cartList);
+    await ItemDB().addStocksFromSupplyers(cartList);
     await _storage.write(invoice.invoiceId, invoice.toJson());
   }
 
@@ -80,9 +94,12 @@ class SupplyerInvoiceDB implements AbstractDB {
   }
 
   Future<List<SupplyInvoice>> searchInvoiceByDate(DateTimeRange dateTimeRange,
-      {bool isReturnNote = false}) async {
-    List<SupplyInvoice> allInvoice =
-        isReturnNote ? await getReturnNotes() : await getAllInvoices();
+      {bool? isReturnNote}) async {
+    List<SupplyInvoice> allInvoice = isReturnNote == null
+        ? await getAllInvoices()
+        : isReturnNote
+            ? await getReturnNotes()
+            : await getSupplyInvoice();
 
     return allInvoice
         .where((element) =>
@@ -95,6 +112,7 @@ class SupplyerInvoiceDB implements AbstractDB {
   Future<void> deleteDB() async {
     await _storage.erase();
     await GetStorage().remove(DBVal.supplyerInvoiceId);
+    await GetStorage().remove(DBVal.returnNoteId);
   }
 
   String generateInvoiceId() {
@@ -170,7 +188,6 @@ class SupplyerInvoiceDB implements AbstractDB {
 
   @override
   getName() {
-    // TODO: implement getName
     return DBVal.supplyerInvoice;
   }
 }

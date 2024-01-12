@@ -117,22 +117,22 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                 label: const Center(child: Text('Item Name'))),
             GridColumn(
                 columnName: Item.qtyKey,
-                label: Center(child: const Text('Qty'))),
+                label: const Center(child: Text('Qty'))),
             GridColumn(
                 columnName: Item.priceKey,
-                label: Center(child: const Text('Price'))),
+                label: const Center(child: Text('Price'))),
             GridColumn(
                 columnName: Item.priceTwoKey,
-                label: Center(child: const Text('Price 02'))),
+                label: const Center(child: Text('Price 02'))),
             GridColumn(
                 columnName: Item.priceThreeKey,
-                label: Center(child: const Text('Price 03'))),
+                label: const Center(child: Text('Price 03'))),
             GridColumn(
                 columnName: Item.priceFourKey,
-                label: Center(child: const Text('Price 04'))),
+                label: const Center(child: Text('Price 04'))),
             GridColumn(
                 columnName: Item.priceFiveKey,
-                label: Center(child: const Text('Price 05'))),
+                label: const Center(child: Text('Price 05'))),
 
             // Add more columns as needed
           ],
@@ -178,8 +178,8 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                         width: 100.0,
                         labelText: 'Net price',
                         controller: netPriceController,
-                        keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
                               RegExp(r'^\d*\.?\d*')),
@@ -188,8 +188,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                           if (value.isNotEmpty) {
                             net = double.parse(value);
                             double totalWithGST = (net *
-                                (1 +
-                                    Val.gstTotalPrecentage)); // Assuming GST is 10%
+                                (Val.gstTotalPrecentage)); // Assuming GST is 10%
                             totalPriceController.text =
                                 totalWithGST.toStringAsFixed(2);
                           } else {
@@ -197,15 +196,15 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                           }
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       PosTextFormField(
                         width: 100.0,
                         controller: totalPriceController,
                         labelText: 'Total Price',
-                        keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
                               RegExp(r'^\d*\.?\d*')),
@@ -220,7 +219,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                           }
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       PosTextFormField(
@@ -267,7 +266,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                   Cart cartItem = Cart(
                       itemId: item.id,
                       name: item.name,
-                      netPrice: itemPrice,
+                      price: itemPrice,
                       qty: qty,
                       isPostedItem: isDeliveryItem.value,
                       comment: commnet);
@@ -276,7 +275,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                 }
                 Navigator.of(context).pop();
               },
-              child: Text('Add to Invoice'),
+              child: const Text('Add to Invoice'),
             ),
           ],
         );
@@ -290,11 +289,13 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
       children: [
         Text(
           '$key : ',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.w400),
         ),
         Text(
           value,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         )
       ],
     );

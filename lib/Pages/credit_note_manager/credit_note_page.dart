@@ -7,14 +7,11 @@ import 'package:pdf/pdf.dart';
 import 'package:pos/Pages/credit_note_manager/all_credit_note_page.dart';
 import 'package:pos/Pages/credit_note_manager/credit_draft_page.dart';
 import 'package:pos/Pages/invoice_draft_manager/invoice_customer_select.dart';
-import 'package:pos/Pages/quotation_manager/all_quotation_invoice.dart';
 import 'package:pos/controllers/credit_draft_controller.dart';
-import 'package:pos/controllers/quote_draft_controller.dart';
 import 'package:pos/database/credit_db_serive.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/customer.dart';
 import 'package:pos/utils/alert_message.dart';
-import 'package:pos/widgets/alert_dialog.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/verify_dialog.dart';
 import 'package:printing/printing.dart';
@@ -31,8 +28,8 @@ class CreditNotePage extends StatelessWidget {
 
   CreditNotePage({super.key, required this.invoiceId});
 
-  late final Invoice invoice;
-  late final BuildContext context;
+  late User invoice;
+  late BuildContext context;
 
   @override
   Widget build(BuildContext context) {
@@ -81,12 +78,19 @@ class CreditNotePage extends StatelessWidget {
                   text: 'Remove',
                   color: Colors.red.shade400,
                 ),
-                SizedBox(height: 150),
+                const SizedBox(height: 150),
               ],
             ),
           ),
           CreditInvoicePage(invoice: invoice)
         ]));
+  }
+
+  Future<void> viewInvoice(invoice) async {
+    User oldInvoice = invoice.copyWith();
+    final file = await PdfInvoiceApi.generateInvoicePDF(oldInvoice,
+        invoiceType: InvoiceType.creditNote);
+    await PdfApi.openFile(file);
   }
 
   Future<void> deleteInvoice() async {
@@ -159,7 +163,7 @@ class CreditNotePage extends StatelessWidget {
   }
 
   void printInvoice() async {
-    Invoice oldInvoice = invoice.copyWith();
+    User oldInvoice = invoice.copyWith();
 
     showDialog(
         context: context,
@@ -167,13 +171,16 @@ class CreditNotePage extends StatelessWidget {
           return Dialog(
             child: PrintVerify(
               invoice: oldInvoice,
-              onPrintPressed: (Printer printer, Invoice invoice) async {
+              onPrintPressed: (Printer printer, User invoice) async {
                 await PdfInvoiceApi.printInvoice(invoice,
                     printer: printer, invoiceType: InvoiceType.creditNote);
               },
-              onEmailPressed: (Invoice invoice) async {
+              onEmailPressed: (User invoice) async {
                 await EmailSender.showEmailSendingDialog(
                     context, invoice, InvoiceType.creditNote);
+              },
+              onViewPressed: (User invoice) {
+                viewInvoice(invoice);
               },
             ),
           );

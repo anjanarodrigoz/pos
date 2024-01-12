@@ -9,6 +9,9 @@ import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/printer_setup_buttton.dart';
 import 'package:printing/printing.dart';
 
+import '../api/pdf_api.dart';
+import '../api/pdf_invoice_api.dart';
+import '../enums/enums.dart';
 import '../models/invoice.dart';
 import 'pos_text_form_field.dart';
 
@@ -17,11 +20,13 @@ class PrintVerify extends StatelessWidget {
       {super.key,
       required this.invoice,
       required this.onPrintPressed,
+      required this.onViewPressed,
       required this.onEmailPressed});
 
-  final Invoice invoice;
-  final Function(Printer printer, Invoice invoice) onPrintPressed;
-  final Function(Invoice invoice) onEmailPressed;
+  final User invoice;
+  final Function(Printer printer, User invoice) onPrintPressed;
+  final Function(User invoice) onEmailPressed;
+  final Function(User invoice) onViewPressed;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -36,7 +41,7 @@ class PrintVerify extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 700.0,
+      width: 720.0,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Form(
@@ -83,6 +88,12 @@ class PrintVerify extends StatelessWidget {
                                     content: Text('Please setup printer'),
                                   ));
                         }
+                      }),
+                  PosButton(
+                      text: 'View',
+                      onPressed: () {
+                        updateInvoice();
+                        onViewPressed(invoice);
                       }),
                   PosButton(
                       text: 'Email',

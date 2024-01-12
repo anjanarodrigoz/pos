@@ -37,7 +37,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
       Get.back();
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: const Text('Customer details saved')),
+        const SnackBar(content: Text('Customer details saved')),
       );
     }
   }
@@ -56,7 +56,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
           backgroundColor: TColors.blue,
           title: Text(
             'New Customer - # ${_customer.id}',
-            style: TextStyle(fontSize: 17.0),
+            style: const TextStyle(fontSize: 17.0),
           )),
       body: Container(
         color: Colors.grey.shade200,
@@ -177,7 +177,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              '- Delivery Address -',
+                                              '- Billing Address -',
                                               style: TextStyle(
                                                   color: Colors.grey.shade500),
                                             ),

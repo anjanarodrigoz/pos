@@ -14,7 +14,7 @@ import '../../utils/val.dart';
 import '../../widgets/paid_status_widget.dart';
 
 class SaveInvoiceViewPage extends StatefulWidget {
-  Invoice invoice;
+  User invoice;
 
   SaveInvoiceViewPage({super.key, required this.invoice});
 
@@ -93,25 +93,25 @@ class _SaveInvoiceViewPageState extends State<SaveInvoiceViewPage> {
           columns: [
             GridColumn(
                 columnName: InvoiceRow.itemIdKey,
-                label: Center(child: const Text('Item ID'))),
+                label: const Center(child: Text('Item ID'))),
             GridColumn(
                 columnName: InvoiceRow.nameKey,
-                label: Center(child: const Text('Item Name'))),
+                label: const Center(child: Text('Item Name'))),
             GridColumn(
                 columnName: InvoiceRow.qtyKey,
-                label: Center(child: const Text('Qty'))),
+                label: const Center(child: Text('Qty'))),
             GridColumn(
                 columnName: InvoiceRow.netPriceKey,
-                label: Center(child: const Text('Net Price'))),
+                label: const Center(child: Text('Net Price'))),
             GridColumn(
                 columnName: InvoiceRow.gstKey,
-                label: Center(child: const Text('GST'))),
+                label: const Center(child: Text('GST'))),
             GridColumn(
                 columnName: InvoiceRow.itemPriceKey,
-                label: Center(child: const Text('Item Price'))),
+                label: const Center(child: Text('Item Price'))),
             GridColumn(
                 columnName: InvoiceRow.totalKey,
-                label: Center(child: const Text('Total'))),
+                label: const Center(child: Text('Total'))),
 
             // Add more columns as needed
           ],

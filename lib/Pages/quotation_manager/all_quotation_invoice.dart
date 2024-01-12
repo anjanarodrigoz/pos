@@ -22,7 +22,7 @@ class AllQuotesPage extends StatelessWidget {
 
   // Use your DatabaseService class
 
-  List<Invoice> _invoice = [];
+  List<User> _invoice = [];
   InvoiceDataSource invoiceDataSource = InvoiceDataSource(invoiceData: []);
 
   @override
@@ -88,26 +88,26 @@ class AllQuotesPage extends StatelessWidget {
                       }),
                       columns: [
                         GridColumn(
-                            columnName: Invoice.invoiceIdKey,
-                            label: Center(child: const Text('Invoice ID'))),
+                            columnName: User.invoiceIdKey,
+                            label: const Center(child: Text('Invoice ID'))),
                         GridColumn(
-                            columnName: Invoice.customerNameKey,
-                            label: Center(child: const Text('Customer Name'))),
+                            columnName: User.customerNameKey,
+                            label: const Center(child: Text('Customer Name'))),
                         GridColumn(
-                            columnName: Invoice.customerIdKey,
-                            label: Center(child: const Text('Customer ID'))),
+                            columnName: User.customerIdKey,
+                            label: const Center(child: Text('Customer ID'))),
                         GridColumn(
-                            columnName: Invoice.createdDateKey,
-                            label: Center(child: const Text('Created Date'))),
+                            columnName: User.createdDateKey,
+                            label: const Center(child: Text('Created Date'))),
                         GridColumn(
-                            columnName: Invoice.netKey,
-                            label: Center(child: const Text('Net Total'))),
+                            columnName: User.netKey,
+                            label: const Center(child: Text('Net Total'))),
                         GridColumn(
-                            columnName: Invoice.gstKey,
-                            label: Center(child: const Text('GST Total'))),
+                            columnName: User.gstKey,
+                            label: const Center(child: Text('GST Total'))),
                         GridColumn(
-                            columnName: Invoice.totalKey,
-                            label: Center(child: const Text('Total'))),
+                            columnName: User.totalKey,
+                            label: const Center(child: Text('Total'))),
 
                         // Add more columns as needed
                       ],
@@ -124,20 +124,18 @@ class AllQuotesPage extends StatelessWidget {
 class InvoiceDataSource extends DataGridSource {
   List<DataGridRow> _customersData = [];
 
-  InvoiceDataSource({required List<Invoice> invoiceData}) {
+  InvoiceDataSource({required List<User> invoiceData}) {
     _customersData = invoiceData
         .map<DataGridRow>((e) => DataGridRow(cells: [
+              DataGridCell(columnName: User.invoiceIdKey, value: e.invoiceId),
               DataGridCell(
-                  columnName: Invoice.invoiceIdKey, value: e.invoiceId),
+                  columnName: User.customerNameKey, value: e.customerName),
+              DataGridCell(columnName: User.customerIdKey, value: e.customerId),
               DataGridCell(
-                  columnName: Invoice.customerNameKey, value: e.customerName),
-              DataGridCell(
-                  columnName: Invoice.customerIdKey, value: e.customerId),
-              DataGridCell(
-                  columnName: Invoice.createdDateKey, value: e.createdDate),
-              DataGridCell(columnName: Invoice.netKey, value: e.totalNetPrice),
-              DataGridCell(columnName: Invoice.gstKey, value: e.totalGstPrice),
-              DataGridCell(columnName: Invoice.totalKey, value: e.total),
+                  columnName: User.createdDateKey, value: e.createdDate),
+              DataGridCell(columnName: User.netKey, value: e.totalNetPrice),
+              DataGridCell(columnName: User.gstKey, value: e.totalGstPrice),
+              DataGridCell(columnName: User.totalKey, value: e.total),
             ]))
         .toList();
   }
@@ -150,21 +148,21 @@ class InvoiceDataSource extends DataGridSource {
     // TODO: implement buildRow
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((e) {
-      if (e.columnName == Invoice.createdDateKey) {
+      if (e.columnName == User.createdDateKey) {
         return Container(
           alignment: Alignment.center,
-          padding: EdgeInsets.all(4.0),
+          padding: const EdgeInsets.all(4.0),
           child: Text(MyFormat.formatDate(e.value),
               style: const TextStyle(fontSize: 13.0)),
         );
       }
 
-      if (e.columnName == Invoice.netKey ||
-          e.columnName == Invoice.gstKey ||
-          e.columnName == Invoice.totalKey) {
+      if (e.columnName == User.netKey ||
+          e.columnName == User.gstKey ||
+          e.columnName == User.totalKey) {
         return Container(
           alignment: Alignment.centerRight,
-          padding: EdgeInsets.all(4.0),
+          padding: const EdgeInsets.all(4.0),
           child: Text(MyFormat.formatCurrency(e.value),
               style: const TextStyle(fontSize: 13.0)),
         );
@@ -172,7 +170,7 @@ class InvoiceDataSource extends DataGridSource {
 
       return Container(
         alignment: Alignment.center,
-        padding: EdgeInsets.all(4.0),
+        padding: const EdgeInsets.all(4.0),
         child: Text(e.value.toString(), style: const TextStyle(fontSize: 13.0)),
       );
     }).toList());

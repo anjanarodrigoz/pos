@@ -29,7 +29,7 @@ class SupplyAllInvoice extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          SizedBox(
+          const SizedBox(
             height: 10.0,
           ),
           PosButton(
@@ -92,30 +92,30 @@ class SupplyAllInvoice extends StatelessWidget {
                       }),
                       columns: [
                         GridColumn(
-                            columnName: Invoice.invoiceIdKey,
-                            label: Center(child: const Text('Invoice ID'))),
+                            columnName: User.invoiceIdKey,
+                            label: const Center(child: Text('Invoice ID'))),
                         if (!isRetunManager)
                           GridColumn(
-                              columnName: Invoice.invoiceIdKey,
-                              label: Center(child: const Text('Reference ID'))),
+                              columnName: User.invoiceIdKey,
+                              label: const Center(child: Text('Reference ID'))),
                         GridColumn(
-                            columnName: Invoice.customerNameKey,
-                            label: Center(child: const Text('Supplyer Name'))),
+                            columnName: User.customerNameKey,
+                            label: const Center(child: Text('Supplyer Name'))),
                         GridColumn(
-                            columnName: Invoice.customerIdKey,
-                            label: Center(child: const Text('Supplyer ID'))),
+                            columnName: User.customerIdKey,
+                            label: const Center(child: Text('Supplyer ID'))),
                         GridColumn(
-                            columnName: Invoice.createdDateKey,
-                            label: Center(child: const Text('Created Date'))),
+                            columnName: User.createdDateKey,
+                            label: const Center(child: Text('Created Date'))),
                         GridColumn(
-                            columnName: Invoice.netKey,
-                            label: Center(child: const Text('Net Total'))),
+                            columnName: User.netKey,
+                            label: const Center(child: Text('Net Total'))),
                         GridColumn(
-                            columnName: Invoice.gstKey,
-                            label: Center(child: const Text('GST Total'))),
+                            columnName: User.gstKey,
+                            label: const Center(child: Text('GST Total'))),
                         GridColumn(
-                            columnName: Invoice.totalKey,
-                            label: Center(child: const Text('Total'))),
+                            columnName: User.totalKey,
+                            label: const Center(child: Text('Total'))),
 
                         // Add more columns as needed
                       ],
@@ -136,20 +136,18 @@ class SupplyInvoiceDataSource extends DataGridSource {
       {required List<SupplyInvoice> invoiceData, required isRetunManager}) {
     _customersData = invoiceData
         .map<DataGridRow>((e) => DataGridRow(cells: [
-              DataGridCell(
-                  columnName: Invoice.invoiceIdKey, value: e.invoiceId),
+              DataGridCell(columnName: User.invoiceIdKey, value: e.invoiceId),
               if (!isRetunManager)
                 DataGridCell(
-                    columnName: Invoice.invoiceIdKey, value: e.referenceId),
+                    columnName: User.invoiceIdKey, value: e.referenceId),
               DataGridCell(
-                  columnName: Invoice.customerNameKey, value: e.supplyerName),
+                  columnName: User.customerNameKey, value: e.supplyerName),
+              DataGridCell(columnName: User.customerIdKey, value: e.supplyerId),
               DataGridCell(
-                  columnName: Invoice.customerIdKey, value: e.supplyerId),
-              DataGridCell(
-                  columnName: Invoice.createdDateKey, value: e.createdDate),
-              DataGridCell(columnName: Invoice.netKey, value: e.totalNetPrice),
-              DataGridCell(columnName: Invoice.gstKey, value: e.totalGstPrice),
-              DataGridCell(columnName: Invoice.totalKey, value: e.total),
+                  columnName: User.createdDateKey, value: e.createdDate),
+              DataGridCell(columnName: User.netKey, value: e.totalNetPrice),
+              DataGridCell(columnName: User.gstKey, value: e.totalGstPrice),
+              DataGridCell(columnName: User.totalKey, value: e.total),
             ]))
         .toList();
   }
@@ -162,10 +160,10 @@ class SupplyInvoiceDataSource extends DataGridSource {
     // TODO: implement buildRow
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((e) {
-      if (e.columnName == Invoice.createdDateKey) {
+      if (e.columnName == User.createdDateKey) {
         return Container(
           alignment: Alignment.center,
-          padding: EdgeInsets.all(4.0),
+          padding: const EdgeInsets.all(4.0),
           child: Text(
             MyFormat.formatDate(e.value),
             style: const TextStyle(fontSize: 13.0),
@@ -173,13 +171,13 @@ class SupplyInvoiceDataSource extends DataGridSource {
         );
       }
 
-      if (e.columnName == Invoice.netKey ||
-          e.columnName == Invoice.gstKey ||
-          e.columnName == Invoice.totalKey ||
-          e.columnName == Invoice.paykey) {
+      if (e.columnName == User.netKey ||
+          e.columnName == User.gstKey ||
+          e.columnName == User.totalKey ||
+          e.columnName == User.paykey) {
         return Container(
           alignment: Alignment.centerRight,
-          padding: EdgeInsets.all(4.0),
+          padding: const EdgeInsets.all(4.0),
           child: Text(
             MyFormat.formatCurrency(e.value),
             style: const TextStyle(fontSize: 13.0),
@@ -189,7 +187,7 @@ class SupplyInvoiceDataSource extends DataGridSource {
 
       return Container(
         alignment: Alignment.center,
-        padding: EdgeInsets.all(4.0),
+        padding: const EdgeInsets.all(4.0),
         child: Text(
           e.value.toString(),
           style: const TextStyle(fontSize: 13.0),

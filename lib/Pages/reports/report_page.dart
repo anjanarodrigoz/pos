@@ -18,7 +18,7 @@ import 'package:syncfusion_flutter_datagrid_export/export.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class ReportPage extends StatefulWidget {
-  ReportPage({super.key});
+  const ReportPage({super.key});
 
   @override
   State<ReportPage> createState() => _ReportPageState();
@@ -34,7 +34,7 @@ class _ReportPageState extends State<ReportPage> {
   final GlobalKey<SfDataGridState> pdfKey = GlobalKey<SfDataGridState>();
 
   ReportController controller = Get.put(ReportController());
-  DataGridController _dataGridController = DataGridController();
+  final DataGridController _dataGridController = DataGridController();
 
   DataSource _dataSource = DataSource([]);
 
@@ -199,6 +199,13 @@ class _ReportPageState extends State<ReportPage> {
                               );
                             });
                       }
+                    }),
+                PosButton(
+                    text: 'View',
+                    onPressed: () async {
+                      final file = await PdfApi.saveDocument(
+                          name: '$reportTitle-$reportType.pdf', pdf: pdf);
+                      await PdfApi.openFile(file);
                     }),
                 PosButton(
                     text: 'E-mail',

@@ -13,10 +13,9 @@ class PrinterManager {
   factory PrinterManager() => _instance ??= PrinterManager._();
 
   // Discover available printers
-  Future<List<Printer>> discoverPrinters() async {
+  Future<void> discoverPrinters() async {
     final List<Printer> printers = await Printing.listPrinters();
-    printerList = [];
-    return printers;
+    printerList = printers;
   }
 
   // Save selected printer to GetStorage

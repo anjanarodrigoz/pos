@@ -266,7 +266,7 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
                     Cart cartItem = Cart(
                         itemId: item.id,
                         name: item.name,
-                        netPrice: itemPrice,
+                        price: itemPrice,
                         qty: qty,
                         isPostedItem: isDeliveryItem.value,
                         cartId: Cart.generateUniqueItemId(),

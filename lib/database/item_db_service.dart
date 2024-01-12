@@ -74,6 +74,19 @@ class ItemDB implements AbstractDB {
     return true;
   }
 
+  Future<bool> addStocksFromSupplyers(List<Cart> cartList) async {
+    for (Cart cart in cartList) {
+      Item? item = getItem(cart.itemId);
+
+      if (item != null) {
+        final updatedItem =
+            item.copyWith(qty: item.qty + cart.qty, buyingPrice: cart.price);
+        await updateItem(updatedItem);
+      }
+    }
+    return true;
+  }
+
   Future<bool> copyItemsInInvoice(List<Cart> cartList) async {
     for (Cart cart in cartList) {
       Item? item = getItem(cart.itemId);

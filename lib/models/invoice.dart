@@ -3,7 +3,7 @@ import 'extra_charges.dart';
 import 'invoice_item.dart';
 import 'payment.dart';
 
-class Invoice {
+class User {
   static const String invoiceIdKey = 'invoiceId';
   static const String createdDateKey = 'createdDate';
   static const String isPaidKey = 'isPaid';
@@ -52,7 +52,7 @@ class Invoice {
   double paidAmount = 0.0;
   Duration outStandingDates = const Duration(days: 0);
 
-  Invoice({
+  User({
     required this.email,
     required this.customerMobile,
     required this.invoiceId,
@@ -73,7 +73,7 @@ class Invoice {
     calOtherValues();
   }
 
-  Invoice copyWith({
+  User copyWith({
     bool? isPaid,
     bool? isDeleted,
     String? customerId,
@@ -89,7 +89,7 @@ class Invoice {
     Address? billingAddress,
     Address? shippingAddress,
   }) {
-    return Invoice(
+    return User(
       invoiceId: invoiceId,
       createdDate: createdDate,
       email: email ?? this.email,
@@ -130,8 +130,8 @@ class Invoice {
     };
   }
 
-  factory Invoice.fromJson(Map<String, dynamic> json) {
-    return Invoice(
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
       email: json[emailkey] ?? '',
       customerMobile: json[customerMobileKey],
       gstPrecentage: json[gstPrecentageKey],

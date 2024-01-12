@@ -29,7 +29,7 @@ class EmailSender {
     String password = store.password;
     String smtp = store.smtpServer.toLowerCase();
 
-    var smtpServer;
+    SmtpServer smtpServer;
 
     if (isGmail(username)) {
       smtpServer = gmail(username, password);

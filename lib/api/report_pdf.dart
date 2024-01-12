@@ -1,16 +1,7 @@
-import 'dart:io';
-
 import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/widgets.dart';
-import 'package:pos/api/pdf_api.dart';
-
-import 'package:pdf/widgets.dart' as pw;
-import 'package:pdf/pdf.dart';
 import 'package:pos/controllers/report_controller.dart';
-import 'package:pos/enums/enums.dart';
 import 'package:pos/utils/my_format.dart';
-
 import '../database/store_db.dart';
 import '../models/store.dart';
 
@@ -31,18 +22,18 @@ class ReportPdf {
     required this.rows,
     required this.reportTitle,
     this.dateTimeRange,
-  }) {}
+  });
 
   Future<Document> generatePDF() async {
     final pdf = Document();
 
     pdf.addPage(MultiPage(
+      pageFormat: PdfPageFormat.a4,
       margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
       build: (context) => [
         buildHeader(),
-        SizedBox(height: 0.5 * PdfPageFormat.cm),
+        SizedBox(height: 2 * PdfPageFormat.mm),
         buildTable(),
-        Spacer(),
       ],
     ));
 
@@ -59,23 +50,12 @@ class ReportPdf {
                 buildCompanyInfo(),
                 buildTitle(),
               ]),
-          SizedBox(height: 1 * PdfPageFormat.cm),
         ],
       );
 
-  Widget buildTitle() => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text(
-            reportType,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            reportTitle,
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
-          ),
-        ],
+  Widget buildTitle() => Text(
+        reportTitle,
+        style: TextStyle(fontSize: 8, fontWeight: FontWeight.normal),
       );
 
   Widget buildCompanyInfo() {
@@ -86,19 +66,21 @@ class ReportPdf {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(store.companyName.toUpperCase(),
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0)),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 8.0)),
         if (store.slogan.isNotEmpty)
           Text(store.slogan,
-              style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12.0)),
-        SizedBox(height: 0.2 * PdfPageFormat.cm),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 7.0)),
+        SizedBox(height: 0.1 * PdfPageFormat.cm),
         Text(
           'Created Date : ${MyFormat.formatDateTwo(createdDate)}',
-          style: TextStyle(fontSize: 9, fontWeight: FontWeight.normal),
+          style: TextStyle(fontSize: 8, fontWeight: FontWeight.normal),
         ),
-        Text(
-          MyFormat.reportDateTimeFormat(dateTimeRange),
-          style: TextStyle(fontSize: 9, fontWeight: FontWeight.normal),
-        ),
+        SizedBox(height: 0.1 * PdfPageFormat.cm),
+        if (dateTimeRange.start.year != 0)
+          Text(
+            MyFormat.reportDateTimeFormat(dateTimeRange),
+            style: TextStyle(fontSize: 8, fontWeight: FontWeight.normal),
+          ),
       ],
     );
   }
@@ -138,7 +120,6 @@ class ReportPdf {
           fontWeight: FontWeight.bold,
           fontSize: 8.0,
         ),
-        headerDecoration: const BoxDecoration(color: PdfColors.grey300),
         headerAlignment: Alignment.center,
         cellPadding: const EdgeInsets.only(top: 1),
         cellStyle: const TextStyle(fontSize: 7.0),

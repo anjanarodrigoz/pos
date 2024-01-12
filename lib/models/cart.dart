@@ -16,7 +16,7 @@ class Cart {
   String? cartId;
   String name;
   String? comment;
-  double netPrice;
+  double price;
   int qty;
   bool isPostedItem;
 
@@ -25,7 +25,7 @@ class Cart {
     required this.name,
     this.comment,
     this.cartId,
-    required this.netPrice,
+    required this.price,
     required this.qty,
     this.isPostedItem = false,
   });
@@ -44,7 +44,7 @@ class Cart {
       cartId: cartId ?? this.cartId,
       name: name ?? this.name,
       comment: comment ?? this.comment,
-      netPrice: netPrice ?? this.netPrice,
+      price: netPrice ?? this.price,
       qty: qty ?? this.qty,
       isPostedItem: isPostedItem ?? this.isPostedItem,
     );
@@ -55,7 +55,7 @@ class Cart {
       itemId: json[itemIdKey],
       name: json[nameKey],
       comment: json[commentKey],
-      netPrice: json[netPriceKey],
+      price: json[netPriceKey],
       cartId: json[cartIdKey],
       qty: json[qtyKey],
       isPostedItem: json[isPostedItemKey],
@@ -67,7 +67,7 @@ class Cart {
         cartId: generateUniqueItemId(),
         itemId: item.itemId,
         name: item.name,
-        netPrice: item.netPrice,
+        price: item.netPrice,
         qty: item.qty,
         isPostedItem: item.isPostedItem,
         comment: item.comment);
@@ -78,7 +78,7 @@ class Cart {
       itemIdKey: itemId,
       nameKey: name,
       commentKey: comment,
-      netPriceKey: netPrice,
+      netPriceKey: price,
       qtyKey: qty,
       cartIdKey: cartId,
       isPostedItemKey: isPostedItem,
@@ -90,13 +90,13 @@ class Cart {
     return '${DateTime.now().millisecondsSinceEpoch}_${random.nextInt(10000)}';
   }
 
-  double get gst => (netPrice * Val.gstPrecentage);
+  double get gst => (price * Val.gstPrecentage);
 
   double get totalGst => gst * qty;
 
-  double get netTotal => netPrice * qty;
+  double get netTotal => price * qty;
 
-  double get itemPrice => netPrice * Val.gstTotalPrecentage;
+  double get itemPrice => price * Val.gstTotalPrecentage;
 
   double get totalPrice => itemPrice * qty;
 }

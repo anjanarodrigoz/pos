@@ -22,7 +22,11 @@ enum ReportType {
   customerDetails,
   outstanding,
   stockValue,
-  retrunNotes
+  retrunNotes,
+  itemReturn,
+  supplyTotal,
+  supplyItemTotal,
+  stockBuyingValue
 }
 
 extension InvoiceTypeCaps on InvoiceType {

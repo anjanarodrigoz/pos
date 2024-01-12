@@ -32,8 +32,8 @@ class QuotationPage extends StatelessWidget {
 
   QuotationPage({super.key, required this.invoiceId});
 
-  late final Invoice invoice;
-  late final BuildContext context;
+  late User invoice;
+  late BuildContext context;
 
   @override
   Widget build(BuildContext context) {
@@ -83,13 +83,20 @@ class QuotationPage extends StatelessWidget {
                     text: 'Remove',
                     color: Colors.red.shade400,
                   ),
-                  SizedBox(height: 150),
+                  const SizedBox(height: 150),
                 ],
               ),
             ),
           ),
           QuoteInvoicePage(invoice: invoice)
         ]));
+  }
+
+  Future<void> viewInvoice(invoice) async {
+    User oldInvoice = invoice.copyWith();
+    final file = await PdfInvoiceApi.generateInvoicePDF(oldInvoice,
+        invoiceType: InvoiceType.quotation);
+    await PdfApi.openFile(file);
   }
 
   Future<void> deleteInvoice() async {
@@ -162,7 +169,7 @@ class QuotationPage extends StatelessWidget {
   }
 
   void printInvoice() async {
-    Invoice oldInvoice = invoice.copyWith();
+    User oldInvoice = invoice.copyWith();
 
     showDialog(
         context: context,
@@ -170,13 +177,16 @@ class QuotationPage extends StatelessWidget {
           return Dialog(
             child: PrintVerify(
               invoice: oldInvoice,
-              onPrintPressed: (Printer printer, Invoice invoice) async {
+              onPrintPressed: (Printer printer, User invoice) async {
                 await PdfInvoiceApi.printInvoice(invoice,
                     printer: printer, invoiceType: InvoiceType.quotation);
               },
-              onEmailPressed: (Invoice invoice) async {
+              onEmailPressed: (User invoice) async {
                 await EmailSender.showEmailSendingDialog(
                     context, invoice, InvoiceType.quotation);
+              },
+              onViewPressed: (User invoice) {
+                viewInvoice(invoice);
               },
             ),
           );

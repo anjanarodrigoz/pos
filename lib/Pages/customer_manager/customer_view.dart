@@ -11,7 +11,7 @@ import '../../widgets/pos_text_form_field.dart';
 
 class CustomerViewPage extends StatefulWidget {
   final String cusId;
-  CustomerViewPage({super.key, required this.cusId});
+  const CustomerViewPage({super.key, required this.cusId});
 
   @override
   State<CustomerViewPage> createState() => _CustomerViewPageState();
@@ -182,7 +182,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              '- Delivery Address -',
+                                              '- Billing Address -',
                                               style: TextStyle(
                                                   color: Colors.grey.shade500),
                                             ),
@@ -377,10 +377,6 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 PosButton(
-                    color: Colors.red.shade900,
-                    onPressed: () => deleteCustomer(),
-                    text: 'Delete'),
-                PosButton(
                     enable: !isEditMode,
                     onPressed: () {
                       setState(() {
@@ -412,7 +408,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
       setState(() {});
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: const Text('Customer details updated')),
+        const SnackBar(content: Text('Customer details updated')),
       );
     }
   }

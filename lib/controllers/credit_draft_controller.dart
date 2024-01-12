@@ -14,7 +14,7 @@ class CreditDraftController extends GetxController {
   RxList<ExtraCharges> extraList = <ExtraCharges>[].obs;
   RxList<String> comments = <String>[].obs;
   RxList<Cart> cartList = <Cart>[].obs;
-  Invoice? copyInvoice;
+  User? copyInvoice;
   bool wantToUpdate;
 
   var netTotal = 0.0.obs;
@@ -117,13 +117,13 @@ class CreditDraftController extends GetxController {
         .map((cart) => InvoicedItem(
             itemId: cart.itemId,
             name: cart.name,
-            netPrice: cart.netPrice,
+            netPrice: cart.price,
             qty: cart.qty,
             comment: cart.comment,
             isPostedItem: cart.isPostedItem))
         .toList();
 
-    Invoice invoice = Invoice(
+    User invoice = User(
         email: customer.email ?? '',
         customerMobile: customer.mobileNumber,
         invoiceId: invoiceId.value,
@@ -147,13 +147,13 @@ class CreditDraftController extends GetxController {
         .map((cart) => InvoicedItem(
             itemId: cart.itemId,
             name: cart.name,
-            netPrice: cart.netPrice,
+            netPrice: cart.price,
             qty: cart.qty,
             comment: cart.comment,
             isPostedItem: cart.isPostedItem))
         .toList();
 
-    Invoice invoice = Invoice(
+    User invoice = User(
         email: customer.email ?? '',
         customerMobile: customer.mobileNumber,
         invoiceId: invoiceId.value,

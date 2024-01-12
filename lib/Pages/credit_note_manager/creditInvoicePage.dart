@@ -14,7 +14,7 @@ import '../../utils/val.dart';
 import '../../widgets/paid_status_widget.dart';
 
 class CreditInvoicePage extends StatelessWidget {
-  Invoice invoice;
+  User invoice;
 
   CreditInvoicePage({super.key, required this.invoice});
 
@@ -72,17 +72,17 @@ class CreditInvoicePage extends StatelessWidget {
                                       children: [
                                         Text(
                                           'INVOICE  #${invoice.invoiceId}',
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontSize: 14.0,
                                               fontWeight: FontWeight.bold),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 10,
                                         ),
                                         Text(
                                           MyFormat.formatDate(
                                               invoice.createdDate),
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ],
@@ -130,7 +130,7 @@ class CreditInvoicePage extends StatelessWidget {
                                 ),
                                 detailsRowWidget('GST Total',
                                     MyFormat.formatCurrency(totalGstPrice)),
-                                Divider(),
+                                const Divider(),
                                 detailsRowWidget(
                                     'Total', MyFormat.formatCurrency(total)),
                               ],
@@ -167,7 +167,7 @@ class CreditInvoicePage extends StatelessWidget {
         ),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
               color: TColors.blue, fontWeight: FontWeight.w700, fontSize: 14.0),
         )
       ],
@@ -189,26 +189,26 @@ class CreditInvoicePage extends StatelessWidget {
         columns: [
           GridColumn(
               columnName: InvoiceRow.itemIdKey,
-              label: Center(child: const Text('Item ID'))),
+              label: const Center(child: Text('Item ID'))),
           GridColumn(
               maximumWidth: 300.0,
               columnName: InvoiceRow.nameKey,
-              label: Center(child: const Text('Item Name'))),
+              label: const Center(child: Text('Item Name'))),
           GridColumn(
               columnName: InvoiceRow.qtyKey,
-              label: Center(child: const Text('Qty'))),
+              label: const Center(child: Text('Qty'))),
           GridColumn(
               columnName: InvoiceRow.netPriceKey,
-              label: Center(child: const Text('Net Price'))),
+              label: const Center(child: Text('Net Price'))),
           GridColumn(
               columnName: InvoiceRow.gstKey,
-              label: Center(child: const Text('GST'))),
+              label: const Center(child: Text('GST'))),
           GridColumn(
               columnName: InvoiceRow.itemPriceKey,
-              label: Center(child: const Text('Item Price'))),
+              label: const Center(child: Text('Item Price'))),
           GridColumn(
               columnName: InvoiceRow.totalKey,
-              label: Center(child: const Text('Total'))),
+              label: const Center(child: Text('Total'))),
 
           // Add more columns as needed
         ],
