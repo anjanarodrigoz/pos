@@ -1,0 +1,31 @@
+name: Flutter Desktop App
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Flutter actions
+      uses: subosito/flutter-action@v1
+      with:
+        channel: 'stable'
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Run Flutter build
+      run: flutter build windows --release
+
+    - name: Upload Artifact
+      uses: ncipollo/release-action@v1
+      with:
+        name: windows-app
+        artifacts: build/windows/runner/Release/
+        tag: v1.0.0
+        token: ${{ secrets.POS_TOKEN }}
