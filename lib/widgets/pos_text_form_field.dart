@@ -19,12 +19,14 @@ class PosTextFormField extends StatelessWidget {
   Widget? prefixIcon;
   String? hintText;
   String? errorText;
+  bool obscureText;
 
   PosTextFormField(
       {super.key,
       this.labelText,
       this.onTap,
       this.onSaved,
+      this.obscureText = false,
       this.height = 50,
       this.inputFormatters,
       this.validator,
@@ -48,12 +50,8 @@ class PosTextFormField extends StatelessWidget {
         width: width,
         height: height,
         child: TextFormField(
-          onTap: onTap ??
-              (controller != null
-                  ? () => controller?.selection = TextSelection(
-                      baseOffset: 0,
-                      extentOffset: controller!.value.text.length)
-                  : null),
+          obscureText: obscureText,
+          onTap: onTap,
           keyboardType: keyboardType,
           onChanged: onChanged,
           enabled: enable,

@@ -19,9 +19,10 @@ import '../../widgets/pos_button.dart';
 import '../../widgets/pos_text_form_field.dart';
 
 class InvoiceEditPage extends StatelessWidget {
-  InvoiceEditPage({super.key});
-  final InvoiceEditController _controller = Get.find<InvoiceEditController>();
+  final InvoiceEditController controller;
   late BuildContext context;
+
+  InvoiceEditPage({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +31,7 @@ class InvoiceEditPage extends StatelessWidget {
       appBar: AppBar(
         toolbarHeight: 40.0,
         title: Text(
-          'Edit Invoice - #${_controller.invoice.invoiceId}',
+          'Edit Invoice - #${controller.invoice.invoiceId}',
           style: TStyle.titleBarStyle,
         ),
         leading: IconButton(
@@ -57,7 +58,7 @@ class InvoiceEditPage extends StatelessWidget {
                           context: context,
                           builder: ((context) => Dialog(
                                 child: InvoiceItemSelectPage(
-                                  invoiceEditController: _controller,
+                                  invoiceEditController: controller,
                                 ),
                               )));
                     }),
@@ -89,7 +90,10 @@ class InvoiceEditPage extends StatelessWidget {
           ),
           Column(
             children: [
-              Expanded(child: InvoiceEditView()),
+              Expanded(
+                  child: InvoiceEditView(
+                invoiceController: controller,
+              )),
             ],
           ),
         ],
@@ -102,7 +106,7 @@ class InvoiceEditPage extends StatelessWidget {
       context: context,
       builder: (context) {
         return ExtraChargeDialog(onPressed: (ExtraCharges extraCharges) {
-          _controller.addExtraCharges(extraCharges);
+          controller.addExtraCharges(extraCharges);
         }, showSavedCharges: () {
           showDialog(
               context: context,
@@ -115,7 +119,7 @@ class InvoiceEditPage extends StatelessWidget {
                             comment: extraCharges.comment,
                             netPrice: extraCharges.price,
                             onPressed: (ExtraCharges extraCharges) {
-                              _controller.addExtraCharges(extraCharges);
+                              controller.addExtraCharges(extraCharges);
                             }));
                   }));
         });
@@ -125,8 +129,8 @@ class InvoiceEditPage extends StatelessWidget {
 
   Future<void> addComments() async {
     String oldComment = '';
-    if (_controller.comments.isNotEmpty) {
-      for (String comment in _controller.comments) {
+    if (controller.comments.isNotEmpty) {
+      for (String comment in controller.comments) {
         oldComment += comment;
       }
     }
@@ -137,23 +141,26 @@ class InvoiceEditPage extends StatelessWidget {
               oldComment: oldComment,
               onPressed: (comment) {
                 if (comment.isNotEmpty) {
-                  _controller.addComments(comment);
+                  controller.addComments(comment);
+                  controller.close();
                 } else {
-                  _controller.comments.clear();
+                  controller.comments.clear();
+                  controller.close();
                 }
               });
         });
   }
 
   Future<void> updateInvoice() async {
-    await _controller.updateInvoice();
-    Get.offAll(InvoicePage(searchInvoiceId: _controller.invoice.invoiceId));
+    await controller.updateInvoice();
+    Get.offAll(InvoicePage(searchInvoiceId: controller.invoice.invoiceId));
   }
 
   Future<void> back() async {
     final storage = CartDB();
     await storage.resetCart();
-    if (!_controller.isClosed) {
+
+    if (!controller.isClosed) {
       Get.delete<InvoiceEditController>();
     }
     Get.back();

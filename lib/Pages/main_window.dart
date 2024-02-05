@@ -63,16 +63,17 @@ class _MainWindowState extends State<MainWindow> {
                         menuItem(() => openQuoteManager(), 'Quatation'),
                         menuItem(
                             () => openSupplyInvoiceManager(), 'Supply Invoice'),
-                        menuItem(() => backupFile(), 'Setup')
+                        menuItem(() => openReturnNoteManager(), 'Return Notes'),
+                        menuItem(() => openPaymentManager(), 'Payments'),
                       ],
                     ),
                     Column(
                       children: [
-                        menuItem(() => openPaymentManager(), 'Payments'),
                         menuItem(() => openStockManager(), 'Stock'),
                         menuItem(() => openCustomerManager(), 'Customers'),
                         menuItem(() => openSupplyerManager(), 'Supplyers'),
                         menuItem(() => openReport(), 'Reports'),
+                        menuItem(() => backupFile(), 'Setup'),
                       ],
                     ),
                   ],
@@ -139,6 +140,14 @@ class _MainWindowState extends State<MainWindow> {
     await windowResizer();
 
     Get.offAll(() => SupplyAllInvoice());
+  }
+
+  openReturnNoteManager() async {
+    await windowResizer();
+
+    Get.offAll(() => SupplyAllInvoice(
+          isRetunManager: true,
+        ));
   }
 
   openQuoteManager() async {

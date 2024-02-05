@@ -15,7 +15,7 @@ class InvoiceDraftController extends GetxController {
   RxList<String> comments = <String>[].obs;
   RxList<Cart> cartList = <Cart>[].obs;
   Function? disposeListen;
-  Invoice? copyInvoice;
+  User? copyInvoice;
   var netTotal = 0.0.obs;
   var gstTotal = 0.0.obs;
   var cartTotal = 0.0;
@@ -86,13 +86,14 @@ class InvoiceDraftController extends GetxController {
         .map((cart) => InvoicedItem(
             itemId: cart.itemId,
             name: cart.name,
-            netPrice: cart.netPrice,
+            netPrice: cart.price,
             qty: cart.qty,
             comment: cart.comment,
             isPostedItem: cart.isPostedItem))
         .toList();
 
-    Invoice invoice = Invoice(
+    User invoice = User(
+        email: customer.email ?? '',
         customerMobile: customer.mobileNumber,
         invoiceId: invoiceId.value,
         createdDate: DateTime.now(),

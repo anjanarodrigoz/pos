@@ -9,7 +9,7 @@ import '../models/invoice_item.dart';
 import '../utils/val.dart';
 
 class InvoiceEditController extends GetxController {
-  final Invoice invoice;
+  late User _invoice;
   RxList<ExtraCharges> extraList = <ExtraCharges>[].obs;
   RxList<String> comments = <String>[].obs;
   List<Cart> oldCartList = <Cart>[];
@@ -23,13 +23,18 @@ class InvoiceEditController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    extraList.value = invoice.extraCharges ?? [];
+
+    extraList.value = RxList<ExtraCharges>.from(_invoice.extraCharges ?? []);
+    comments.value = RxList<String>.from(_invoice.comments ?? []);
+
     oldCartList =
-        invoice.itemList.map((item) => Cart.fromInvoiceItem(item)).toList();
-    comments.value = invoice.comments ?? [];
+        _invoice.itemList.map((item) => Cart.fromInvoiceItem(item)).toList();
+
     updateCart();
     updateExtraTotal();
   }
+
+  User get invoice => _invoice;
 
   @override
   void onClose() {
@@ -37,10 +42,13 @@ class InvoiceEditController extends GetxController {
     super.onClose();
   }
 
-  InvoiceEditController({required this.invoice});
+  InvoiceEditController({required User invoice}) {
+    _invoice = invoice;
+  }
 
   void addComments(String comment) {
     comments.clear();
+
     comments.add(comment);
   }
 
@@ -74,7 +82,6 @@ class InvoiceEditController extends GetxController {
 
     for (Cart cart in cartList) {
       newCartList.add(cart);
-      print(cart.toJson());
     }
 
     for (Cart cart in newCartList) {
@@ -105,19 +112,19 @@ class InvoiceEditController extends GetxController {
         .map((cart) => InvoicedItem(
             itemId: cart.itemId,
             name: cart.name,
-            netPrice: cart.netPrice,
+            netPrice: cart.price,
             qty: cart.qty,
             comment: cart.comment,
             isPostedItem: cart.isPostedItem))
         .toList();
 
-    Invoice newInvoice = invoice.copyWith(
-      customerMobile: invoice.customerMobile,
-      customerId: invoice.customerId,
+    User newInvoice = _invoice.copyWith(
+      customerMobile: _invoice.customerMobile,
+      customerId: _invoice.customerId,
       gstPrecentage: Val.gstPrecentage,
-      customerName: invoice.customerName,
-      billingAddress: invoice.billingAddress,
-      shippingAddress: invoice.shippingAddress,
+      customerName: _invoice.customerName,
+      billingAddress: _invoice.billingAddress,
+      shippingAddress: _invoice.shippingAddress,
       comments: comments,
       extraCharges: extraList,
       itemList: itemList,
@@ -125,5 +132,10 @@ class InvoiceEditController extends GetxController {
 
     await db.updateInvoice(newInvoice);
     await CartDB().clearCart();
+  }
+
+  Future<void> close() async {
+    print('Invoice: ${_invoice.comments}');
+    print('New Comments :$comments');
   }
 }

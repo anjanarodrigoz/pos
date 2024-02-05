@@ -118,12 +118,6 @@ class _StockPageState extends State<StockPage> {
                     GridColumn(
                         columnName: Item.priceFiveKey,
                         label: Center(child: const Text('Price 05'))),
-                    GridColumn(
-                        columnName: Item.lastInDateKey,
-                        label: Center(child: const Text('Last In Date'))),
-                    GridColumn(
-                        columnName: Item.lastOutDateKey,
-                        label: Center(child: const Text('Last Out Date'))),
 
                     // Add more columns as needed
                   ],
@@ -165,16 +159,6 @@ class ItemDataSource extends DataGridSource {
               DataGridCell(
                   columnName: Item.priceFiveKey,
                   value: MyFormat.formatCurrency(e.priceFive)),
-              DataGridCell(
-                  columnName: Item.lastInDateKey,
-                  value: e.lastInDate == null
-                      ? ''
-                      : MyFormat.formatDate(e.lastInDate!)),
-              DataGridCell(
-                  columnName: Item.lastOutDateKey,
-                  value: e.lastOutDate == null
-                      ? ''
-                      : MyFormat.formatDate(e.lastOutDate!)),
             ]))
         .toList();
   }

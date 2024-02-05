@@ -60,17 +60,17 @@ class CreditDraftPage extends StatelessWidget {
                     }),
                 const SizedBox(height: 50.0),
                 PosButton(
-                  text: 'Close Draft',
-                  onPressed: () async {
-                    Get.offAll(AllCreditNotePage());
-                  },
-                ),
-                PosButton(
                   text: _controller.wantToUpdate
                       ? 'Update Invoice'
                       : 'Save Invoice',
                   onPressed: () {
                     saveDraftInvoice();
+                  },
+                ),
+                PosButton(
+                  text: 'Close Draft',
+                  onPressed: () async {
+                    Get.offAll(AllCreditNotePage());
                   },
                 ),
               ],

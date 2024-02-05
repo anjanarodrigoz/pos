@@ -38,7 +38,6 @@ class _EmailSetupPageState extends State<EmailSetupPage> {
   void initState() {
     super.initState();
     store = StoreDB().getStore();
-    senderEmailController.text = '180839e@uom.lk';
   }
 
   @override
@@ -76,6 +75,7 @@ class _EmailSetupPageState extends State<EmailSetupPage> {
                           labelText: 'Email',
                         ),
                         PosTextFormField(
+                          obscureText: true,
                           onSaved: (value) => store.password = value!,
                           labelText: 'password',
                           initialValue: store.password,

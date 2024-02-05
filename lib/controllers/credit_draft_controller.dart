@@ -14,7 +14,7 @@ class CreditDraftController extends GetxController {
   RxList<ExtraCharges> extraList = <ExtraCharges>[].obs;
   RxList<String> comments = <String>[].obs;
   RxList<Cart> cartList = <Cart>[].obs;
-  Invoice? copyInvoice;
+  User? copyInvoice;
   bool wantToUpdate;
 
   var netTotal = 0.0.obs;
@@ -74,10 +74,24 @@ class CreditDraftController extends GetxController {
     comments.add(comment);
   }
 
-  void updateCart() async {
+  void updateCart({Cart? newCart}) async {
     cartTotal = 0;
+    if (newCart != null && newCart.qty == 0) {
+      cartList.remove(
+          cartList.where((cart) => cart.cartId == newCart.cartId).first);
+    }
+
     for (Cart cart in cartList) {
-      cartTotal += cart.netTotal;
+      if (newCart != null) {
+        if (cart.cartId == newCart.cartId) {
+          int index = cartList.indexOf(cart);
+          cartList.remove(cart);
+          cartList.insert(index, newCart);
+          cartTotal += newCart.netTotal;
+        }
+      } else {
+        cartTotal += cart.netTotal;
+      }
     }
     updateTotals();
   }
@@ -103,13 +117,14 @@ class CreditDraftController extends GetxController {
         .map((cart) => InvoicedItem(
             itemId: cart.itemId,
             name: cart.name,
-            netPrice: cart.netPrice,
+            netPrice: cart.price,
             qty: cart.qty,
             comment: cart.comment,
             isPostedItem: cart.isPostedItem))
         .toList();
 
-    Invoice invoice = Invoice(
+    User invoice = User(
+        email: customer.email ?? '',
         customerMobile: customer.mobileNumber,
         invoiceId: invoiceId.value,
         createdDate: DateTime.now(),
@@ -132,13 +147,14 @@ class CreditDraftController extends GetxController {
         .map((cart) => InvoicedItem(
             itemId: cart.itemId,
             name: cart.name,
-            netPrice: cart.netPrice,
+            netPrice: cart.price,
             qty: cart.qty,
             comment: cart.comment,
             isPostedItem: cart.isPostedItem))
         .toList();
 
-    Invoice invoice = Invoice(
+    User invoice = User(
+        email: customer.email ?? '',
         customerMobile: customer.mobileNumber,
         invoiceId: invoiceId.value,
         createdDate: DateTime.now(),

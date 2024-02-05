@@ -66,25 +66,29 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Invoice #$invoiceId',
+                              invoiceController.isRetunManager
+                                  ? 'Retun Note #$invoiceId'
+                                  : 'Invoice #$invoiceId',
                               style: const TextStyle(
                                   fontSize: 15.0, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(
                               height: 5.0,
                             ),
-                            Obx(() => InkWell(
-                                  onTap: () => openDailog(),
-                                  child: Text(
-                                    'Reference No #${invoiceController.referenceId.value}',
-                                    style: const TextStyle(
-                                        fontSize: 15.0,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                )),
-                            const SizedBox(
-                              height: 10.0,
-                            ),
+                            if (!invoiceController.isRetunManager)
+                              Obx(() => InkWell(
+                                    onTap: () => openDailog(),
+                                    child: Text(
+                                      'Reference No #${invoiceController.referenceId.value}',
+                                      style: const TextStyle(
+                                          fontSize: 15.0,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  )),
+                            if (!invoiceController.isRetunManager)
+                              const SizedBox(
+                                height: 10.0,
+                              ),
                             detailsRowWidget('Supplyer ID', supplyer.id),
                             const SizedBox(
                               height: 5.0,
@@ -185,10 +189,9 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
               columns: [
                 GridColumn(
                     columnName: InvoiceRow.itemIdKey,
-                    maximumWidth: 120,
                     label: Center(child: const Text('Item ID'))),
                 GridColumn(
-                    minimumWidth: 500.0,
+                    maximumWidth: 400.0,
                     columnName: InvoiceRow.nameKey,
                     label: Center(child: const Text('Item Name'))),
                 GridColumn(
@@ -204,7 +207,6 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
                     columnName: InvoiceRow.itemPriceKey,
                     label: Center(child: const Text('Item Price'))),
                 GridColumn(
-                    minimumWidth: 120.0,
                     columnName: InvoiceRow.totalKey,
                     label: Center(child: const Text('Total'))),
 
@@ -231,7 +233,7 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
           itemId: {cartList.indexOf(cart): itemId},
           itemName: {InvoiceItemCategory.item: cart.name},
           gst: MyFormat.formatCurrency(cart.gst),
-          netPrice: MyFormat.formatCurrency(cart.netPrice),
+          netPrice: MyFormat.formatCurrency(cart.price),
           itemPrice: MyFormat.formatCurrency(cart.itemPrice),
           total: MyFormat.formatCurrency(cart.totalPrice),
           qty: cart.qty.toString()));
@@ -286,7 +288,7 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
     TextEditingController totalPriceController = TextEditingController();
     TextEditingController commentController = TextEditingController();
     TextEditingController qtyController = TextEditingController();
-    double net = oldCart.netPrice;
+    double net = oldCart.price;
     RxBool isDeliveryItem = oldCart.isPostedItem.obs;
     netPriceController.text = MyFormat.formatPrice(net);
     totalPriceController.text =

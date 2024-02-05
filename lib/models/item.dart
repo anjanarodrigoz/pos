@@ -6,6 +6,7 @@ class Item {
   static const String descriptionKey = 'description';
   static const String commentKey = 'comment';
   static const String priceKey = 'price';
+  static const String buyingPriceKey = 'buying_price';
   static const String priceTwoKey = 'price_two';
   static const String priceThreeKey = 'price_three';
   static const String priceFourKey = 'price_four';
@@ -19,6 +20,7 @@ class Item {
   String? description;
   String? comment;
   double price;
+  double buyingPrice;
   double priceTwo;
   double priceThree;
   double priceFour;
@@ -33,6 +35,7 @@ class Item {
     required this.price,
     this.description,
     this.comment,
+    this.buyingPrice = 0,
     this.priceTwo = 0,
     this.priceThree = 0,
     this.priceFour = 0,
@@ -51,11 +54,13 @@ class Item {
     double? priceThree,
     double? priceFour,
     double? priceFive,
+    double? buyingPrice,
     int? qty,
     DateTime? lastInDate,
     DateTime? lastOutDate,
   }) {
     return Item(
+      buyingPrice: buyingPrice ?? this.buyingPrice,
       id: id,
       name: name ?? this.name,
       description: description ?? this.description,
@@ -74,6 +79,7 @@ class Item {
   factory Item.fromJson(Map<String, dynamic> json) {
     return Item(
       id: json[idKey],
+      buyingPrice: json[buyingPriceKey] ?? 0.00,
       name: json[nameKey],
       description: json[descriptionKey],
       comment: json[commentKey],
@@ -96,6 +102,7 @@ class Item {
     return {
       idKey: id,
       nameKey: name,
+      buyingPriceKey: buyingPrice,
       descriptionKey: description,
       commentKey: comment,
       priceKey: price,
@@ -108,6 +115,14 @@ class Item {
       lastOutDateKey: lastOutDate?.toIso8601String(),
     };
   }
+
+  get netBuyingStock => double.parse((buyingPrice * qty).toStringAsFixed(2));
+
+  get gstBuyingStock =>
+      double.parse((buyingPrice * Val.gstPrecentage * qty).toStringAsFixed(2));
+
+  get totalBuyingStock => double.parse(
+      (buyingPrice * Val.gstTotalPrecentage * qty).toStringAsFixed(2));
 
   get netStock => double.parse((price * qty).toStringAsFixed(2));
 

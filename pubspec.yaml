@@ -52,10 +52,10 @@ dependencies:
   file_picker: ^5.5.0
   encrypt: ^5.0.2
   flutter_highlight: ^0.7.0
-  flutter_archive: ^5.0.0
   syncfusion_flutter_datepicker: ^22.2.12
   syncfusion_flutter_datagrid_export: ^22.2.12
   mailer: ^6.0.1
+  archive: ^3.4.6
 
 dev_dependencies:
   flutter_test:

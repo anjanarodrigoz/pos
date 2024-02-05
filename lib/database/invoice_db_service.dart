@@ -21,14 +21,14 @@ class InvoiceDB implements AbstractDB {
 
   InvoiceDB._internal();
 
-  Future<List<Invoice>> getAllInvoices() async {
+  Future<List<User>> getAllInvoices() async {
     final List invoiceData = await _storage.getValues().toList() ?? [];
-    return invoiceData.map((data) => Invoice.fromJson(data)).toList();
+    return invoiceData.map((data) => User.fromJson(data)).toList();
   }
 
-  Future<List<Invoice>> searchInvoiceByDate(
+  Future<List<User>> searchInvoiceByDate(
       DateTimeRange dateTimeRange, ReportPaymentFilter paidStatus) async {
-    List<Invoice> allInvoice = await getAllInvoices();
+    List<User> allInvoice = await getAllInvoices();
 
     if (paidStatus != ReportPaymentFilter.all) {
       bool isPaid = paidStatus == ReportPaymentFilter.paid;
@@ -47,20 +47,20 @@ class InvoiceDB implements AbstractDB {
         .toList();
   }
 
-  Invoice getInvoice(String invoiceId) {
-    Invoice invoice = Invoice.fromJson(_storage.read(invoiceId));
+  User getInvoice(String invoiceId) {
+    User invoice = User.fromJson(_storage.read(invoiceId));
     return invoice;
   }
 
-  Future<void> addInvoice(Invoice invoice) async {
+  Future<void> addInvoice(User invoice) async {
     await _storage.write(invoice.invoiceId, invoice.toJson());
   }
 
-  Future<void> updateInvoice(Invoice updatedInvoice) async {
+  Future<void> updateInvoice(User updatedInvoice) async {
     await _storage.write(updatedInvoice.invoiceId, updatedInvoice.toJson());
   }
 
-  Future<void> deleteInvoice(Invoice invoice) async {
+  Future<void> deleteInvoice(User invoice) async {
     List<Cart> cartList =
         invoice.itemList.map((item) => Cart.fromInvoiceItem(item)).toList();
     await ItemDB().returnFromCart(cartList);
@@ -106,10 +106,10 @@ class InvoiceDB implements AbstractDB {
     await GetStorage().remove(DBVal.invoiceId);
   }
 
-  Stream<List<Invoice>> getStreamInvoice() async* {
-    StreamController<List<Invoice>> streamController =
-        StreamController<List<Invoice>>();
-    List<Invoice> invoiceList = await getAllInvoices();
+  Stream<List<User>> getStreamInvoice() async* {
+    StreamController<List<User>> streamController =
+        StreamController<List<User>>();
+    List<User> invoiceList = await getAllInvoices();
     streamController.add(invoiceList);
     _storage.listen(() async {
       invoiceList.clear();
@@ -121,7 +121,7 @@ class InvoiceDB implements AbstractDB {
     yield* streamController.stream;
   }
 
-  Future<void> addInvoicePayment(Payment payment, Invoice invoice) async {
+  Future<void> addInvoicePayment(Payment payment, User invoice) async {
     String payId = generatePayId();
 
     payment = payment.copyWith(payId: 'P$payId');
@@ -143,7 +143,7 @@ class InvoiceDB implements AbstractDB {
 
   Future<void> removeInvoicePayment(
       String invoiceId, String paymentId, BuildContext context) async {
-    Invoice invoice = getInvoice(invoiceId);
+    User invoice = getInvoice(invoiceId);
 
     if (DateTime.now().difference(invoice.createdDate) >
         const Duration(days: 7)) {
@@ -179,7 +179,7 @@ class InvoiceDB implements AbstractDB {
     final lastId = json[DBVal.invoiceId];
 
     for (var data in invoiceData) {
-      await addInvoice(Invoice.fromJson(data));
+      await addInvoice(User.fromJson(data));
     }
 
     saveLastId(lastId);

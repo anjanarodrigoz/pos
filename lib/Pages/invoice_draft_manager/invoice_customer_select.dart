@@ -14,7 +14,7 @@ import '../../models/invoice.dart';
 class InvoiceCustomerSelectPage extends StatelessWidget {
   final DataGridController _dataGridController = DataGridController();
   late List<Customer> customerList;
-  Invoice? invoice;
+  User? invoice;
   InvoiceType invoiceType;
   CustomerDataSource customerDataSource = CustomerDataSource(customersData: []);
   InvoiceCustomerSelectPage(
@@ -65,28 +65,28 @@ class InvoiceCustomerSelectPage extends StatelessWidget {
                   columns: [
                     GridColumn(
                         columnName: Customer.idKey,
-                        label: Center(child: const Text('ID'))),
+                        label: const Center(child: Text('ID'))),
                     GridColumn(
                         columnName: Customer.firstNameKey,
-                        label: Center(child: const Text('First Name'))),
+                        label: const Center(child: Text('First Name'))),
                     GridColumn(
                         columnName: Customer.lastNameKey,
-                        label: Center(child: const Text('Last Name'))),
+                        label: const Center(child: Text('Last Name'))),
                     GridColumn(
                         columnName: Customer.mobileNumberKey,
-                        label: Center(child: const Text('Mobile Number'))),
+                        label: const Center(child: Text('Mobile Number'))),
                     GridColumn(
                         columnName: Customer.emailKey,
-                        label: Center(child: const Text('Email'))),
+                        label: const Center(child: Text('Email'))),
                     GridColumn(
                         columnName: Address.areaCodeKey,
-                        label: Center(child: const Text('Area Code'))),
+                        label: const Center(child: Text('Area Code'))),
                     GridColumn(
                         columnName: Address.cityKey,
-                        label: Center(child: const Text('City'))),
+                        label: const Center(child: Text('City'))),
                     GridColumn(
                         columnName: Address.postalCodeKey,
-                        label: Center(child: const Text('Postal Code'))),
+                        label: const Center(child: Text('Postal Code'))),
 
                     // Add more columns as needed
                   ],

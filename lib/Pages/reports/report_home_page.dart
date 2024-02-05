@@ -16,13 +16,10 @@ class ReportHomePage extends StatefulWidget {
 }
 
 class _ReportHomePageState extends State<ReportHomePage> {
-  late final BuildContext context;
   final double width = 200.00;
 
   @override
   Widget build(BuildContext context) {
-    this.context = context;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -118,10 +115,16 @@ class _ReportHomePageState extends State<ReportHomePage> {
                           {'Stock': 'Stock Quantity'},
                         );
                       },
-                      'Stock value': () {
+                      'Stock Selling value': () {
                         showFilterDialog(
                           ReportType.stockValue,
-                          {'Stock': 'Stock Value'},
+                          {'Stock': 'Stock Selling Value'},
+                        );
+                      },
+                      'Stock Buying Value': () {
+                        showFilterDialog(
+                          ReportType.stockBuyingValue,
+                          {'Stock': 'Stock Buying Value'},
                         );
                       },
                     });
@@ -134,13 +137,37 @@ class _ReportHomePageState extends State<ReportHomePage> {
                       'Supply Invoice Report': () {
                         showFilterDialog(
                           ReportType.supplyInvoice,
-                          {'Supply Transcation': 'Invoice'},
+                          {'Supply Transcation': 'Supply Invoice'},
                         );
                       },
                       'Supply Item Report': () {
                         showFilterDialog(
                           ReportType.supplyItem,
-                          {'Supply Transcation': 'Items'},
+                          {'Supply Transcation': 'Supply Items'},
+                        );
+                      },
+                      'Supply Return Report': () {
+                        showFilterDialog(
+                          ReportType.retrunNotes,
+                          {'Supply Transcation': 'Return Notes'},
+                        );
+                      },
+                      'Supply Item Return Report': () {
+                        showFilterDialog(
+                          ReportType.itemReturn,
+                          {'Supply Transcation': 'Item Return Report'},
+                        );
+                      },
+                      'Supply Total Invoice Report': () {
+                        showFilterDialog(
+                          ReportType.supplyTotal,
+                          {'Supply Transcation': 'Supply Total Invoice Report'},
+                        );
+                      },
+                      'Supply Total Item Report': () {
+                        showFilterDialog(
+                          ReportType.supplyItemTotal,
+                          {'Supply Transcation': 'Supply Item Total Report'},
                         );
                       },
                     });
@@ -168,7 +195,7 @@ class _ReportHomePageState extends State<ReportHomePage> {
             const SizedBox(
               width: 50.0,
             ),
-            Expanded(child: ReportPage())
+            const Expanded(child: ReportPage())
           ],
         ),
       ),
@@ -198,7 +225,7 @@ class _ReportHomePageState extends State<ReportHomePage> {
                                   },
                                   child: Text(
                                     type.key,
-                                    style: TextStyle(color: TColors.blue),
+                                    style: const TextStyle(color: TColors.blue),
                                   )),
                             ))
                         .toList()),
@@ -216,11 +243,11 @@ class _ReportHomePageState extends State<ReportHomePage> {
               children: [
                 Text(
                   title.keys.first,
-                  style: TextStyle(fontSize: 15.0),
+                  style: const TextStyle(fontSize: 15.0),
                 ),
                 Text(
                   title.values.first,
-                  style: TextStyle(fontSize: 12.0),
+                  style: const TextStyle(fontSize: 12.0),
                 ),
               ],
             ),

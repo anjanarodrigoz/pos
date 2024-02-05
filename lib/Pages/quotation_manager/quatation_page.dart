@@ -15,13 +15,16 @@ import 'package:pos/widgets/alert_dialog.dart';
 
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/verify_dialog.dart';
+import 'package:printing/printing.dart';
 
+import '../../api/email_sender.dart';
 import '../../api/pdf_api.dart';
 import '../../api/pdf_invoice_api.dart';
 
 import '../../models/invoice.dart';
 
 import '../../theme/t_colors.dart';
+import '../../widgets/print_verify.dart';
 import 'QuoteInvoicePage.dart';
 
 class QuotationPage extends StatelessWidget {
@@ -29,8 +32,8 @@ class QuotationPage extends StatelessWidget {
 
   QuotationPage({super.key, required this.invoiceId});
 
-  late final Invoice invoice;
-  late final BuildContext context;
+  late User invoice;
+  late BuildContext context;
 
   @override
   Widget build(BuildContext context) {
@@ -63,9 +66,15 @@ class QuotationPage extends StatelessWidget {
                     text: 'Copy',
                   ),
                   PosButton(
-                    onPressed: () => printInvoice(context),
+                    onPressed: () async => printInvoice(),
                     text: 'Print',
                   ),
+                  // PosButton(
+                  //   onPressed: () async =>
+                  //       await EmailSender.showEmailSendingDialog(
+                  //           context, invoice, InvoiceType.quotation),
+                  //   text: 'Email',
+                  // ),
                   const SizedBox(
                     height: 50,
                   ),
@@ -74,7 +83,7 @@ class QuotationPage extends StatelessWidget {
                     text: 'Remove',
                     color: Colors.red.shade400,
                   ),
-                  SizedBox(height: 150),
+                  const SizedBox(height: 150),
                 ],
               ),
             ),
@@ -83,10 +92,11 @@ class QuotationPage extends StatelessWidget {
         ]));
   }
 
-  Future<void> printInvoice(context) async {
-    final pdfFile = await PdfInvoiceApi.generateInvoicePDF(invoice,
+  Future<void> viewInvoice(invoice) async {
+    User oldInvoice = invoice.copyWith();
+    final file = await PdfInvoiceApi.generateInvoicePDF(oldInvoice,
         invoiceType: InvoiceType.quotation);
-    PdfApi.openFile(pdfFile);
+    await PdfApi.openFile(file);
   }
 
   Future<void> deleteInvoice() async {
@@ -156,5 +166,30 @@ class QuotationPage extends StatelessWidget {
         wantToUpdate: true,
         copyInvoice: invoice));
     Get.offAll(QuoteDraftPage());
+  }
+
+  void printInvoice() async {
+    User oldInvoice = invoice.copyWith();
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: PrintVerify(
+              invoice: oldInvoice,
+              onPrintPressed: (Printer printer, User invoice) async {
+                await PdfInvoiceApi.printInvoice(invoice,
+                    printer: printer, invoiceType: InvoiceType.quotation);
+              },
+              onEmailPressed: (User invoice) async {
+                await EmailSender.showEmailSendingDialog(
+                    context, invoice, InvoiceType.quotation);
+              },
+              onViewPressed: (User invoice) {
+                viewInvoice(invoice);
+              },
+            ),
+          );
+        });
   }
 }

@@ -35,4 +35,7 @@ class DBVal {
   static const String returnNoteId = 'return_note_id';
   static const String quatation = 'quatation';
   static const String quatationId = 'quatation_id';
+  static const String password = 'password';
+  static const String resetPassword = 'reset_password';
+  static const String user = 'User';
 }

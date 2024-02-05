@@ -52,7 +52,7 @@ class _PaymentPageState extends State<PaymentPage> {
     return Scaffold(
       appBar: const PosAppBar(title: 'Payments'),
       body: Container(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Expanded(
             child: SfDataGrid(
@@ -89,7 +89,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     columnName: Payment.payIdKey,
                     label: const Center(child: Text('Pay ID'))),
                 GridColumn(
-                    columnName: Invoice.invoiceIdKey,
+                    columnName: User.invoiceIdKey,
                     label: const Center(child: Text('Invoice ID'))),
 
                 GridColumn(
@@ -102,10 +102,10 @@ class _PaymentPageState extends State<PaymentPage> {
                     columnName: Payment.commentKey,
                     label: const Center(child: Text('Comment'))),
                 GridColumn(
-                    columnName: Invoice.customerNameKey,
+                    columnName: User.customerNameKey,
                     label: const Center(child: Text('Customer Name'))),
                 GridColumn(
-                    columnName: Invoice.customerIdKey,
+                    columnName: User.customerIdKey,
                     label: const Center(child: Text('Customer ID'))),
                 // Add more columns as needed
               ],
@@ -117,11 +117,11 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   Future<void> getPaymentData() async {
-    List<Invoice> invoices = await _databaseService.getAllInvoices();
+    List<User> invoices = await _databaseService.getAllInvoices();
 
     _payments = [];
 
-    for (Invoice invoice in invoices) {
+    for (User invoice in invoices) {
       for (Payment payment in invoice.payments ?? []) {
         _payments.add(Payment(
             date: payment.date,
@@ -168,17 +168,15 @@ class PaymentDataSource extends DataGridSource {
               DataGridCell(columnName: Payment.dateKey, value: e.date),
               DataGridCell(columnName: Payment.timeKey, value: e.date),
               DataGridCell(columnName: Payment.payIdKey, value: e.payId),
-              DataGridCell(
-                  columnName: Invoice.invoiceIdKey, value: e.invoiceId),
+              DataGridCell(columnName: User.invoiceIdKey, value: e.invoiceId),
               DataGridCell(
                   columnName: Payment.paymethodKey,
                   value: e.paymethod.displayName),
               DataGridCell(columnName: Payment.amountKey, value: e.amount),
               DataGridCell(columnName: Payment.commentKey, value: e.comment),
               DataGridCell(
-                  columnName: Invoice.customerNameKey, value: e.customerName),
-              DataGridCell(
-                  columnName: Invoice.customerIdKey, value: e.customerId),
+                  columnName: User.customerNameKey, value: e.customerName),
+              DataGridCell(columnName: User.customerIdKey, value: e.customerId),
             ]))
         .toList();
   }

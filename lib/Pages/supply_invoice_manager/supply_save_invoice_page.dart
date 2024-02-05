@@ -79,12 +79,13 @@ class SupplySaveInvoicePage extends StatelessWidget {
                                         SizedBox(
                                           height: 5,
                                         ),
-                                        Text(
-                                          'REFERENCE  #${invoice.referenceId}',
-                                          style: TextStyle(
-                                              fontSize: 14.0,
-                                              fontWeight: FontWeight.bold),
-                                        ),
+                                        if (!(invoice.isReturnNote))
+                                          Text(
+                                            'REFERENCE  #${invoice.referenceId}',
+                                            style: TextStyle(
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.bold),
+                                          ),
                                         SizedBox(
                                           height: 10,
                                         ),

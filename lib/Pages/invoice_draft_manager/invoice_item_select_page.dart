@@ -89,61 +89,53 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Expanded(
-          child: SfDataGrid(
-            gridLinesVisibility: GridLinesVisibility.both,
-            headerGridLinesVisibility: GridLinesVisibility.both,
-            allowFiltering: true,
-            allowColumnsResizing: true,
-            showFilterIconOnHover: true,
-            columnWidthMode: ColumnWidthMode.auto,
-            source: itemDataSource,
-            onCellTap: ((details) {
-              if (details.rowColumnIndex.rowIndex != 0) {
-                int selectedRowIndex = details.rowColumnIndex.rowIndex - 1;
-                var row =
-                    itemDataSource.effectiveRows.elementAt(selectedRowIndex);
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: SfDataGrid(
+          gridLinesVisibility: GridLinesVisibility.both,
+          headerGridLinesVisibility: GridLinesVisibility.both,
+          allowFiltering: true,
+          rowHeight: 30.0,
+          allowColumnsResizing: true,
+          showFilterIconOnHover: true,
+          columnWidthMode: ColumnWidthMode.auto,
+          source: itemDataSource,
+          onCellTap: ((details) {
+            if (details.rowColumnIndex.rowIndex != 0) {
+              int selectedRowIndex = details.rowColumnIndex.rowIndex - 1;
+              var row =
+                  itemDataSource.effectiveRows.elementAt(selectedRowIndex);
 
-                addItemtoList(row.getCells()[0].value.toString());
-              }
-            }),
-            columns: [
-              GridColumn(
-                  columnName: Item.idKey,
-                  label: Center(child: const Text('Item ID'))),
-              GridColumn(
-                  columnName: Item.nameKey,
-                  label: Center(child: const Text('Item Name'))),
-              GridColumn(
-                  columnName: Item.qtyKey,
-                  label: Center(child: const Text('Qty'))),
-              GridColumn(
-                  columnName: Item.priceKey,
-                  label: Center(child: const Text('Price'))),
-              GridColumn(
-                  columnName: Item.priceTwoKey,
-                  label: Center(child: const Text('Price 02'))),
-              GridColumn(
-                  columnName: Item.priceThreeKey,
-                  label: Center(child: const Text('Price 03'))),
-              GridColumn(
-                  columnName: Item.priceThreeKey,
-                  label: Center(child: const Text('Price 04'))),
-              GridColumn(
-                  columnName: Item.priceThreeKey,
-                  label: Center(child: const Text('Price 05'))),
-              GridColumn(
-                  columnName: Item.priceThreeKey,
-                  label: Center(child: const Text('Last In Date'))),
+              addItemtoList(row.getCells()[0].value.toString());
+            }
+          }),
+          columns: [
+            GridColumn(
+                columnName: Item.idKey,
+                label: const Center(child: Text('Item ID'))),
+            GridColumn(
+                columnName: Item.nameKey,
+                label: const Center(child: Text('Item Name'))),
+            GridColumn(
+                columnName: Item.qtyKey,
+                label: const Center(child: Text('Qty'))),
+            GridColumn(
+                columnName: Item.priceKey,
+                label: const Center(child: Text('Price'))),
+            GridColumn(
+                columnName: Item.priceTwoKey,
+                label: const Center(child: Text('Price 02'))),
+            GridColumn(
+                columnName: Item.priceThreeKey,
+                label: const Center(child: Text('Price 03'))),
+            GridColumn(
+                columnName: Item.priceFourKey,
+                label: const Center(child: Text('Price 04'))),
+            GridColumn(
+                columnName: Item.priceFiveKey,
+                label: const Center(child: Text('Price 05'))),
 
-              GridColumn(
-                  columnName: Item.priceThreeKey,
-                  label: Center(child: const Text('Last Out Date'))),
-
-              // Add more columns as needed
-            ],
-          ),
+            // Add more columns as needed
+          ],
         ),
       ),
     );
@@ -173,7 +165,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
         return AlertDialog(
           title: Text(item.name),
           content: SizedBox(
-            height: 200,
+            height: 250,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -186,8 +178,8 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                         width: 100.0,
                         labelText: 'Net price',
                         controller: netPriceController,
-                        keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
                               RegExp(r'^\d*\.?\d*')),
@@ -196,8 +188,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                           if (value.isNotEmpty) {
                             net = double.parse(value);
                             double totalWithGST = (net *
-                                (1 +
-                                    Val.gstTotalPrecentage)); // Assuming GST is 10%
+                                (Val.gstTotalPrecentage)); // Assuming GST is 10%
                             totalPriceController.text =
                                 totalWithGST.toStringAsFixed(2);
                           } else {
@@ -205,15 +196,15 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                           }
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       PosTextFormField(
                         width: 100.0,
                         controller: totalPriceController,
                         labelText: 'Total Price',
-                        keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
                               RegExp(r'^\d*\.?\d*')),
@@ -228,7 +219,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                           }
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       PosTextFormField(
@@ -244,7 +235,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                 ),
                 PosTextFormField(
                   width: 400.0,
-                  height: 70.0,
+                  height: 100.0,
                   labelText: 'Comment',
                   controller: commentController,
                 ),
@@ -266,7 +257,8 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
             TextButton(
               onPressed: () async {
                 double itemPrice = net;
-                String commnet = commentController.text;
+                String commnet =
+                    MyFormat.divideStringIntoLines(commentController.text);
                 int qty = qtyController.text.isEmpty
                     ? 0
                     : int.parse(qtyController.text);
@@ -274,7 +266,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                   Cart cartItem = Cart(
                       itemId: item.id,
                       name: item.name,
-                      netPrice: itemPrice,
+                      price: itemPrice,
                       qty: qty,
                       isPostedItem: isDeliveryItem.value,
                       comment: commnet);
@@ -283,7 +275,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                 }
                 Navigator.of(context).pop();
               },
-              child: Text('Add to Invoice'),
+              child: const Text('Add to Invoice'),
             ),
           ],
         );
@@ -297,11 +289,13 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
       children: [
         Text(
           '$key : ',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.w400),
         ),
         Text(
           value,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         )
       ],
     );

@@ -17,11 +17,14 @@ class SupplyInvoice {
   static const String totalKey = 'total';
   static const String netKey = 'netTotal';
   static const String gstKey = 'gstTotal';
+  static const String emailKey = 'email';
+  static const String isReturnNoteKey = 'isReturnNote';
 
   final String invoiceId;
   final DateTime createdDate;
   String supplyerId;
   String? referenceId;
+  String email;
   String supplyerName;
   String supplyerMobile;
   double gstPrecentage;
@@ -34,8 +37,10 @@ class SupplyInvoice {
   double totalExtraPrice = 0.0;
   double totalGstPrice = 0.0;
   double total = 0.0;
+  bool isReturnNote;
 
   SupplyInvoice({
+    required this.email,
     required this.supplyerMobile,
     required this.invoiceId,
     required this.createdDate,
@@ -44,6 +49,7 @@ class SupplyInvoice {
     required this.supplyerName,
     required this.itemList,
     this.referenceId,
+    this.isReturnNote = false,
     this.extraCharges,
     this.comments,
     this.billingAddress,
@@ -57,13 +63,17 @@ class SupplyInvoice {
     String? supplyerName,
     String? supplyerMobile,
     double? gstPrecentage,
+    bool? isReturnNote,
     List<InvoicedItem>? itemList,
     List<ExtraCharges>? extraCharges,
     DateTime? closeDate,
     List<String>? comments,
     Address? billingAddress,
+    String? email,
   }) {
     return SupplyInvoice(
+      isReturnNote: isReturnNote ?? this.isReturnNote,
+      email: email ?? this.email,
       referenceId: realInvoiceId,
       invoiceId: invoiceId,
       createdDate: createdDate,
@@ -80,6 +90,8 @@ class SupplyInvoice {
 
   Map<String, dynamic> toJson() {
     return {
+      email: email,
+      isReturnNoteKey: isReturnNote,
       supplyerMobileKey: supplyerMobile,
       gstPrecentageKey: gstPrecentage,
       invoiceIdKey: invoiceId,
@@ -96,6 +108,8 @@ class SupplyInvoice {
 
   factory SupplyInvoice.fromJson(Map<String, dynamic> json) {
     return SupplyInvoice(
+      isReturnNote: json[isReturnNoteKey] ?? false,
+      email: json[emailKey] ?? '',
       supplyerMobile: json[supplyerMobileKey],
       gstPrecentage: json[gstPrecentageKey],
       invoiceId: json[invoiceIdKey],

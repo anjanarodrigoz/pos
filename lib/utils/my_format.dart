@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class MyFormat {
@@ -37,5 +38,29 @@ class MyFormat {
   static String formatTime(DateTime dateTime) {
     final format = DateFormat('HH:mm aa');
     return format.format(dateTime);
+  }
+
+  static String divideStringIntoLines(String input, {int lineLength = 45}) {
+    List<String> lines = [];
+
+    input = input.replaceAll('\n', '');
+
+    int i = 0;
+
+    while (input.length > lineLength) {
+      lines.add(input.substring(i, i + lineLength));
+
+      input = input.substring(lineLength);
+    }
+
+    lines.add(input);
+    return lines.join('\n');
+  }
+
+  static String reportDateTimeFormat(DateTimeRange dateTimeRange) {
+    DateTime start = dateTimeRange.start;
+    DateTime end = dateTimeRange.end.subtract(const Duration(days: 1));
+
+    return 'From ${MyFormat.formatDateTwo(start)} To  ${MyFormat.formatDateTwo(end)}';
   }
 }

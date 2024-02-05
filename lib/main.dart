@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:pos/Pages/main_window.dart';
+import 'package:pos/Pages/login_page.dart';
 import 'package:pos/database/cart_db_service.dart';
 import 'package:pos/utils/val.dart';
 import 'package:window_manager/window_manager.dart';
@@ -36,7 +36,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const GetMaterialApp(
-        debugShowCheckedModeBanner: false, home: MainWindow());
+    return GetMaterialApp(debugShowCheckedModeBanner: false, home: LoginPage());
   }
 }

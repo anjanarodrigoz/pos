@@ -28,13 +28,13 @@ class ReportController extends GetxController {
   bool isRequiredTableSummery = false;
 
   static const createdDateKey = "Date";
-  static const invoiceIdKey = "Invoice Id";
-  static const customerNameKey = "Customer Name";
-  static const customerIdKey = "Customer ID";
-  static const customerMobileKey = "Customer Mobile";
-  static const supplyerNameKey = "Supplyer Name";
-  static const supplyerIdKey = "Supplyer ID";
-  static const supplyerMobileKey = "Supplyer Mobile";
+  static const invoiceIdKey = "Id";
+  static const customerNameKey = "Name";
+  static const customerIdKey = "Cus. Id";
+  static const customerMobileKey = "Mobile";
+  static const supplyerNameKey = "Name";
+  static const supplyerIdKey = "Sup. Id";
+  static const supplyerMobileKey = "Mobile";
   static const netKey = "Net Total";
   static const gstKey = "GST Total";
   static const totalKey = "Total";
@@ -45,12 +45,12 @@ class ReportController extends GetxController {
   static const receiptsPriceKey = "Receipt Price";
   static const salepriceKey = "Sales Price";
   static const receiptsKey = "Receipts";
-  static const itemIdKey = "Item ID";
+  static const itemIdKey = "Item Id";
   static const nameKey = "Item Name";
   static const quantityKey = "Quantity";
   static const soldKey = "Stock Sold";
   static const requireKey = "Stock Required";
-  static const itempriceKey = "Item Net Price";
+  static const itempriceKey = "Item Price";
   static const priceKey = "Price";
   static const price2Key = "Price 2";
   static const price3Key = "Price 3";
@@ -86,8 +86,9 @@ class ReportController extends GetxController {
       case ReportType.itemQuote:
         await generateItemsSummeryReport(reportType);
       case ReportType.itemInvoicedItem:
+        await generateItemInvoiceReport();
       case ReportType.supplyInvoice:
-        await generateSupplyInvoiceReport();
+        await generateSupplyInvoiceReport(false);
       case ReportType.supplyItem:
         await generateItemsSummeryReport(reportType);
       case ReportType.stockRequired:
@@ -100,6 +101,16 @@ class ReportController extends GetxController {
         await generateCustomerOutstandingReport();
       case ReportType.stockValue:
         await generateStockValueReport();
+      case ReportType.retrunNotes:
+        await generateReturnNoteReport();
+      case ReportType.itemReturn:
+        await generateItemsSummeryReport(reportType);
+      case ReportType.supplyTotal:
+        await generateSupplyInvoiceReport(null);
+      case ReportType.supplyItemTotal:
+        await generateItemsSummeryReport(reportType);
+      case ReportType.stockBuyingValue:
+        await generateStockBuyingValueReport();
     }
   }
 
@@ -116,7 +127,7 @@ class ReportController extends GetxController {
   */
 
   Future<void> generateInvoiceReport(ReportType reportType) async {
-    List<Invoice> searchInvoiceList = [];
+    List<User> searchInvoiceList = [];
 
     isRequiredTableSummery = true;
 
@@ -219,7 +230,7 @@ class ReportController extends GetxController {
 
   Future<void> generateSummeryReport() async {
     isRequiredTableSummery = false;
-    List<Invoice> searchInvoiceList =
+    List<User> searchInvoiceList =
         await InvoiceDB().searchInvoiceByDate(dateTimeRange, paidStatus);
     if (searchInvoiceList.isEmpty) {
       isrecordAvaliable = false;
@@ -239,7 +250,7 @@ class ReportController extends GetxController {
     double bankTrnasfer = 0.00;
     double totalReceipts = 0.00;
 
-    for (Invoice invoice in searchInvoiceList) {
+    for (User invoice in searchInvoiceList) {
       invoiceNet += double.parse(invoice.totalNetPrice.toStringAsFixed(2));
       invoiceGst += invoice.totalGstPrice;
       totalSale += invoice.total;
@@ -332,9 +343,15 @@ class ReportController extends GetxController {
     } else if (reportType == ReportType.quote) {
       searchInvoiceList =
           await QuotationDB().searchInvoiceByDate(dateTimeRange, paidStatus);
+    } else if (reportType == ReportType.supplyItem) {
+      searchInvoiceList = await SupplyerInvoiceDB()
+          .searchInvoiceByDate(dateTimeRange, isReturnNote: false);
+    } else if (reportType == ReportType.itemReturn) {
+      searchInvoiceList = await SupplyerInvoiceDB()
+          .searchInvoiceByDate(dateTimeRange, isReturnNote: true);
     } else {
-      searchInvoiceList =
-          await SupplyerInvoiceDB().searchInvoiceByDate(dateTimeRange);
+      searchInvoiceList = await SupplyerInvoiceDB()
+          .searchInvoiceByDate(dateTimeRange, isReturnNote: null);
     }
 
     if (searchInvoiceList.isEmpty) {
@@ -364,6 +381,9 @@ class ReportController extends GetxController {
                 extraMap[itemkey]!.updateQuantity(qty: extraItem.qty);
       }
     }
+
+    if (reportType == ReportType.supplyInvoice ||
+        reportType == ReportType.retrunNotes) {}
 
     columns.value = {
       itemIdKey: itemIdKey,
@@ -444,10 +464,10 @@ class ReportController extends GetxController {
 
   */
 
-  Future<void> generateSupplyInvoiceReport() async {
+  Future<void> generateSupplyInvoiceReport(isReturnNote) async {
     isRequiredTableSummery = true;
-    List<SupplyInvoice> supplyInvoiceList =
-        await SupplyerInvoiceDB().searchInvoiceByDate(dateTimeRange);
+    List<SupplyInvoice> supplyInvoiceList = await SupplyerInvoiceDB()
+        .searchInvoiceByDate(dateTimeRange, isReturnNote: isReturnNote);
 
     if (supplyInvoiceList.isEmpty) {
       isrecordAvaliable = false;
@@ -461,7 +481,6 @@ class ReportController extends GetxController {
       invoiceIdKey: invoiceIdKey,
       supplyerNameKey: supplyerNameKey,
       supplyerIdKey: supplyerIdKey,
-      supplyerMobileKey: supplyerMobileKey,
       netKey: netKey,
       gstKey: gstKey,
       totalKey: totalKey,
@@ -469,6 +488,7 @@ class ReportController extends GetxController {
       (e) {
         if (e.key == supplyerIdKey || e.key == supplyerNameKey) {
           return GridColumn(
+              width: 100.0,
               allowFiltering: true,
               columnName: e.key,
               label: Center(child: Text(e.value)));
@@ -476,7 +496,7 @@ class ReportController extends GetxController {
 
         if (e.key == netKey || e.key == gstKey || e.key == totalKey) {
           return GridColumn(
-              width: 100.0,
+              width: 130.0,
               allowFiltering: false,
               columnName: e.key,
               label: Center(child: Text(e.value)));
@@ -495,7 +515,6 @@ class ReportController extends GetxController {
               invoiceIdKey: invoice.invoiceId,
               supplyerNameKey: invoice.supplyerName,
               supplyerIdKey: invoice.supplyerId,
-              supplyerMobileKey: invoice.supplyerMobile,
               netKey: invoice.totalNetPrice,
               gstKey: invoice.totalGstPrice,
               totalKey: invoice.total,
@@ -709,7 +728,7 @@ class ReportController extends GetxController {
  */
 
   Future<void> generateCustomerOutstandingReport() async {
-    List<Invoice> searchInvoiceList = [];
+    List<User> searchInvoiceList = [];
 
     isRequiredTableSummery = true;
 
@@ -822,6 +841,7 @@ class ReportController extends GetxController {
           (e) => GridColumn(
               allowFiltering: false,
               columnName: e.key,
+              width: 120.0,
               label: Center(child: Text(e.value))),
         )
         .toList();
@@ -842,4 +862,143 @@ class ReportController extends GetxController {
                     .toList()))
         .toList();
   }
+
+  Future<void> generateStockBuyingValueReport() async {
+    isRequiredTableSummery = true;
+    List<Item> itemList = [];
+
+    itemList = await ItemDB().getAllItems();
+
+    if (itemList.isEmpty) {
+      isrecordAvaliable = false;
+      return;
+    }
+
+    isrecordAvaliable = true;
+
+    columns.value = {
+      itemIdKey: itemIdKey,
+      nameKey: nameKey,
+      quantityKey: quantityKey,
+      priceKey: priceKey,
+      netKey: netKey,
+      gstKey: gstKey,
+      totalKey: totalKey,
+    }
+        .entries
+        .map(
+          (e) => GridColumn(
+              allowFiltering: false,
+              width: 120,
+              columnName: e.key,
+              label: Center(child: Text(e.value))),
+        )
+        .toList();
+
+    rows.value = itemList
+        .map((item) => DataGridRow(
+                cells: {
+              itemIdKey: item.id,
+              nameKey: item.name,
+              quantityKey: item.qty,
+              priceKey: item.buyingPrice,
+              netKey: item.netBuyingStock,
+              gstKey: item.gstBuyingStock,
+              totalKey: item.totalBuyingStock
+            }
+                    .entries
+                    .map((e) => DataGridCell(columnName: e.key, value: e.value))
+                    .toList()))
+        .toList();
+  }
+
+  bool checkDate() {
+    return (dateTimeRange.end.difference(dateTimeRange.start).inDays) == 1
+        ? true
+        : false;
+  }
+
+  /*
+  
+  
+  
+  
+   */
+
+  generateReturnNoteReport() async {
+    isRequiredTableSummery = true;
+    List<SupplyInvoice> supplyInvoiceList = await SupplyerInvoiceDB()
+        .searchInvoiceByDate(dateTimeRange, isReturnNote: true);
+
+    if (supplyInvoiceList.isEmpty) {
+      isrecordAvaliable = false;
+      return;
+    }
+
+    isrecordAvaliable = true;
+
+    columns.value = {
+      createdDateKey: createdDateKey,
+      invoiceIdKey: invoiceIdKey,
+      supplyerNameKey: supplyerNameKey,
+      supplyerIdKey: supplyerIdKey,
+      netKey: netKey,
+      gstKey: gstKey,
+      totalKey: totalKey,
+    }.entries.map(
+      (e) {
+        if (e.key == supplyerIdKey || e.key == supplyerNameKey) {
+          return GridColumn(
+              allowFiltering: true,
+              width: 100,
+              columnName: e.key,
+              label: Center(child: Text(e.value)));
+        }
+
+        if (e.key == netKey || e.key == gstKey || e.key == totalKey) {
+          return GridColumn(
+              width: 120.0,
+              allowFiltering: false,
+              columnName: e.key,
+              label: Center(child: Text(e.value)));
+        }
+
+        return GridColumn(
+            allowFiltering: false,
+            columnName: e.key,
+            label: Center(child: Text(e.value)));
+      },
+    ).toList();
+
+    rows.value = supplyInvoiceList
+        .map((invoice) => {
+              createdDateKey: invoice.createdDate,
+              invoiceIdKey: invoice.invoiceId,
+              supplyerNameKey: invoice.supplyerName,
+              supplyerIdKey: invoice.supplyerId,
+              netKey: invoice.totalNetPrice,
+              gstKey: invoice.totalGstPrice,
+              totalKey: invoice.total,
+            })
+        .toList()
+        .map((e) => DataGridRow(
+                cells: e.entries.map((cell) {
+              if (cell.key == netKey) {
+                return DataGridCell<double>(
+                    columnName: cell.key,
+                    value: double.parse(
+                        (cell.value as double).toStringAsFixed(2)));
+              }
+
+              if (cell.value is DateTime) {
+                return DataGridCell(
+                    columnName: cell.key,
+                    value: MyFormat.formatDateTwo(cell.value as DateTime));
+              }
+              return DataGridCell(columnName: cell.key, value: cell.value);
+            }).toList()))
+        .toList();
+  }
+
+  generateItemInvoiceReport() {}
 }

@@ -4,11 +4,18 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
+import 'package:pdf/widgets.dart';
 import 'package:pos/database/store_db.dart';
+import 'package:pos/enums/enums.dart';
 import 'package:pos/utils/alert_message.dart';
+import 'package:pos/utils/my_format.dart';
 import 'dart:developer' as dev;
 
+import '../models/invoice.dart';
 import '../models/store.dart';
+import '../widgets/emial_sending_widget.dart';
+import 'pdf_api.dart';
+import 'pdf_invoice_api.dart';
 
 class EmailSender {
   static sendEmail(String recipients, BuildContext context,
@@ -22,7 +29,7 @@ class EmailSender {
     String password = store.password;
     String smtp = store.smtpServer.toLowerCase();
 
-    var smtpServer;
+    SmtpServer smtpServer;
 
     if (isGmail(username)) {
       smtpServer = gmail(username, password);
@@ -103,5 +110,68 @@ class EmailSender {
 
   static bool isGmail(String username) {
     return username.endsWith('@gmail.com');
+  }
+
+  static String emailBody(invoice, InvoiceType invoiceType) {
+    Store store = StoreDB().getStore();
+    return '''
+Dear ${invoiceType == InvoiceType.supplyInvoice ? invoice.supplyerName : invoice.customerName},
+
+We hope this email finds you well. We want to express our gratitude for your continued support. As a token of our appreciation, we've attached your latest ${invoiceType.name().toLowerCase()}.
+
+${invoiceType.name()} Details:
+${invoiceType.name()} Number: ${invoice.invoiceId}
+${invoiceType.name()} Date: ${MyFormat.formatDateOne(invoice.createdDate)}
+Total Amount: ${MyFormat.formatCurrency(invoice.total)}
+
+Please feel free to reach out if you have any questions or concerns regarding your ${invoiceType.name().toLowerCase()} or any other matter. We are here to assist you in any way we can.
+
+Thank you for choosing our services. We look forward to serving you again in the future.
+
+Best regards,
+${store.companyName}
+${store.mobileNumber1}
+${store.email}
+''';
+  }
+
+  static Future<void> showEmailSendingDialog(
+      context, invoice, invoiceType) async {
+    File file = invoiceType == InvoiceType.supplyInvoice
+        ? await PdfInvoiceApi.generateSupplyInvoicePDF(invoice)
+        : await PdfInvoiceApi.generateInvoicePDF(invoice,
+            invoiceType: invoiceType);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return EmailSendingDialog(
+              email: invoice.email,
+              onPressed: (email, message) async {
+                await EmailSender.sendEmail(email, context,
+                    title: 'Invoice_${invoice.invoiceId}',
+                    body: EmailSender.emailBody(invoice, invoiceType),
+                    attachment: [FileAttachment(file)]);
+              });
+        });
+  }
+
+  static Future<void> showReportEmailSending(
+      context, Document pdf, String reportTitle, String reportType) async {
+    File file = await PdfApi.saveDocument(
+        name: '$reportType-$reportTitle.pdf', pdf: pdf);
+
+    showDialog(
+        context: context,
+        builder: (context) {
+          return EmailSendingDialog(
+              email: '',
+              isMessageRequired: true,
+              onPressed: (email, message) async {
+                await EmailSender.sendEmail(email, context,
+                    title: '$reportType-$reportTitle',
+                    body: message,
+                    attachment: [FileAttachment(file)]);
+              });
+        });
   }
 }

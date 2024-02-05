@@ -18,7 +18,9 @@ import 'supplyer_invoice_draft_page.dart';
 
 class SelectSupplyerPage extends StatefulWidget {
   SupplyInvoice? supplyInvoice;
-  SelectSupplyerPage({super.key, this.supplyInvoice});
+  bool isRetunManager;
+  SelectSupplyerPage(
+      {super.key, this.supplyInvoice, required this.isRetunManager});
 
   @override
   State<SelectSupplyerPage> createState() => _SelectSupplyerPageState();
@@ -59,7 +61,8 @@ class _SelectSupplyerPageState extends State<SelectSupplyerPage> {
         backgroundColor: TColors.blue,
         leading: IconButton(
             onPressed: () {
-              Get.offAll(SupplyAllInvoice());
+              Get.offAll(
+                  SupplyAllInvoice(isRetunManager: widget.isRetunManager));
             },
             icon: Icon(Icons.arrow_back_outlined)),
         title: Text(
@@ -93,7 +96,9 @@ class _SelectSupplyerPageState extends State<SelectSupplyerPage> {
                         SupplyerDB().getSupplyer(row.getCells()[0].value);
 
                     Get.put(SupplyInvoiceDraftController(
-                        supplyer: supplyer, copyInvoice: widget.supplyInvoice));
+                        supplyer: supplyer,
+                        copyInvoice: widget.supplyInvoice,
+                        isRetunManager: widget.isRetunManager));
                     Get.offAll(SupplyInvoiceDraftPage());
                   }
                 }),

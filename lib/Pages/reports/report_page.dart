@@ -1,17 +1,24 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
+import 'package:pos/api/email_sender.dart';
+import 'package:pos/api/pdf_api.dart';
+import 'package:pos/api/printer_manager.dart';
+import 'package:pos/api/report_pdf.dart';
 import 'package:pos/controllers/report_controller.dart';
 import 'package:pos/database/store_db.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/widgets/pos_button.dart';
+import 'package:pos/widgets/printer_setup_buttton.dart';
+import 'package:printing/printing.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:syncfusion_flutter_datagrid_export/export.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class ReportPage extends StatefulWidget {
-  ReportPage({super.key});
+  const ReportPage({super.key});
 
   @override
   State<ReportPage> createState() => _ReportPageState();
@@ -27,11 +34,16 @@ class _ReportPageState extends State<ReportPage> {
   final GlobalKey<SfDataGridState> pdfKey = GlobalKey<SfDataGridState>();
 
   ReportController controller = Get.put(ReportController());
+  final DataGridController _dataGridController = DataGridController();
+
+  DataSource _dataSource = DataSource([]);
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
       List<DataGridRow> rows = controller.rows;
       List<GridColumn> columns = controller.columns;
+      _dataSource = DataSource(rows);
 
       return columns.isEmpty
           ? const Center(child: Text('Select Report Type'))
@@ -51,18 +63,20 @@ class _ReportPageState extends State<ReportPage> {
                         const SizedBox(
                           width: 10,
                         ),
-                        const Text(
-                          "-",
-                          style: TextStyle(fontSize: 14.0),
-                        ),
+                        if (!controller.checkDate())
+                          const Text(
+                            "-",
+                            style: TextStyle(fontSize: 14.0),
+                          ),
                         const SizedBox(
                           width: 10,
                         ),
-                        Text(
-                          MyFormat.formatDateTwo(controller.dateTimeRange.end
-                              .subtract(const Duration(days: 1))),
-                          style: const TextStyle(fontSize: 14.0),
-                        ),
+                        if (!controller.checkDate())
+                          Text(
+                            MyFormat.formatDateTwo(controller.dateTimeRange.end
+                                .subtract(const Duration(days: 1))),
+                            style: const TextStyle(fontSize: 14.0),
+                          ),
                       ],
                     ),
                     Column(
@@ -86,132 +100,29 @@ class _ReportPageState extends State<ReportPage> {
                         text: 'Export',
                         icon: Icons.picture_as_pdf_rounded,
                         onPressed: () async {
-                          late PdfStringFormat format;
-                          PdfDocument document = pdfKey.currentState!
-                              .exportToPdfDocument(
-                                  exportTableSummaries:
-                                      controller.isRequiredTableSummery,
-                                  headerFooterExport:
-                                      (DataGridPdfHeaderFooterExportDetails
-                                          headerFooterExport) {
-                                    final double width = headerFooterExport
-                                        .pdfPage
-                                        .getClientSize()
-                                        .width;
-                                    final PdfPageTemplateElement header =
-                                        PdfPageTemplateElement(
-                                            Rect.fromLTWH(0, 0, width, 65));
-                                    header.graphics.drawString(
-                                        StoreDB().getStore().companyName,
-                                        PdfStandardFont(
-                                            PdfFontFamily.courier, 15,
-                                            style: PdfFontStyle.bold),
-                                        bounds:
-                                            const Rect.fromLTRB(350, 0, 2, 0));
-                                    header.graphics.drawString(
-                                      StoreDB().getStore().slogan,
-                                      PdfStandardFont(PdfFontFamily.courier, 8,
-                                          style: PdfFontStyle.regular),
-                                      bounds:
-                                          const Rect.fromLTRB(350, 15, 2, 0),
-                                    );
-                                    header.graphics.drawString(
-                                      controller.title.keys.first,
-                                      PdfStandardFont(PdfFontFamily.courier, 12,
-                                          style: PdfFontStyle.bold),
-                                      bounds:
-                                          const Rect.fromLTWH(0, 0, 200, 50),
-                                    );
-                                    header.graphics.drawString(
-                                      controller.title.values.first,
-                                      PdfStandardFont(PdfFontFamily.courier, 8,
-                                          style: PdfFontStyle.regular),
-                                      bounds:
-                                          const Rect.fromLTWH(0, 10, 200, 40),
-                                    );
-                                    header.graphics.drawString(
-                                      'Created Date : ${MyFormat.formatDateOne(DateTime.now())}',
-                                      PdfStandardFont(PdfFontFamily.courier, 8,
-                                          style: PdfFontStyle.regular),
-                                      bounds:
-                                          const Rect.fromLTWH(0, 20, 200, 40),
-                                    );
+                          String companyName = StoreDB().getStore().companyName;
+                          String reportType = controller.title.value.keys.first;
+                          String reportTitle =
+                              controller.title.value.values.first;
+                          var pdf = await ReportPdf(
+                                  columns: controller.columns.value
+                                      .map((element) => element.columnName)
+                                      .toList(),
+                                  rows: _dataSource.effectiveRows
+                                      .map((DataGridRow row) => row
+                                          .getCells()
+                                          .map((DataGridCell e) =>
+                                              e.value.toString())
+                                          .toList())
+                                      .toList(),
+                                  companyName: companyName,
+                                  reportType: reportType,
+                                  reportTitle: reportTitle,
+                                  createdDate: DateTime.now(),
+                                  dateTimeRange: controller.dateTimeRange)
+                              .generatePDF();
 
-                                    if (controller.dateTimeRange.start.year !=
-                                        0) {
-                                      header.graphics.drawString(
-                                        'From ${MyFormat.formatDateTwo(controller.dateTimeRange.start)} To ${MyFormat.formatDateTwo(controller.dateTimeRange.end.subtract(const Duration(days: 1)))}',
-                                        PdfStandardFont(
-                                            PdfFontFamily.courier, 8,
-                                            style: PdfFontStyle.regular),
-                                        bounds:
-                                            const Rect.fromLTWH(0, 30, 200, 40),
-                                      );
-                                    }
-
-                                    headerFooterExport.pdfDocumentTemplate.top =
-                                        header;
-                                  },
-                                  fitAllColumnsInOnePage: true,
-                                  cellExport: (details) {
-                                    format = PdfStringFormat(
-                                        alignment: PdfTextAlignment.center,
-                                        lineAlignment:
-                                            PdfVerticalAlignment.middle);
-
-                                    if (details.columnName ==
-                                            ReportController.salepriceKey ||
-                                        details.columnName ==
-                                            ReportController.receiptsPriceKey) {
-                                      format = PdfStringFormat(
-                                          alignment: PdfTextAlignment.right,
-                                          lineAlignment:
-                                              PdfVerticalAlignment.middle);
-                                    }
-
-                                    if (details.columnName ==
-                                            ReportController.customerSaleKey ||
-                                        details.columnName ==
-                                            ReportController.receiptsKey) {
-                                      format = PdfStringFormat(
-                                          alignment: PdfTextAlignment.left,
-                                          lineAlignment:
-                                              PdfVerticalAlignment.middle);
-                                    }
-
-                                    if (details.cellType ==
-                                        DataGridExportCellType
-                                            .tableSummaryRow) {
-                                      if ((details.cellValue as String)
-                                          .isNotEmpty) {
-                                        details.pdfCell.value =
-                                            MyFormat.formatPrice(double.parse(
-                                                details.cellValue as String));
-                                        format = PdfStringFormat(
-                                            alignment: PdfTextAlignment.right,
-                                            lineAlignment:
-                                                PdfVerticalAlignment.middle);
-                                      }
-                                    }
-                                    if (details.cellValue is double) {
-                                      details.pdfCell.value =
-                                          MyFormat.formatPrice(
-                                              details.cellValue as double);
-                                      format = PdfStringFormat(
-                                          alignment: PdfTextAlignment.right,
-                                          lineAlignment:
-                                              PdfVerticalAlignment.middle);
-                                    }
-
-                                    details.pdfCell.stringFormat = format;
-                                  },
-                                  autoColumnWidth: true);
-
-                          final List<int> bytes = await document.save();
-                          File file =
-                              await File('DataGrid.pdf').writeAsBytes(bytes);
-                          ReportPage.openFile(file);
-                          document.dispose();
+                          await showExport(pdf, reportType, reportTitle);
                         }),
                   ],
                 ),
@@ -223,10 +134,11 @@ class _ReportPageState extends State<ReportPage> {
                     key: pdfKey,
                     allowColumnsResizing: true,
                     rowHeight: 40.0,
+                    controller: _dataGridController,
                     gridLinesVisibility: GridLinesVisibility.both,
                     headerGridLinesVisibility: GridLinesVisibility.both,
                     columnWidthMode: ColumnWidthMode.auto,
-                    source: DataSource(rows),
+                    source: _dataSource,
                     allowFiltering: true,
                     columns: columns,
                     tableSummaryRows: [
@@ -259,6 +171,55 @@ class _ReportPageState extends State<ReportPage> {
               ],
             );
     });
+  }
+
+  Future<void> showExport(pdf, String reportType, String reportTitle) async {
+    PrinterManager printerManager = PrinterManager();
+
+    showDialog(
+        context: context,
+        builder: (c) {
+          return AlertDialog(
+            content: Row(
+              children: [
+                PosButton(
+                    text: 'Print',
+                    onPressed: () async {
+                      if (printerManager.printer != null) {
+                        await Printing.directPrintPdf(
+                            printer: printerManager.printer!,
+                            onLayout: (format) async =>
+                                Uint8List.fromList(await pdf.save()));
+                      } else {
+                        showDialog(
+                            context: context,
+                            builder: (c) {
+                              return const AlertDialog(
+                                content: Text('Please setup printer'),
+                              );
+                            });
+                      }
+                    }),
+                PosButton(
+                    text: 'View',
+                    onPressed: () async {
+                      final file = await PdfApi.saveDocument(
+                          name: '$reportTitle-$reportType.pdf', pdf: pdf);
+                      await PdfApi.openFile(file);
+                    }),
+                PosButton(
+                    text: 'E-mail',
+                    onPressed: () async {
+                      EmailSender.showReportEmailSending(
+                          context, pdf, reportTitle, reportType);
+                    }),
+                PrintSetupButton(onPrinterSelected: (Printer? printer) {
+                  printerManager.printer = printer;
+                })
+              ],
+            ),
+          );
+        });
   }
 }
 

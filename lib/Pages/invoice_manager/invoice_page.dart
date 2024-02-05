@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -8,23 +6,24 @@ import 'package:pos/Pages/invoice_manager/invoice_edit_page.dart';
 import 'package:pos/Pages/invoice_manager/save_invoice_page.dart';
 import 'package:pos/Pages/invoice_manager/search_invoice_page.dart';
 import 'package:pos/api/email_sender.dart';
+import 'package:pos/api/pdf_api.dart';
+import 'package:pos/api/printer_manager.dart';
 import 'package:pos/database/invoice_db_service.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/payment.dart';
 import 'package:pos/utils/alert_message.dart';
-import 'package:pos/widgets/alert_dialog.dart';
 import 'package:pos/widgets/pos_appbar.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/pos_text_form_field.dart';
+import 'package:pos/widgets/print_verify.dart';
 import 'package:pos/widgets/verify_dialog.dart';
-import 'package:window_manager/window_manager.dart';
-import '../../api/pdf_api.dart';
+import 'package:printing/printing.dart';
+
 import '../../api/pdf_invoice_api.dart';
 import '../../controllers/invoice_edit_controller.dart';
-import '../../controllers/size_controller.dart';
+
 import '../../models/invoice.dart';
 import '../../theme/t_colors.dart';
-import '../main_window.dart';
 
 class InvoicePage extends StatefulWidget {
   String? searchInvoiceId;
@@ -35,10 +34,11 @@ class InvoicePage extends StatefulWidget {
 }
 
 class _InvoicePageState extends State<InvoicePage> {
-  List<Invoice> invoiceList = [];
-  late Invoice invoice;
+  List<User> invoiceList = [];
+  late User invoice;
   final RxInt index = 0.obs;
   String? searchInvoiceId;
+  int ss = 77;
 
   @override
   void initState() {
@@ -78,12 +78,8 @@ class _InvoicePageState extends State<InvoicePage> {
                   text: 'Copy',
                 ),
                 PosButton(
-                  onPressed: () => printInvoice(context),
+                  onPressed: () async => printInvoice(),
                   text: 'Print',
-                ),
-                PosButton(
-                  onPressed: () => sendEmail(),
-                  text: 'Email',
                 ),
                 PosButton(
                   onPressed: () => payAmout(),
@@ -174,9 +170,8 @@ class _InvoicePageState extends State<InvoicePage> {
 
                       return SaveInvoiceViewPage(invoice: invoice);
                     })
-                  : const Center(
-                      child: Text('No invoices found'),
-                    );
+                  : const Expanded(
+                      child: Center(child: Text('No invoices found')));
             },
           ),
         ],
@@ -208,15 +203,11 @@ class _InvoicePageState extends State<InvoicePage> {
           'This invoice has been paid and Can not be edited.', context);
       return;
     }
-    Get.put(InvoiceEditController(invoice: invoice));
-    Get.to(InvoiceEditPage());
-  }
 
-  Future<void> printInvoice(context) async {
-    final pdfFile =
-        await PdfInvoiceApi.generateInvoicePDF(invoiceList[index.value]);
-    PdfApi.openFile(pdfFile);
-    //await PdfInvoiceApi.printPdf(invoiceList[index.value]);
+    final controller = Get.put(InvoiceEditController(invoice: invoice));
+    Get.to(() => InvoiceEditPage(
+          controller: controller,
+        ));
   }
 
   Future<void> deleteInvoice() async {
@@ -279,7 +270,7 @@ class _InvoicePageState extends State<InvoicePage> {
                       FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))
                     ],
                     labelText: 'Pay amount',
-                    prefixIcon: Icon(Icons.attach_money_outlined),
+                    prefixIcon: const Icon(Icons.attach_money_outlined),
                   ),
                   const SizedBox(height: 20),
                   Obx(
@@ -336,7 +327,7 @@ class _InvoicePageState extends State<InvoicePage> {
   }
 
   void searchInvoices() {
-    Get.to(InvoiceSearchPage());
+    Get.to(const InvoiceSearchPage());
   }
 
   Future<void> openCopyInvoice() async {
@@ -356,7 +347,35 @@ class _InvoicePageState extends State<InvoicePage> {
     }
   }
 
-  sendEmail() async {
-    await EmailSender.sendEmail('kk', context);
+  void printInvoice() async {
+    User oldInvoice = invoice.copyWith();
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: PrintVerify(
+              invoice: oldInvoice,
+              onPrintPressed: (Printer printer, User invoice) async {
+                await PdfInvoiceApi.printInvoice(invoice,
+                    printer: printer, invoiceType: InvoiceType.invoice);
+              },
+              onEmailPressed: (User invoice) async {
+                await EmailSender.showEmailSendingDialog(
+                    context, invoice, InvoiceType.invoice);
+              },
+              onViewPressed: (User invoice) {
+                viewInvoice(invoice);
+              },
+            ),
+          );
+        });
+  }
+
+  Future<void> viewInvoice(invoice) async {
+    User oldInvoice = invoice.copyWith();
+    final file = await PdfInvoiceApi.generateInvoicePDF(oldInvoice,
+        invoiceType: InvoiceType.invoice);
+    await PdfApi.openFile(file);
   }
 }

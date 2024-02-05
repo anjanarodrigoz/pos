@@ -20,6 +20,7 @@ class SupplyInvoiceDraftController extends GetxController {
   RxList<String> comments = <String>[].obs;
   RxList<Cart> cartList = <Cart>[].obs;
   SupplyInvoice? copyInvoice;
+  final bool isRetunManager;
 
   var netTotal = 0.0.obs;
   var gstTotal = 0.0.obs;
@@ -36,7 +37,9 @@ class SupplyInvoiceDraftController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    invoiceId.value = SupplyerInvoiceDB().generateInvoiceId();
+    invoiceId.value = isRetunManager
+        ? SupplyerInvoiceDB().generateReturnNoteId()
+        : SupplyerInvoiceDB().generateInvoiceId();
     if (copyInvoice != null) {
       extraList.value = copyInvoice!.extraCharges ?? [];
       cartList.value =
@@ -47,7 +50,8 @@ class SupplyInvoiceDraftController extends GetxController {
     }
   }
 
-  SupplyInvoiceDraftController({required this.supplyer, this.copyInvoice});
+  SupplyInvoiceDraftController(
+      {required this.supplyer, this.copyInvoice, required this.isRetunManager});
 
   void addExtraCharges(ExtraCharges extraCharges) {
     extraList.add(extraCharges);
@@ -88,14 +92,16 @@ class SupplyInvoiceDraftController extends GetxController {
         .map((cart) => InvoicedItem(
             itemId: cart.itemId,
             name: cart.name,
-            netPrice: cart.netPrice,
+            netPrice: cart.price,
             qty: cart.qty,
             comment: cart.comment,
             isPostedItem: cart.isPostedItem))
         .toList();
 
     SupplyInvoice invoice = SupplyInvoice(
+        email: supplyer.email ?? '',
         referenceId: referenceId.value,
+        isReturnNote: isRetunManager,
         supplyerMobile: supplyer.mobileNumber,
         invoiceId: invoiceId.value,
         createdDate: DateTime.now(),
@@ -107,7 +113,9 @@ class SupplyInvoiceDraftController extends GetxController {
         extraCharges: extraList,
         itemList: itemList);
 
-    await db.saveLastId(invoiceId.value);
+    isRetunManager
+        ? await db.saveReturnNoteId(invoiceId.value)
+        : await db.saveLastId(invoiceId.value);
     await db.addInvoice(invoice);
     Get.delete<SupplyInvoiceDraftController>();
   }
