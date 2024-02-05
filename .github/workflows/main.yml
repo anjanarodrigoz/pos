@@ -1,7 +1,7 @@
-name: Flutter Desktop App
+name: Flutter CI
 
 on:
-  pull_request:
+  push:
     branches: [ main ]
 
 jobs:
@@ -19,12 +19,27 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
 
-    - name: Run Flutter build
-      run: flutter build windows --release
+    - name: Build Windows application
+      run: flutter build windows
 
-    - name: Upload Artifact
-      uses: ncipollo/release-action@v1
+    - name: Tag with version
+      id: tag_version
+      run: |
+        echo "VERSION=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.POS_TOKEN }}
       with:
-        artifacts: "build/windows/runner/Release/*"
-        tag: v1.0.0
-        token: ${{ secrets.POS_TOKEN }}
+        tag_name: ${{ env.VERSION }}
+        release_name: Release ${{ env.VERSION }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows-build
+        path: build/windows/runner/Release/
