@@ -25,7 +25,6 @@ jobs:
     - name: Upload Artifact
       uses: ncipollo/release-action@v1
       with:
-        name: windows-app
-        artifacts: build/windows/runner/Release/
+        artifacts: "build/windows/runner/Release/*"
         tag: v1.0.0
         token: ${{ secrets.POS_TOKEN }}
