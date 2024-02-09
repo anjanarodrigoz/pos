@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pos/models/invoice_item.dart';
+import 'package:pos/utils/constant.dart';
 import 'package:pos/widgets/outstanding_date_widget.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../data_sources/invoiceDataSource.dart';
@@ -14,7 +15,7 @@ import '../../utils/val.dart';
 import '../../widgets/paid_status_widget.dart';
 
 class QuoteInvoicePage extends StatelessWidget {
-  User invoice;
+  Invoice invoice;
 
   QuoteInvoicePage({super.key, required this.invoice});
 
@@ -193,7 +194,7 @@ class QuoteInvoicePage extends StatelessWidget {
         gridLinesVisibility: GridLinesVisibility.both,
         headerGridLinesVisibility: GridLinesVisibility.both,
         allowColumnsResizing: true,
-        rowHeight: 27.0,
+        rowHeight: Const.tableRowHeight,
         columnWidthMode: ColumnWidthMode.auto,
         allowSwiping: true,
         source: generateDataRowList(),
@@ -233,7 +234,7 @@ class QuoteInvoicePage extends StatelessWidget {
     return Container(
       child: Text(
         value,
-        style: TStyle.style_01,
+        style: Const.tableValuesTextStyle,
       ),
     );
   }

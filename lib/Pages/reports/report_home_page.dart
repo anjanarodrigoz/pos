@@ -109,20 +109,23 @@ class _ReportHomePageState extends State<ReportHomePage> {
                           {'Stock': 'Stock Required'},
                         );
                       },
-                      'Stock Quantity Report': () {
+                      'Balanced Stock Report': () {
                         showFilterDialog(
-                          ReportType.stockQuantity,
-                          {'Stock': 'Stock Quantity'},
+                          showDatePicker: false,
+                          ReportType.balancedStock,
+                          {'Stock': 'Balanced Stock'},
                         );
                       },
-                      'Stock Selling value': () {
+                      'Balanced Stock Selling value': () {
                         showFilterDialog(
-                          ReportType.stockValue,
-                          {'Stock': 'Stock Selling Value'},
+                          showDatePicker: false,
+                          ReportType.stockSellingValue,
+                          {'Stock': 'Balanced Stock Selling Value'},
                         );
                       },
                       'Stock Buying Value': () {
                         showFilterDialog(
+                          showDatePicker: false,
                           ReportType.stockBuyingValue,
                           {'Stock': 'Stock Buying Value'},
                         );
@@ -179,12 +182,14 @@ class _ReportHomePageState extends State<ReportHomePage> {
                     showReportTypes({
                       'Customer Details': () {
                         showFilterDialog(
+                          showDatePicker: false,
                           ReportType.customerDetails,
                           {'Customer': 'Customer Details'},
                         );
                       },
                       'Customer Outstanding': () {
                         showFilterDialog(
+                          showDatePicker: false,
                           ReportType.outstanding,
                           {'Customer': 'OutStanding'},
                         );
@@ -234,7 +239,7 @@ class _ReportHomePageState extends State<ReportHomePage> {
   }
 
   showFilterDialog(ReportType reportType, Map<String, String> title,
-      {bool showPaidStatus = false}) {
+      {bool showPaidStatus = false, bool showDatePicker = true}) {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -258,6 +263,7 @@ class _ReportHomePageState extends State<ReportHomePage> {
                 showPaidStatus: showPaidStatus,
                 reportType: reportType,
                 title: title,
+                showDatePicker: showDatePicker,
               ),
             )));
   }

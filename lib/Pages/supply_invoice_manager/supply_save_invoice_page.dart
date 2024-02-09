@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pos/models/invoice_item.dart';
+import 'package:pos/utils/constant.dart';
 import 'package:pos/widgets/outstanding_date_widget.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../data_sources/invoiceDataSource.dart';
@@ -72,27 +73,27 @@ class SupplySaveInvoicePage extends StatelessWidget {
                                       children: [
                                         Text(
                                           'INVOICE  #${invoice.invoiceId}',
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontSize: 14.0,
                                               fontWeight: FontWeight.bold),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 5,
                                         ),
                                         if (!(invoice.isReturnNote))
                                           Text(
                                             'REFERENCE  #${invoice.referenceId}',
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                                 fontSize: 14.0,
                                                 fontWeight: FontWeight.bold),
                                           ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 10,
                                         ),
                                         Text(
                                           MyFormat.formatDate(
                                               invoice.createdDate),
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ],
@@ -140,7 +141,7 @@ class SupplySaveInvoicePage extends StatelessWidget {
                                 ),
                                 detailsRowWidget('GST Total',
                                     MyFormat.formatCurrency(totalGstPrice)),
-                                Divider(),
+                                const Divider(),
                                 detailsRowWidget(
                                     'Total', MyFormat.formatCurrency(total)),
                               ],
@@ -177,7 +178,7 @@ class SupplySaveInvoicePage extends StatelessWidget {
         ),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
               color: TColors.blue, fontWeight: FontWeight.w700, fontSize: 14.0),
         )
       ],
@@ -192,35 +193,34 @@ class SupplySaveInvoicePage extends StatelessWidget {
         gridLinesVisibility: GridLinesVisibility.both,
         headerGridLinesVisibility: GridLinesVisibility.both,
         allowColumnsResizing: true,
-        rowHeight: 27.0,
+        rowHeight: Const.tableRowHeight,
         columnWidthMode: ColumnWidthMode.auto,
         allowSwiping: true,
         source: generateDataRowList(),
         columns: [
           GridColumn(
               columnName: InvoiceRow.itemIdKey,
-              maximumWidth: 120,
-              label: Center(child: const Text('Item ID'))),
+              maximumWidth: 100,
+              label: const Center(child: Text('Item ID'))),
           GridColumn(
-              minimumWidth: 500.0,
+              minimumWidth: 450.0,
               columnName: InvoiceRow.nameKey,
-              label: Center(child: const Text('Item Name'))),
+              label: const Center(child: Text('Item Name'))),
           GridColumn(
               columnName: InvoiceRow.qtyKey,
-              label: Center(child: const Text('Qty'))),
+              label: const Center(child: Text('Qty'))),
           GridColumn(
               columnName: InvoiceRow.netPriceKey,
-              label: Center(child: const Text('Net Price'))),
+              label: const Center(child: Text('Net Price'))),
           GridColumn(
               columnName: InvoiceRow.gstKey,
-              label: Center(child: const Text('GST'))),
+              label: const Center(child: Text('GST'))),
           GridColumn(
               columnName: InvoiceRow.itemPriceKey,
-              label: Center(child: const Text('Item Price'))),
+              label: const Center(child: Text('Item Price'))),
           GridColumn(
-              minimumWidth: 120.0,
               columnName: InvoiceRow.totalKey,
-              label: Center(child: const Text('Total'))),
+              label: const Center(child: Text('Total'))),
 
           // Add more columns as needed
         ],
@@ -231,11 +231,9 @@ class SupplySaveInvoicePage extends StatelessWidget {
   Widget cell(
     String value,
   ) {
-    return Container(
-      child: Text(
-        value,
-        style: TStyle.style_01,
-      ),
+    return Text(
+      value,
+      style: Const.tableValuesTextStyle,
     );
   }
 

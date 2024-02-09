@@ -17,7 +17,7 @@ import '../models/supply_invoice.dart';
 import 'pdf_api.dart';
 
 class PdfInvoiceApi {
-  static Future<File> generateInvoicePDF(User invoice,
+  static Future<File> generateInvoicePDF(Invoice invoice,
       {required InvoiceType invoiceType}) async {
     final pdf = Document();
 
@@ -81,7 +81,7 @@ class PdfInvoiceApi {
         name: 'supply_invoice_${invoice.invoiceId}.pdf', pdf: pdf);
   }
 
-  static Widget buildHeader(User invoice, invoiceType) => Column(
+  static Widget buildHeader(Invoice invoice, invoiceType) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -372,7 +372,7 @@ class PdfInvoiceApi {
     );
   }
 
-  static Widget buildFooter(User invoice) {
+  static Widget buildFooter(Invoice invoice) {
     Store store = StoreDB().getStore();
 
     return Column(

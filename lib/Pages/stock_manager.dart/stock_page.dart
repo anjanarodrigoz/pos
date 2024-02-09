@@ -5,6 +5,7 @@ import 'package:pos/Pages/main_window.dart';
 import 'package:pos/Pages/stock_manager.dart/item_form.dart';
 import 'package:pos/Pages/stock_manager.dart/item_view.dart';
 import 'package:pos/theme/t_colors.dart';
+import 'package:pos/utils/constant.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -77,7 +78,7 @@ class _StockPageState extends State<StockPage> {
                   gridLinesVisibility: GridLinesVisibility.both,
                   headerGridLinesVisibility: GridLinesVisibility.both,
                   allowFiltering: true,
-                  rowHeight: 30.0,
+                  rowHeight: Const.tableRowHeight,
                   allowColumnsResizing: true,
                   showFilterIconOnHover: true,
                   columnWidthMode: ColumnWidthMode.auto,
@@ -96,28 +97,28 @@ class _StockPageState extends State<StockPage> {
                   columns: [
                     GridColumn(
                         columnName: Item.idKey,
-                        label: Center(child: const Text('Item ID'))),
+                        label: const Center(child: Text('Item ID'))),
                     GridColumn(
                         columnName: Item.nameKey,
-                        label: Center(child: const Text('Item Name'))),
+                        label: const Center(child: Text('Item Name'))),
                     GridColumn(
                         columnName: Item.qtyKey,
-                        label: Center(child: const Text('Qty'))),
+                        label: const Center(child: Text('Qty'))),
                     GridColumn(
                         columnName: Item.priceKey,
-                        label: Center(child: const Text('Price'))),
+                        label: const Center(child: Text('Price'))),
                     GridColumn(
                         columnName: Item.priceTwoKey,
-                        label: Center(child: const Text('Price 02'))),
+                        label: const Center(child: Text('Price 02'))),
                     GridColumn(
                         columnName: Item.priceThreeKey,
-                        label: Center(child: const Text('Price 03'))),
+                        label: const Center(child: Text('Price 03'))),
                     GridColumn(
                         columnName: Item.priceFourKey,
-                        label: Center(child: const Text('Price 04'))),
+                        label: const Center(child: Text('Price 04'))),
                     GridColumn(
                         columnName: Item.priceFiveKey,
-                        label: Center(child: const Text('Price 05'))),
+                        label: const Center(child: Text('Price 05'))),
 
                     // Add more columns as needed
                   ],
@@ -173,11 +174,8 @@ class ItemDataSource extends DataGridSource {
         cells: row.getCells().map<Widget>((e) {
       return Container(
         alignment: Alignment.center,
-        padding: const EdgeInsets.all(4.0),
-        child: Text(
-          e.value.toString(),
-          style: const TextStyle(fontSize: 13.0),
-        ),
+        padding: Const.tableValuesPadding,
+        child: Text(e.value.toString(), style: Const.tableValuesTextStyle),
       );
     }).toList());
   }

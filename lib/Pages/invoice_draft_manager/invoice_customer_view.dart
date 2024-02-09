@@ -18,7 +18,7 @@ import '../quotation_manager/quatation_draft_page.dart';
 
 class InvoiceCustomerViewPage extends StatefulWidget {
   String cusId;
-  User? invoice;
+  Invoice? invoice;
   InvoiceType invoiceType;
   InvoiceCustomerViewPage(
       {super.key,
@@ -37,7 +37,7 @@ class _InvoiceCustomerViewPageState extends State<InvoiceCustomerViewPage> {
   final Address deliveryAddress = Address();
   final Address postalAddress = Address();
   final dbService = CustomerDB();
-  User? invoice;
+  Invoice? invoice;
 
   @override
   void initState() {
@@ -373,7 +373,7 @@ class _InvoiceCustomerViewPageState extends State<InvoiceCustomerViewPage> {
           // TODO: Handle this case.
           Get.put(
               CreditDraftController(customer: _customer, copyInvoice: invoice));
-          Get.offAll(CreditDraftPage());
+          Get.offAll(const CreditDraftPage());
         case InvoiceType.returnNote:
         // TODO: Handle this case.
       }

@@ -34,8 +34,8 @@ class InvoicePage extends StatefulWidget {
 }
 
 class _InvoicePageState extends State<InvoicePage> {
-  List<User> invoiceList = [];
-  late User invoice;
+  List<Invoice> invoiceList = [];
+  late Invoice invoice;
   final RxInt index = 0.obs;
   String? searchInvoiceId;
   int ss = 77;
@@ -348,7 +348,7 @@ class _InvoicePageState extends State<InvoicePage> {
   }
 
   void printInvoice() async {
-    User oldInvoice = invoice.copyWith();
+    Invoice oldInvoice = invoice.copyWith();
 
     showDialog(
         context: context,
@@ -356,15 +356,15 @@ class _InvoicePageState extends State<InvoicePage> {
           return Dialog(
             child: PrintVerify(
               invoice: oldInvoice,
-              onPrintPressed: (Printer printer, User invoice) async {
+              onPrintPressed: (Printer printer, Invoice invoice) async {
                 await PdfInvoiceApi.printInvoice(invoice,
                     printer: printer, invoiceType: InvoiceType.invoice);
               },
-              onEmailPressed: (User invoice) async {
+              onEmailPressed: (Invoice invoice) async {
                 await EmailSender.showEmailSendingDialog(
                     context, invoice, InvoiceType.invoice);
               },
-              onViewPressed: (User invoice) {
+              onViewPressed: (Invoice invoice) {
                 viewInvoice(invoice);
               },
             ),
@@ -373,7 +373,7 @@ class _InvoicePageState extends State<InvoicePage> {
   }
 
   Future<void> viewInvoice(invoice) async {
-    User oldInvoice = invoice.copyWith();
+    Invoice oldInvoice = invoice.copyWith();
     final file = await PdfInvoiceApi.generateInvoicePDF(oldInvoice,
         invoiceType: InvoiceType.invoice);
     await PdfApi.openFile(file);

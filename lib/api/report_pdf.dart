@@ -53,10 +53,18 @@ class ReportPdf {
         ],
       );
 
-  Widget buildTitle() => Text(
-        reportTitle,
-        style: TextStyle(fontSize: 8, fontWeight: FontWeight.normal),
-      );
+  Widget buildTitle() => Column(children: [
+        Text(
+          '$reportType - $reportTitle',
+          style: TextStyle(fontSize: 8, fontWeight: FontWeight.normal),
+        ),
+        SizedBox(height: 0.1 * PdfPageFormat.cm),
+        if (dateTimeRange.start.year != 0)
+          Text(
+            MyFormat.reportDateTimeFormat(dateTimeRange),
+            style: TextStyle(fontSize: 8, fontWeight: FontWeight.normal),
+          )
+      ]);
 
   Widget buildCompanyInfo() {
     Store store = StoreDB().getStore();
@@ -66,21 +74,16 @@ class ReportPdf {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(store.companyName.toUpperCase(),
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 8.0)),
+            style: TextStyle(fontWeight: FontWeight.normal, fontSize: 8.0)),
         if (store.slogan.isNotEmpty)
           Text(store.slogan,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 7.0)),
+              style: TextStyle(fontWeight: FontWeight.normal, fontSize: 7.0)),
         SizedBox(height: 0.1 * PdfPageFormat.cm),
         Text(
-          'Created Date : ${MyFormat.formatDateTwo(createdDate)}',
+          'Created Date : ${MyFormat.formatDate(createdDate)}',
           style: TextStyle(fontSize: 8, fontWeight: FontWeight.normal),
         ),
         SizedBox(height: 0.1 * PdfPageFormat.cm),
-        if (dateTimeRange.start.year != 0)
-          Text(
-            MyFormat.reportDateTimeFormat(dateTimeRange),
-            style: TextStyle(fontSize: 8, fontWeight: FontWeight.normal),
-          ),
       ],
     );
   }

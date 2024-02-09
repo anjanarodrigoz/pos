@@ -3,7 +3,7 @@ import 'extra_charges.dart';
 import 'invoice_item.dart';
 import 'payment.dart';
 
-class User {
+class Invoice {
   static const String invoiceIdKey = 'invoiceId';
   static const String createdDateKey = 'createdDate';
   static const String isPaidKey = 'isPaid';
@@ -52,7 +52,7 @@ class User {
   double paidAmount = 0.0;
   Duration outStandingDates = const Duration(days: 0);
 
-  User({
+  Invoice({
     required this.email,
     required this.customerMobile,
     required this.invoiceId,
@@ -73,7 +73,7 @@ class User {
     calOtherValues();
   }
 
-  User copyWith({
+  Invoice copyWith({
     bool? isPaid,
     bool? isDeleted,
     String? customerId,
@@ -89,7 +89,7 @@ class User {
     Address? billingAddress,
     Address? shippingAddress,
   }) {
-    return User(
+    return Invoice(
       invoiceId: invoiceId,
       createdDate: createdDate,
       email: email ?? this.email,
@@ -130,8 +130,8 @@ class User {
     };
   }
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  factory Invoice.fromJson(Map<String, dynamic> json) {
+    return Invoice(
       email: json[emailkey] ?? '',
       customerMobile: json[customerMobileKey],
       gstPrecentage: json[gstPrecentageKey],
@@ -180,7 +180,11 @@ class User {
 
     total = (totalNetPrice * (1 + gstPrecentage) * 100).round() / 100;
 
-    toPay = total - paidAmount;
+    if (isPaid) {
+      toPay = 0.0;
+    } else {
+      toPay = total - paidAmount;
+    }
 
     outStandingDates = DateTime.now().difference(createdDate);
   }

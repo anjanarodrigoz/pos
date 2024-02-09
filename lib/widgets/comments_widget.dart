@@ -66,9 +66,9 @@ class _CommentsDialogState extends State<CommentsDialog> {
                     const SizedBox(
                       height: 20.0,
                     ),
-                    Container(
+                    SizedBox(
                       width: 400.0,
-                      height: 500,
+                      height: 430.0,
                       child: ListView.separated(
                         itemCount: filteredComments.length,
                         itemBuilder: (context, index) {
@@ -91,7 +91,7 @@ class _CommentsDialogState extends State<CommentsDialog> {
                             onTap: () {
                               String newComment =
                                   commentController.text.toString();
-                              newComment += '\n\n$comment';
+                              newComment += comment;
                               oldComment = newComment;
                               setState(() {});
                             },
@@ -125,7 +125,7 @@ class _CommentsDialogState extends State<CommentsDialog> {
               onPressed(comment);
               Navigator.of(context).pop();
             },
-            child: Text('Add to Invoice'),
+            child: const Text('Add to Invoice'),
           ),
         ],
       ),
@@ -154,7 +154,7 @@ class _CommentsDialogState extends State<CommentsDialog> {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text('Add New Comment'),
+              title: const Text('Add New Comment'),
               content: SizedBox(
                 height: 400.0,
                 child: Column(children: [
@@ -162,7 +162,7 @@ class _CommentsDialogState extends State<CommentsDialog> {
                     controller: nameController,
                     labelText: 'Comment name',
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   PosTextFormField(

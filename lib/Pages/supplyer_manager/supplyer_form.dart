@@ -25,20 +25,19 @@ class _SupplyerFormPageState extends State<SupplyerFormPage> {
       firstName: '',
       lastName: '',
       mobileNumber: '');
-  final Address address = Address();
   final Address deliveryAddress = Address();
 
   Future<void> _saveSupplyerDetails() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      _supplyer.address = address;
+      _supplyer.address = deliveryAddress;
       await supplyerDb.addSupplyer(_supplyer);
       await supplyerDb.saveLastId(_supplyer.id);
       Get.back();
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: const Text('Supplyer details saved')),
+        const SnackBar(content: Text('Supplyer details saved')),
       );
     }
   }
@@ -57,7 +56,7 @@ class _SupplyerFormPageState extends State<SupplyerFormPage> {
           backgroundColor: TColors.blue,
           title: Text(
             'New Supplyer - # ${_supplyer.id}',
-            style: TextStyle(fontSize: 17.0),
+            style: const TextStyle(fontSize: 17.0),
           )),
       body: Container(
         color: Colors.grey.shade200,

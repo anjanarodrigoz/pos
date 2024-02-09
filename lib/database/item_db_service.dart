@@ -108,7 +108,7 @@ class ItemDB implements AbstractDB {
   @override
   Future<Map> backupData() async {
     final List itemData = await _storage.getValues().toList() ?? [];
-    final lastId = GetStorage().read(DBVal.itemId) ?? '1000';
+    final lastId = GetStorage().read(DBVal.itemId) ?? '0';
 
     return {DBVal.items: itemData, DBVal.itemId: lastId};
   }

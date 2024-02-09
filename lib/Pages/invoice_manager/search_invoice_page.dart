@@ -5,6 +5,7 @@ import 'package:pos/Pages/invoice_manager/invoice_page.dart';
 import 'package:pos/database/invoice_db_service.dart';
 import 'package:pos/models/invoice.dart';
 import 'package:pos/theme/t_colors.dart';
+import 'package:pos/utils/constant.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/utils/val.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -19,7 +20,7 @@ class InvoiceSearchPage extends StatefulWidget {
 class _InvoiceSearchPageState extends State<InvoiceSearchPage> {
   late final _databaseService; // Use your DatabaseService class
 
-  List<User> _invoice = [];
+  List<Invoice> _invoice = [];
   InvoiceDataSource invoiceDataSource = InvoiceDataSource(invoiceData: []);
   Function? disposeListen;
 
@@ -68,7 +69,7 @@ class _InvoiceSearchPageState extends State<InvoiceSearchPage> {
               gridLinesVisibility: GridLinesVisibility.both,
               headerGridLinesVisibility: GridLinesVisibility.both,
               allowFiltering: true,
-              rowHeight: 30.0,
+              rowHeight: Const.tableRowHeight,
               allowColumnsResizing: true,
               showFilterIconOnHover: true,
               columnWidthMode: ColumnWidthMode.auto,
@@ -87,28 +88,32 @@ class _InvoiceSearchPageState extends State<InvoiceSearchPage> {
               }),
               columns: [
                 GridColumn(
-                    columnName: User.invoiceIdKey,
+                    width: 120.0,
+                    columnName: Invoice.invoiceIdKey,
                     label: const Center(child: Text('Invoice ID'))),
                 GridColumn(
-                    columnName: User.customerNameKey,
-                    label: const Center(child: Text('Customer Name'))),
+                    columnWidthMode: ColumnWidthMode.fitByCellValue,
+                    columnName: Invoice.customerNameKey,
+                    label: const Center(child: Text('Name'))),
                 GridColumn(
-                    columnName: User.customerIdKey,
-                    label: const Center(child: Text('Customer ID'))),
+                    width: 70.0,
+                    columnName: Invoice.customerIdKey,
+                    label: const Center(child: Text('ID'))),
                 GridColumn(
-                    columnName: User.createdDateKey,
-                    label: const Center(child: Text('Created Date'))),
+                    width: 180,
+                    columnName: Invoice.createdDateKey,
+                    label: const Center(child: Text('Date'))),
                 GridColumn(
-                    columnName: User.netKey,
+                    columnName: Invoice.netKey,
                     label: const Center(child: Text('Net Total'))),
                 GridColumn(
-                    columnName: User.gstKey,
+                    columnName: Invoice.gstKey,
                     label: const Center(child: Text('GST Total'))),
                 GridColumn(
-                    columnName: User.totalKey,
+                    columnName: Invoice.totalKey,
                     label: const Center(child: Text('Total'))),
                 GridColumn(
-                    columnName: User.paykey,
+                    columnName: Invoice.paykey,
                     label: const Center(child: Text('Out Standing'))),
 
                 // Add more columns as needed
@@ -131,19 +136,21 @@ class _InvoiceSearchPageState extends State<InvoiceSearchPage> {
 class InvoiceDataSource extends DataGridSource {
   List<DataGridRow> _customersData = [];
 
-  InvoiceDataSource({required List<User> invoiceData}) {
+  InvoiceDataSource({required List<Invoice> invoiceData}) {
     _customersData = invoiceData
         .map<DataGridRow>((e) => DataGridRow(cells: [
-              DataGridCell(columnName: User.invoiceIdKey, value: e.invoiceId),
               DataGridCell(
-                  columnName: User.customerNameKey, value: e.customerName),
-              DataGridCell(columnName: User.customerIdKey, value: e.customerId),
+                  columnName: Invoice.invoiceIdKey, value: e.invoiceId),
               DataGridCell(
-                  columnName: User.createdDateKey, value: e.createdDate),
-              DataGridCell(columnName: User.netKey, value: e.totalNetPrice),
-              DataGridCell(columnName: User.gstKey, value: e.totalGstPrice),
-              DataGridCell(columnName: User.totalKey, value: e.total),
-              DataGridCell(columnName: User.paykey, value: e.toPay),
+                  columnName: Invoice.customerNameKey, value: e.customerName),
+              DataGridCell(
+                  columnName: Invoice.customerIdKey, value: e.customerId),
+              DataGridCell(
+                  columnName: Invoice.createdDateKey, value: e.createdDate),
+              DataGridCell(columnName: Invoice.netKey, value: e.totalNetPrice),
+              DataGridCell(columnName: Invoice.gstKey, value: e.totalGstPrice),
+              DataGridCell(columnName: Invoice.totalKey, value: e.total),
+              DataGridCell(columnName: Invoice.paykey, value: e.toPay),
             ]))
         .toList();
   }
@@ -156,37 +163,37 @@ class InvoiceDataSource extends DataGridSource {
     // TODO: implement buildRow
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((e) {
-      if (e.columnName == User.createdDateKey) {
+      if (e.columnName == Invoice.createdDateKey) {
         return Container(
           alignment: Alignment.center,
-          padding: const EdgeInsets.all(4.0),
+          padding: Const.tableValuesPadding,
           child: Text(
             MyFormat.formatDate(e.value),
-            style: const TextStyle(fontSize: 13.0),
+            style: Const.tableValuesTextStyle,
           ),
         );
       }
 
-      if (e.columnName == User.netKey ||
-          e.columnName == User.gstKey ||
-          e.columnName == User.totalKey ||
-          e.columnName == User.paykey) {
+      if (e.columnName == Invoice.netKey ||
+          e.columnName == Invoice.gstKey ||
+          e.columnName == Invoice.totalKey ||
+          e.columnName == Invoice.paykey) {
         return Container(
           alignment: Alignment.centerRight,
-          padding: const EdgeInsets.all(4.0),
+          padding: Const.tableValuesPadding,
           child: Text(
             MyFormat.formatCurrency(e.value),
-            style: const TextStyle(fontSize: 13.0),
+            style: Const.tableValuesTextStyle,
           ),
         );
       }
 
       return Container(
         alignment: Alignment.center,
-        padding: const EdgeInsets.all(4.0),
+        padding: Const.tableValuesPadding,
         child: Text(
           e.value.toString(),
-          style: const TextStyle(fontSize: 13.0),
+          style: Const.tableValuesTextStyle,
         ),
       );
     }).toList());

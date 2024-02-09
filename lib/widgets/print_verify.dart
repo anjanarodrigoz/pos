@@ -23,10 +23,10 @@ class PrintVerify extends StatelessWidget {
       required this.onViewPressed,
       required this.onEmailPressed});
 
-  final User invoice;
-  final Function(Printer printer, User invoice) onPrintPressed;
-  final Function(User invoice) onEmailPressed;
-  final Function(User invoice) onViewPressed;
+  final Invoice invoice;
+  final Function(Printer printer, Invoice invoice) onPrintPressed;
+  final Function(Invoice invoice) onEmailPressed;
+  final Function(Invoice invoice) onViewPressed;
 
   final _formKey = GlobalKey<FormState>();
 

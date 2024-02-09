@@ -15,7 +15,7 @@ class InvoiceDraftController extends GetxController {
   RxList<String> comments = <String>[].obs;
   RxList<Cart> cartList = <Cart>[].obs;
   Function? disposeListen;
-  User? copyInvoice;
+  Invoice? copyInvoice;
   var netTotal = 0.0.obs;
   var gstTotal = 0.0.obs;
   var cartTotal = 0.0;
@@ -92,7 +92,7 @@ class InvoiceDraftController extends GetxController {
             isPostedItem: cart.isPostedItem))
         .toList();
 
-    User invoice = User(
+    Invoice invoice = Invoice(
         email: customer.email ?? '',
         customerMobile: customer.mobileNumber,
         invoiceId: invoiceId.value,

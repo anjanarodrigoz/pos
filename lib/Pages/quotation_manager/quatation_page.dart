@@ -32,7 +32,7 @@ class QuotationPage extends StatelessWidget {
 
   QuotationPage({super.key, required this.invoiceId});
 
-  late User invoice;
+  late Invoice invoice;
   late BuildContext context;
 
   @override
@@ -93,7 +93,7 @@ class QuotationPage extends StatelessWidget {
   }
 
   Future<void> viewInvoice(invoice) async {
-    User oldInvoice = invoice.copyWith();
+    Invoice oldInvoice = invoice.copyWith();
     final file = await PdfInvoiceApi.generateInvoicePDF(oldInvoice,
         invoiceType: InvoiceType.quotation);
     await PdfApi.openFile(file);
@@ -169,7 +169,7 @@ class QuotationPage extends StatelessWidget {
   }
 
   void printInvoice() async {
-    User oldInvoice = invoice.copyWith();
+    Invoice oldInvoice = invoice.copyWith();
 
     showDialog(
         context: context,
@@ -177,15 +177,15 @@ class QuotationPage extends StatelessWidget {
           return Dialog(
             child: PrintVerify(
               invoice: oldInvoice,
-              onPrintPressed: (Printer printer, User invoice) async {
+              onPrintPressed: (Printer printer, Invoice invoice) async {
                 await PdfInvoiceApi.printInvoice(invoice,
                     printer: printer, invoiceType: InvoiceType.quotation);
               },
-              onEmailPressed: (User invoice) async {
+              onEmailPressed: (Invoice invoice) async {
                 await EmailSender.showEmailSendingDialog(
                     context, invoice, InvoiceType.quotation);
               },
-              onViewPressed: (User invoice) {
+              onViewPressed: (Invoice invoice) {
                 viewInvoice(invoice);
               },
             ),

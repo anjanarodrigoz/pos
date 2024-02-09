@@ -6,6 +6,7 @@ import 'package:pos/Pages/main_window.dart';
 import 'package:pos/database/customer_db_service.dart';
 import 'package:pos/models/address.dart';
 import 'package:pos/theme/t_colors.dart';
+import 'package:pos/utils/constant.dart';
 import 'package:pos/utils/val.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -63,21 +64,21 @@ class _CustomerPageState extends State<CustomerPage> {
             onPressed: () async {
               Get.offAll(const MainWindow());
             },
-            icon: Icon(Icons.arrow_back_outlined)),
+            icon: const Icon(Icons.arrow_back_outlined)),
         title: Text(
           'Customers',
           style: TStyle.titleBarStyle,
         ),
       ),
       body: Container(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           PosButton(
               text: '+ New Customer',
               onPressed: () {
                 Get.to(const CustomerFormPage());
               }),
-          SizedBox(
+          const SizedBox(
             height: 30.0,
           ),
           Expanded(
@@ -88,7 +89,7 @@ class _CustomerPageState extends State<CustomerPage> {
               allowColumnsResizing: true,
               showFilterIconOnHover: true,
               columnWidthMode: ColumnWidthMode.auto,
-              rowHeight: 30.0,
+              rowHeight: Const.tableRowHeight,
               source: customerDataSource,
               onCellTap: ((details) {
                 if (details.rowColumnIndex.rowIndex != 0) {
@@ -103,28 +104,28 @@ class _CustomerPageState extends State<CustomerPage> {
               columns: [
                 GridColumn(
                     columnName: Customer.idKey,
-                    label: Center(child: const Text('ID'))),
+                    label: const Center(child: Text('ID'))),
                 GridColumn(
                     columnName: Customer.firstNameKey,
-                    label: Center(child: const Text('First Name'))),
+                    label: const Center(child: Text('First Name'))),
                 GridColumn(
                     columnName: Customer.lastNameKey,
-                    label: Center(child: const Text('Last Name'))),
+                    label: const Center(child: Text('Last Name'))),
                 GridColumn(
                     columnName: Customer.mobileNumberKey,
-                    label: Center(child: const Text('Mobile Number'))),
+                    label: const Center(child: Text('Mobile Number'))),
                 GridColumn(
                     columnName: Customer.emailKey,
-                    label: Center(child: const Text('Email'))),
+                    label: const Center(child: Text('Email'))),
                 GridColumn(
                     columnName: Address.areaCodeKey,
-                    label: Center(child: const Text('Area Code'))),
+                    label: const Center(child: Text('Area Code'))),
                 GridColumn(
                     columnName: Address.cityKey,
-                    label: Center(child: const Text('City'))),
+                    label: const Center(child: Text('City'))),
                 GridColumn(
                     columnName: Address.postalCodeKey,
-                    label: Center(child: const Text('Postal Code'))),
+                    label: const Center(child: Text('Postal Code'))),
 
                 // Add more columns as needed
               ],
@@ -177,11 +178,8 @@ class CustomerDataSource extends DataGridSource {
         cells: row.getCells().map<Widget>((e) {
       return Container(
         alignment: Alignment.center,
-        padding: const EdgeInsets.all(4.0),
-        child: Text(
-          e.value.toString(),
-          style: const TextStyle(fontSize: 13.0),
-        ),
+        padding: Const.tableValuesPadding,
+        child: Text(e.value.toString(), style: Const.tableValuesTextStyle),
       );
     }).toList());
   }

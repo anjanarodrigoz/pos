@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pos/Pages/supply_invoice_manager/supply_all_invoice.dart';
 import 'package:pos/Pages/supply_invoice_manager/supply_invoice_view.dart';
-import 'package:pos/database/supplyer_invoice_db_service.dart';
 import 'package:pos/models/extra_charges.dart';
 import 'package:pos/widgets/comments_widget.dart';
 import 'package:pos/widgets/extra_charge_widget.dart';
@@ -86,7 +85,7 @@ class SupplyInvoiceDraftPage extends StatelessWidget {
               ],
             ),
           ),
-          Column(
+          const Column(
             children: [
               Expanded(child: SupplyInvoiceView()),
             ],

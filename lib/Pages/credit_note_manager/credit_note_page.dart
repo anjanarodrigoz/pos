@@ -23,24 +23,27 @@ import '../../theme/t_colors.dart';
 import '../../widgets/print_verify.dart';
 import 'creditInvoicePage.dart';
 
-class CreditNotePage extends StatelessWidget {
+class CreditNotePage extends StatefulWidget {
   final String invoiceId;
 
-  CreditNotePage({super.key, required this.invoiceId});
+  const CreditNotePage({super.key, required this.invoiceId});
 
-  late User invoice;
-  late BuildContext context;
+  @override
+  State<CreditNotePage> createState() => _CreditNotePageState();
+}
+
+class _CreditNotePageState extends State<CreditNotePage> {
+  late Invoice invoice;
 
   @override
   Widget build(BuildContext context) {
-    this.context = context;
-    invoice = CreditNoteDB().getInvoice(invoiceId);
+    invoice = CreditNoteDB().getInvoice(widget.invoiceId);
 
     return Scaffold(
         appBar: AppBar(
           toolbarHeight: 40.0,
           backgroundColor: TColors.blue,
-          title: Text('Credit Note #$invoiceId'),
+          title: Text('Credit Note #${widget.invoiceId}'),
           leading: IconButton(
               onPressed: () {
                 Get.offAll(AllCreditNotePage());
@@ -64,12 +67,12 @@ class CreditNotePage extends StatelessWidget {
                   onPressed: () async => printInvoice(),
                   text: 'Print',
                 ),
-                // PosButton(
-                //   onPressed: () async =>
-                //       await EmailSender.showEmailSendingDialog(
-                //           context, invoice, InvoiceType.creditNote),
-                //   text: 'Email',
-                // ),
+                PosButton(
+                  onPressed: () {
+                    markPaid();
+                  },
+                  text: 'Mark as Paid',
+                ),
                 const SizedBox(
                   height: 50,
                 ),
@@ -87,7 +90,7 @@ class CreditNotePage extends StatelessWidget {
   }
 
   Future<void> viewInvoice(invoice) async {
-    User oldInvoice = invoice.copyWith();
+    Invoice oldInvoice = invoice.copyWith();
     final file = await PdfInvoiceApi.generateInvoicePDF(oldInvoice,
         invoiceType: InvoiceType.creditNote);
     await PdfApi.openFile(file);
@@ -159,11 +162,11 @@ class CreditNotePage extends StatelessWidget {
             lastName: ''),
         wantToUpdate: true,
         copyInvoice: invoice));
-    Get.offAll(CreditDraftPage());
+    Get.offAll(const CreditDraftPage());
   }
 
   void printInvoice() async {
-    User oldInvoice = invoice.copyWith();
+    Invoice oldInvoice = invoice.copyWith();
 
     showDialog(
         context: context,
@@ -171,18 +174,44 @@ class CreditNotePage extends StatelessWidget {
           return Dialog(
             child: PrintVerify(
               invoice: oldInvoice,
-              onPrintPressed: (Printer printer, User invoice) async {
+              onPrintPressed: (Printer printer, Invoice invoice) async {
                 await PdfInvoiceApi.printInvoice(invoice,
                     printer: printer, invoiceType: InvoiceType.creditNote);
               },
-              onEmailPressed: (User invoice) async {
+              onEmailPressed: (Invoice invoice) async {
                 await EmailSender.showEmailSendingDialog(
                     context, invoice, InvoiceType.creditNote);
               },
-              onViewPressed: (User invoice) {
+              onViewPressed: (Invoice invoice) {
                 viewInvoice(invoice);
               },
             ),
+          );
+        });
+  }
+
+  void markPaid() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Get.back();
+                  },
+                  child: const Text('No')),
+              TextButton(
+                  onPressed: () async {
+                    invoice.isPaid = true;
+                    await CreditNoteDB().updateInvoice(invoice);
+                    Get.back();
+                    setState(() {});
+                  },
+                  child: const Text('Yes'))
+            ],
+            title: const Text('Mark as paid'),
+            content: const Text('Are you sure it\'s paid ?'),
           );
         });
   }

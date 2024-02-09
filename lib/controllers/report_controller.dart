@@ -93,13 +93,13 @@ class ReportController extends GetxController {
         await generateItemsSummeryReport(reportType);
       case ReportType.stockRequired:
         await generateStockRequiredReport();
-      case ReportType.stockQuantity:
-        await generateStockQuantityReport();
+      case ReportType.balancedStock:
+        await generateBalancedStockReport();
       case ReportType.customerDetails:
         await generateCustomerDetailsReport();
       case ReportType.outstanding:
         await generateCustomerOutstandingReport();
-      case ReportType.stockValue:
+      case ReportType.stockSellingValue:
         await generateStockValueReport();
       case ReportType.retrunNotes:
         await generateReturnNoteReport();
@@ -127,7 +127,7 @@ class ReportController extends GetxController {
   */
 
   Future<void> generateInvoiceReport(ReportType reportType) async {
-    List<User> searchInvoiceList = [];
+    List<Invoice> searchInvoiceList = [];
 
     isRequiredTableSummery = true;
 
@@ -152,13 +152,13 @@ class ReportController extends GetxController {
     columns.value = {
       createdDateKey: 'Date',
       invoiceIdKey: 'Invoice Id',
-      customerNameKey: 'Customer Name',
-      customerIdKey: 'Customer ID',
-      customerMobileKey: 'Customer Mobile',
+      customerNameKey: 'Name',
+      customerIdKey: 'ID',
+      customerMobileKey: 'Mobile',
       netKey: 'Net Total',
       gstKey: 'Gst Total',
       totalKey: 'Total',
-      paykey: 'To Pay',
+      if (reportType != ReportType.quote) paykey: 'To Pay',
     }.entries.map(
       (e) {
         if (e.key == customerIdKey || e.key == customerNameKey) {
@@ -173,7 +173,6 @@ class ReportController extends GetxController {
             e.key == totalKey ||
             e.key == paykey) {
           return GridColumn(
-              width: 100.0,
               allowFiltering: false,
               columnName: e.key,
               label: Center(child: Text(e.value)));
@@ -196,7 +195,7 @@ class ReportController extends GetxController {
               netKey: invoice.totalNetPrice,
               gstKey: invoice.totalGstPrice,
               totalKey: invoice.total,
-              paykey: invoice.toPay,
+              if (reportType != ReportType.quote) paykey: invoice.toPay,
             })
         .toList()
         .map((e) => DataGridRow(
@@ -230,7 +229,7 @@ class ReportController extends GetxController {
 
   Future<void> generateSummeryReport() async {
     isRequiredTableSummery = false;
-    List<User> searchInvoiceList =
+    List<Invoice> searchInvoiceList =
         await InvoiceDB().searchInvoiceByDate(dateTimeRange, paidStatus);
     if (searchInvoiceList.isEmpty) {
       isrecordAvaliable = false;
@@ -250,7 +249,7 @@ class ReportController extends GetxController {
     double bankTrnasfer = 0.00;
     double totalReceipts = 0.00;
 
-    for (User invoice in searchInvoiceList) {
+    for (Invoice invoice in searchInvoiceList) {
       invoiceNet += double.parse(invoice.totalNetPrice.toStringAsFixed(2));
       invoiceGst += invoice.totalGstPrice;
       totalSale += invoice.total;
@@ -269,7 +268,7 @@ class ReportController extends GetxController {
           case Paymethod.cheque:
             chaques += payment.amount;
 
-          case Paymethod.pdCash:
+          case Paymethod.pdCheque:
             chaques += payment.amount;
         }
       }
@@ -298,6 +297,7 @@ class ReportController extends GetxController {
       ["Credit Note Net", creditNotesNet, "Credit Card", creditCard],
       ["Credit Note GST", creditNotesGst, "Bank Transfer", bankTrnasfer],
       ["Total Sale", totalSale, "Total Receipts", totalReceipts],
+      ["Balance", totalSale - totalReceipts, "", ""],
     ]
         .map((item) => {
               customerSaleKey: item[0],
@@ -396,14 +396,13 @@ class ReportController extends GetxController {
     }
         .entries
         .map(
-          (e) => e.key == itemIdKey
+          (e) => (e.key == itemIdKey || e.key == nameKey)
               ? GridColumn(
                   allowFiltering: true,
                   columnName: e.key,
                   label: Center(child: Text(e.value)))
               : (e.key == netKey || e.key == gstKey || e.key == totalKey)
                   ? GridColumn(
-                      width: 120.0,
                       allowFiltering: false,
                       columnName: e.key,
                       label: Center(child: Text(e.value)))
@@ -608,7 +607,7 @@ class ReportController extends GetxController {
   
    */
 
-  Future<void> generateStockQuantityReport() async {
+  Future<void> generateBalancedStockReport() async {
     isRequiredTableSummery = false;
     List<Item> itemList = [];
 
@@ -728,12 +727,13 @@ class ReportController extends GetxController {
  */
 
   Future<void> generateCustomerOutstandingReport() async {
-    List<User> searchInvoiceList = [];
+    List<Invoice> searchInvoiceList = [];
 
     isRequiredTableSummery = true;
 
-    searchInvoiceList = await InvoiceDB()
-        .searchInvoiceByDate(dateTimeRange, ReportPaymentFilter.notPaid);
+    searchInvoiceList = await InvoiceDB().searchInvoiceByDate(
+        dateTimeRange, ReportPaymentFilter.notPaid,
+        getAllInvoice: true);
 
     if (searchInvoiceList.isEmpty) {
       isrecordAvaliable = false;
@@ -743,13 +743,11 @@ class ReportController extends GetxController {
     isrecordAvaliable = true;
 
     columns.value = {
-      createdDateKey: createdDateKey,
-      invoiceIdKey: invoiceIdKey,
       customerNameKey: customerNameKey,
       customerIdKey: customerIdKey,
       customerMobileKey: customerMobileKey,
-      netKey: netKey,
-      gstKey: gstKey,
+      invoiceIdKey: invoiceIdKey,
+      createdDateKey: createdDateKey,
       totalKey: totalKey,
       paykey: paykey,
       outstanigKey: outstanigKey
@@ -767,7 +765,6 @@ class ReportController extends GetxController {
             e.key == totalKey ||
             e.key == paykey) {
           return GridColumn(
-              width: 100.0,
               allowFiltering: false,
               columnName: e.key,
               label: Center(child: Text(e.value)));
@@ -782,13 +779,11 @@ class ReportController extends GetxController {
 
     rows.value = searchInvoiceList
         .map((invoice) => {
-              createdDateKey: invoice.createdDate,
-              invoiceIdKey: invoice.invoiceId,
               customerNameKey: invoice.customerName,
               customerIdKey: invoice.customerId,
               customerMobileKey: invoice.customerMobile,
-              netKey: invoice.totalNetPrice,
-              gstKey: invoice.totalGstPrice,
+              invoiceIdKey: invoice.invoiceId,
+              createdDateKey: invoice.createdDate,
               totalKey: invoice.total,
               paykey: invoice.toPay,
               outstanigKey:
@@ -1001,4 +996,8 @@ class ReportController extends GetxController {
   }
 
   generateItemInvoiceReport() {}
+
+  bool isDateFilter() {
+    return !(dateTimeRange.start == DateTime(0));
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pos/models/invoice_item.dart';
+import 'package:pos/utils/constant.dart';
 import 'package:pos/widgets/invoice_summery_card.dart';
 import 'package:pos/widgets/outstanding_date_widget.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -14,7 +15,7 @@ import '../../utils/val.dart';
 import '../../widgets/paid_status_widget.dart';
 
 class SaveInvoiceViewPage extends StatefulWidget {
-  User invoice;
+  Invoice invoice;
 
   SaveInvoiceViewPage({super.key, required this.invoice});
 
@@ -86,7 +87,7 @@ class _SaveInvoiceViewPageState extends State<SaveInvoiceViewPage> {
           gridLinesVisibility: GridLinesVisibility.both,
           headerGridLinesVisibility: GridLinesVisibility.both,
           allowColumnsResizing: true,
-          rowHeight: 27.0,
+          rowHeight: Const.tableRowHeight,
           columnWidthMode: ColumnWidthMode.auto,
           allowSwiping: true,
           source: generateDataRowList(),
