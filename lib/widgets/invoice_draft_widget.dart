@@ -1,17 +1,16 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pos/controllers/credit_draft_controller.dart';
+
 import 'package:pos/controllers/invoice_draft_contorller.dart';
-import 'package:pos/controllers/quote_draft_controller.dart';
+
 import 'package:pos/data_sources/invoiceDataSource.dart';
 import 'package:pos/database/cart_db_service.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/customer.dart';
 import 'package:pos/models/extra_charges.dart';
 import 'package:pos/utils/alert_message.dart';
+import 'package:pos/utils/constant.dart';
 import '../models/invoice_row.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../models/cart.dart';
@@ -21,11 +20,12 @@ import '../utils/val.dart';
 import 'pos_text_form_field.dart';
 
 class InvoiceDraftWidget extends StatefulWidget {
-  final invoiceController;
-  InvoiceDraftWidget({
+  const InvoiceDraftWidget({
     super.key,
     required this.invoiceController,
   });
+
+  final invoiceController;
 
   @override
   State<InvoiceDraftWidget> createState() => _InvoiceDraftWidgetState();
@@ -39,6 +39,7 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
   final dbService = CartDB();
   InvoiceDataSource invoiceDataSource = InvoiceDataSource(invoiceData: []);
   late String invoiceId;
+  @override
   late BuildContext context;
 
   @override
@@ -55,7 +56,7 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
     this.context = context;
     return Container(
       width: MediaQuery.of(context).size.width - 200,
-      padding: EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(10.0),
       child: Column(
         children: [
           Card(
@@ -141,7 +142,8 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
         ),
         Text(
           value,
-          style: TextStyle(color: TColors.blue, fontWeight: FontWeight.bold),
+          style:
+              const TextStyle(color: TColors.blue, fontWeight: FontWeight.bold),
         )
       ],
     );
@@ -153,7 +155,7 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
               gridLinesVisibility: GridLinesVisibility.both,
               headerGridLinesVisibility: GridLinesVisibility.both,
               allowColumnsResizing: true,
-              rowHeight: 27.0,
+              rowHeight: Const.tableRowHeight,
               columnWidthMode: ColumnWidthMode.auto,
               allowSwiping: true,
               onCellDoubleTap: (details) {
@@ -178,26 +180,26 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
               columns: [
                 GridColumn(
                     columnName: InvoiceRow.itemIdKey,
-                    label: Center(child: const Text('Item ID'))),
+                    label: const Center(child: Text('Item ID'))),
                 GridColumn(
                     maximumWidth: 300.0,
                     columnName: InvoiceRow.nameKey,
-                    label: Center(child: const Text('Item Name'))),
+                    label: const Center(child: Text('Item Name'))),
                 GridColumn(
                     columnName: InvoiceRow.qtyKey,
-                    label: Center(child: const Text('Qty'))),
+                    label: const Center(child: Text('Qty'))),
                 GridColumn(
                     columnName: InvoiceRow.netPriceKey,
-                    label: Center(child: const Text('Net Price'))),
+                    label: const Center(child: Text('Net Price'))),
                 GridColumn(
                     columnName: InvoiceRow.gstKey,
-                    label: Center(child: const Text('GST'))),
+                    label: const Center(child: Text('GST'))),
                 GridColumn(
                     columnName: InvoiceRow.itemPriceKey,
-                    label: Center(child: const Text('Item Price'))),
+                    label: const Center(child: Text('Item Price'))),
                 GridColumn(
                     columnName: InvoiceRow.totalKey,
-                    label: Center(child: const Text('Total'))),
+                    label: const Center(child: Text('Total'))),
 
                 // Add more columns as needed
               ],
@@ -346,15 +348,15 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
                           }
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       PosTextFormField(
                         width: 100.0,
                         controller: totalPriceController,
                         labelText: 'Total Price',
-                        keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
                               RegExp(r'^\d*\.?\d*')),
@@ -370,7 +372,7 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
                           }
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       PosTextFormField(
@@ -392,7 +394,7 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
                   labelText: 'Comment',
                   controller: commentController,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 5.0,
                 ),
                 Row(
@@ -500,8 +502,8 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
                         width: 100.0,
                         labelText: 'Net price',
                         controller: netPriceController,
-                        keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
                               RegExp(r'^\d*\.?\d*')),
@@ -588,7 +590,7 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
                 }
                 Navigator.of(context).pop();
               },
-              child: Text('Update Item'),
+              child: const Text('Update Item'),
             ),
           ],
         );

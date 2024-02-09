@@ -10,15 +10,18 @@ import 'package:pos/widgets/item_select_widget.dart';
 import '../../theme/t_colors.dart';
 import '../../widgets/pos_button.dart';
 
-class CreditDraftPage extends StatelessWidget {
-  CreditDraftPage({super.key});
+class CreditDraftPage extends StatefulWidget {
+  const CreditDraftPage({super.key});
+
+  @override
+  State<CreditDraftPage> createState() => _CreditDraftPageState();
+}
+
+class _CreditDraftPageState extends State<CreditDraftPage> {
   final CreditDraftController _controller = Get.find<CreditDraftController>();
-  late final BuildContext context;
 
   @override
   Widget build(BuildContext context) {
-    this.context = context;
-
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 40.0,

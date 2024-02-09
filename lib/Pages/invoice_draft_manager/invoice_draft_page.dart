@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:get/get.dart';
 import 'package:pos/Pages/invoice_draft_manager/invoice_item_select_page.dart';
 import 'package:pos/Pages/invoice_manager/invoice_page.dart';
 import 'package:pos/controllers/invoice_draft_contorller.dart';
 import 'package:pos/database/cart_db_service.dart';
-import 'package:pos/database/extra_charges_db_service.dart';
-import 'package:pos/database/invoice_db_service.dart';
+
 import 'package:pos/models/extra_charges.dart';
-import 'package:pos/utils/val.dart';
+
 import 'package:pos/widgets/comments_widget.dart';
 import 'package:pos/widgets/extra_charge_widget.dart';
-import '../../models/invoice.dart';
+
 import '../../theme/t_colors.dart';
-import '../../utils/my_format.dart';
+
 import '../../widgets/pos_button.dart';
 import '../../widgets/invoice_draft_widget.dart';
 
@@ -64,7 +63,7 @@ class InvoiceDraftPage extends StatelessWidget {
                     onPressed: () {
                       addComments();
                     }),
-                SizedBox(height: 50.0),
+                const SizedBox(height: 50.0),
                 PosButton(
                   text: 'Close Draft',
                   onPressed: () async {

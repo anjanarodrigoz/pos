@@ -1,4 +1,4 @@
-enum Paymethod { cash, card, bankTransfer, cheque, pdCash }
+enum Paymethod { cash, card, bankTransfer, cheque, pdCheque }
 
 class Payment {
   static const String payIdKey = 'payId';
@@ -74,8 +74,8 @@ extension PaymethodExtension on Paymethod {
         return 'Bank Transfer';
       case Paymethod.cheque:
         return 'Cheque';
-      case Paymethod.pdCash:
-        return 'PD Cash';
+      case Paymethod.pdCheque:
+        return 'PD Cheque';
       default:
         throw ArgumentError('Invalid enum value: $this');
     }

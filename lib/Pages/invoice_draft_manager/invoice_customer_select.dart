@@ -6,6 +6,7 @@ import 'package:pos/database/customer_db_service.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/alert_message.dart';
+import 'package:pos/utils/constant.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../models/address.dart';
 import '../../models/customer.dart';
@@ -14,7 +15,7 @@ import '../../models/invoice.dart';
 class InvoiceCustomerSelectPage extends StatelessWidget {
   final DataGridController _dataGridController = DataGridController();
   late List<Customer> customerList;
-  User? invoice;
+  Invoice? invoice;
   InvoiceType invoiceType;
   CustomerDataSource customerDataSource = CustomerDataSource(customersData: []);
   InvoiceCustomerSelectPage(
@@ -45,7 +46,7 @@ class InvoiceCustomerSelectPage extends StatelessWidget {
                   gridLinesVisibility: GridLinesVisibility.both,
                   headerGridLinesVisibility: GridLinesVisibility.both,
                   allowFiltering: true,
-                  rowHeight: 30.0,
+                  rowHeight: Const.tableRowHeight,
                   allowColumnsResizing: true,
                   showFilterIconOnHover: true,
                   columnWidthMode: ColumnWidthMode.auto,

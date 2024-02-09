@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:pos/Pages/main_window.dart';
 import 'package:pos/database/invoice_db_service.dart';
-import 'package:pos/models/address.dart';
-import 'package:pos/theme/t_colors.dart';
+import 'package:pos/utils/constant.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/utils/val.dart';
 import 'package:pos/widgets/pos_appbar.dart';
-import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/verify_dialog.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../models/invoice.dart';
-import '../../models/payment.dart';
 import '../../models/payment.dart';
 
 class PaymentPage extends StatefulWidget {
@@ -59,7 +55,7 @@ class _PaymentPageState extends State<PaymentPage> {
               gridLinesVisibility: GridLinesVisibility.both,
               headerGridLinesVisibility: GridLinesVisibility.both,
               allowFiltering: true,
-              rowHeight: 30.0,
+              rowHeight: Const.tableRowHeight,
               allowColumnsResizing: true,
               showFilterIconOnHover: true,
               columnWidthMode: ColumnWidthMode.auto,
@@ -89,7 +85,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     columnName: Payment.payIdKey,
                     label: const Center(child: Text('Pay ID'))),
                 GridColumn(
-                    columnName: User.invoiceIdKey,
+                    columnName: Invoice.invoiceIdKey,
                     label: const Center(child: Text('Invoice ID'))),
 
                 GridColumn(
@@ -102,11 +98,12 @@ class _PaymentPageState extends State<PaymentPage> {
                     columnName: Payment.commentKey,
                     label: const Center(child: Text('Comment'))),
                 GridColumn(
-                    columnName: User.customerNameKey,
-                    label: const Center(child: Text('Customer Name'))),
+                    columnName: Invoice.customerNameKey,
+                    label: const Center(child: Text('Name'))),
                 GridColumn(
-                    columnName: User.customerIdKey,
-                    label: const Center(child: Text('Customer ID'))),
+                    width: 80.0,
+                    columnName: Invoice.customerIdKey,
+                    label: const Center(child: Text('ID'))),
                 // Add more columns as needed
               ],
             ),
@@ -117,11 +114,11 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   Future<void> getPaymentData() async {
-    List<User> invoices = await _databaseService.getAllInvoices();
+    List<Invoice> invoices = await _databaseService.getAllInvoices();
 
     _payments = [];
 
-    for (User invoice in invoices) {
+    for (Invoice invoice in invoices) {
       for (Payment payment in invoice.payments ?? []) {
         _payments.add(Payment(
             date: payment.date,
@@ -151,7 +148,7 @@ class _PaymentPageState extends State<PaymentPage> {
               onContinue: () async {
                 await InvoiceDB()
                     .removeInvoicePayment(invoiceId, payId, context);
-                Navigator.of(context).pop();
+                Get.back();
               },
               continueText: 'Delete',
               verifyText: payId,
@@ -168,15 +165,17 @@ class PaymentDataSource extends DataGridSource {
               DataGridCell(columnName: Payment.dateKey, value: e.date),
               DataGridCell(columnName: Payment.timeKey, value: e.date),
               DataGridCell(columnName: Payment.payIdKey, value: e.payId),
-              DataGridCell(columnName: User.invoiceIdKey, value: e.invoiceId),
+              DataGridCell(
+                  columnName: Invoice.invoiceIdKey, value: e.invoiceId),
               DataGridCell(
                   columnName: Payment.paymethodKey,
                   value: e.paymethod.displayName),
               DataGridCell(columnName: Payment.amountKey, value: e.amount),
               DataGridCell(columnName: Payment.commentKey, value: e.comment),
               DataGridCell(
-                  columnName: User.customerNameKey, value: e.customerName),
-              DataGridCell(columnName: User.customerIdKey, value: e.customerId),
+                  columnName: Invoice.customerNameKey, value: e.customerName),
+              DataGridCell(
+                  columnName: Invoice.customerIdKey, value: e.customerId),
             ]))
         .toList();
   }
@@ -192,40 +191,31 @@ class PaymentDataSource extends DataGridSource {
       if (e.columnName == Payment.dateKey) {
         return Container(
           alignment: Alignment.center,
-          padding: const EdgeInsets.all(4.0),
-          child: Text(
-            MyFormat.formatDateOne(e.value),
-            style: const TextStyle(fontSize: 13.0),
-          ),
+          padding: Const.tableValuesPadding,
+          child: Text(MyFormat.formatDateOne(e.value),
+              style: Const.tableValuesTextStyle),
         );
       }
       if (e.columnName == Payment.timeKey) {
         return Container(
           alignment: Alignment.center,
-          padding: const EdgeInsets.all(4.0),
-          child: Text(
-            MyFormat.formatTime(e.value),
-            style: const TextStyle(fontSize: 13.0),
-          ),
+          padding: Const.tableValuesPadding,
+          child: Text(MyFormat.formatTime(e.value),
+              style: Const.tableValuesTextStyle),
         );
       }
       if (e.columnName == Payment.amountKey) {
         return Container(
           alignment: Alignment.centerRight,
-          padding: const EdgeInsets.all(4.0),
-          child: Text(
-            MyFormat.formatCurrency(e.value),
-            style: const TextStyle(fontSize: 13.0),
-          ),
+          padding: Const.tableValuesPadding,
+          child: Text(MyFormat.formatCurrency(e.value),
+              style: Const.tableValuesTextStyle),
         );
       }
       return Container(
         alignment: Alignment.center,
-        padding: const EdgeInsets.all(4.0),
-        child: Text(
-          e.value.toString(),
-          style: const TextStyle(fontSize: 13.0),
-        ),
+        padding: Const.tableValuesPadding,
+        child: Text(e.value.toString(), style: Const.tableValuesTextStyle),
       );
     }).toList());
   }

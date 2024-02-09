@@ -11,11 +11,13 @@ import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class FilterDialog extends StatefulWidget {
   final bool showPaidStatus;
+  final bool showDatePicker;
   final ReportType reportType;
   final Map<String, String> title;
   const FilterDialog(
       {super.key,
       this.showPaidStatus = false,
+      this.showDatePicker = true,
       required this.reportType,
       required this.title});
 
@@ -53,48 +55,51 @@ class _FilterDialogState extends State<FilterDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Select Date Range',
-                  style: TextStyle(fontSize: 16),
-                ),
-                IconButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text('Select Date Range'),
-                          content: SizedBox(
-                            width: 500,
-                            height: 400.0,
-                            child: SfDateRangePicker(
-                              enableMultiView: true,
-                              onSelectionChanged: _onSelectionChanged,
-                              selectionMode: DateRangePickerSelectionMode.range,
+            if (widget.showDatePicker)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Select Date Range',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Select Date Range'),
+                            content: SizedBox(
+                              width: 500,
+                              height: 400.0,
+                              child: SfDateRangePicker(
+                                enableMultiView: true,
+                                onSelectionChanged: _onSelectionChanged,
+                                selectionMode:
+                                    DateRangePickerSelectionMode.range,
+                              ),
                             ),
-                          ),
-                          actions: [
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop(); // Close the dialog
-                              },
-                              child: Text('OK'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  iconSize: 30.0,
-                  color: TColors.blue,
-                  splashRadius: 25.0,
-                  icon: const Icon(Icons.date_range_rounded),
-                ),
-              ],
-            ),
+                            actions: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pop(); // Close the dialog
+                                },
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    iconSize: 30.0,
+                    color: TColors.blue,
+                    splashRadius: 25.0,
+                    icon: const Icon(Icons.date_range_rounded),
+                  ),
+                ],
+              ),
             if (_startDate != null)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -110,14 +115,14 @@ class _FilterDialogState extends State<FilterDialog> {
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
               ),
-            SizedBox(height: 20),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
+            const SizedBox(height: 20),
             if (widget.showPaidStatus)
               const Text(
                 'Select Paid Status',
                 style: TextStyle(fontSize: 16),
               ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             if (widget.showPaidStatus)
               Wrap(
                   children: ReportPaymentFilter.values
@@ -134,13 +139,13 @@ class _FilterDialogState extends State<FilterDialog> {
                                 },
                               ),
                               Text(filterPaymentType.name()),
-                              SizedBox(
+                              const SizedBox(
                                 width: 20,
                               )
                             ],
                           ))
                       .toList()),
-            SizedBox(
+            const SizedBox(
               height: 60.0,
             ),
             Align(

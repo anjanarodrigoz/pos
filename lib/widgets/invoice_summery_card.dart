@@ -7,7 +7,7 @@ import 'outstanding_date_widget.dart';
 import 'paid_status_widget.dart';
 
 class InvoiceSummeryCard extends StatelessWidget {
-  final User invoice;
+  final Invoice invoice;
 
   const InvoiceSummeryCard({super.key, required this.invoice});
 

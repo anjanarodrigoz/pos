@@ -16,32 +16,32 @@ class QuotationDB implements AbstractDB {
 
   QuotationDB._internal();
 
-  Future<List<User>> getAllInvoices() async {
+  Future<List<Invoice>> getAllInvoices() async {
     final List invoiceData = await _storage.getValues().toList() ?? [];
-    return invoiceData.map((data) => User.fromJson(data)).toList();
+    return invoiceData.map((data) => Invoice.fromJson(data)).toList();
   }
 
-  User getInvoice(String invoiceId) {
-    User invoice = User.fromJson(_storage.read(invoiceId));
+  Invoice getInvoice(String invoiceId) {
+    Invoice invoice = Invoice.fromJson(_storage.read(invoiceId));
     return invoice;
   }
 
-  Future<void> addInvoice(User invoice) async {
+  Future<void> addInvoice(Invoice invoice) async {
     await _storage.write(invoice.invoiceId, invoice.toJson());
   }
 
-  Future<void> updateInvoice(User updatedInvoice) async {
+  Future<void> updateInvoice(Invoice updatedInvoice) async {
     await _storage.write(updatedInvoice.invoiceId, updatedInvoice.toJson());
   }
 
-  Future<void> deleteInvoice(User invoice) async {
+  Future<void> deleteInvoice(Invoice invoice) async {
     _storage.remove(invoice.invoiceId);
   }
 
   String generateInvoiceId() {
     final storage = GetStorage();
-    final lastId = storage.read(DBVal.quatationId) ?? '1000';
-    final lastNumber = int.tryParse(lastId) ?? 1000;
+    final lastId = storage.read(DBVal.quatationId) ?? '0';
+    final lastNumber = int.tryParse(lastId) ?? 0;
 
     final nextNumber = lastNumber + 1;
     return '$nextNumber';
@@ -58,10 +58,10 @@ class QuotationDB implements AbstractDB {
     await GetStorage().remove(DBVal.quatationId);
   }
 
-  Stream<List<User>> getStreamInvoice() async* {
-    StreamController<List<User>> streamController =
-        StreamController<List<User>>();
-    List<User> invoiceList = await getAllInvoices();
+  Stream<List<Invoice>> getStreamInvoice() async* {
+    StreamController<List<Invoice>> streamController =
+        StreamController<List<Invoice>>();
+    List<Invoice> invoiceList = await getAllInvoices();
     streamController.add(invoiceList);
     _storage.listen(() async {
       invoiceList.clear();
@@ -73,9 +73,9 @@ class QuotationDB implements AbstractDB {
     yield* streamController.stream;
   }
 
-  Future<List<User>> searchInvoiceByDate(
+  Future<List<Invoice>> searchInvoiceByDate(
       DateTimeRange dateTimeRange, ReportPaymentFilter paidStatus) async {
-    List<User> allInvoice = await getAllInvoices();
+    List<Invoice> allInvoice = await getAllInvoices();
 
     if (paidStatus != ReportPaymentFilter.all) {
       bool isPaid = paidStatus == ReportPaymentFilter.paid;
@@ -97,7 +97,7 @@ class QuotationDB implements AbstractDB {
   @override
   Future<Map> backupData() async {
     final List quotData = await _storage.getValues().toList() ?? [];
-    final lastId = GetStorage().read(DBVal.quatationId) ?? '1000';
+    final lastId = GetStorage().read(DBVal.quatationId) ?? '0';
 
     return {DBVal.quatation: quotData, DBVal.quatationId: lastId};
   }
@@ -108,7 +108,7 @@ class QuotationDB implements AbstractDB {
     final lastId = json[DBVal.quatationId];
 
     for (var data in invoiceData) {
-      await addInvoice(User.fromJson(data));
+      await addInvoice(Invoice.fromJson(data));
     }
 
     saveLastId(lastId);

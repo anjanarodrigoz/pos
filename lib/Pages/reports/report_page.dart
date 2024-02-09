@@ -9,6 +9,7 @@ import 'package:pos/api/printer_manager.dart';
 import 'package:pos/api/report_pdf.dart';
 import 'package:pos/controllers/report_controller.dart';
 import 'package:pos/database/store_db.dart';
+import 'package:pos/utils/constant.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/printer_setup_buttton.dart';
@@ -53,87 +54,81 @@ class _ReportPageState extends State<ReportPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Text(
-                          MyFormat.formatDateTwo(
-                              controller.dateTimeRange.start),
-                          style: const TextStyle(fontSize: 14.0),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        if (!controller.checkDate())
-                          const Text(
-                            "-",
-                            style: TextStyle(fontSize: 14.0),
-                          ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        if (!controller.checkDate())
+                    if (controller.isDateFilter())
+                      Row(
+                        children: [
                           Text(
-                            MyFormat.formatDateTwo(controller.dateTimeRange.end
-                                .subtract(const Duration(days: 1))),
+                            MyFormat.formatDateTwo(
+                                controller.dateTimeRange.start),
                             style: const TextStyle(fontSize: 14.0),
                           ),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Text(
-                          controller.title.value.keys.first,
-                          style: const TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          controller.title.value.values.first,
-                          style: const TextStyle(
-                              fontSize: 14.0, fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          if (!controller.checkDate())
+                            const Text(
+                              "-",
+                              style: TextStyle(fontSize: 14.0),
+                            ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          if (!controller.checkDate())
+                            Text(
+                              MyFormat.formatDateTwo(controller
+                                  .dateTimeRange.end
+                                  .subtract(const Duration(days: 1))),
+                              style: const TextStyle(fontSize: 14.0),
+                            ),
+                        ],
+                      ),
+                    Text(
+                      '${controller.title.value.keys.first} - ${controller.title.value.values.first}',
+                      style: const TextStyle(
+                          fontSize: 14.0, fontWeight: FontWeight.bold),
                     ),
                     PosButton(
-                        color: Colors.yellow.shade900,
-                        height: 40.0,
-                        width: 150.0,
-                        text: 'Export',
-                        icon: Icons.picture_as_pdf_rounded,
-                        onPressed: () async {
-                          String companyName = StoreDB().getStore().companyName;
-                          String reportType = controller.title.value.keys.first;
-                          String reportTitle =
-                              controller.title.value.values.first;
-                          var pdf = await ReportPdf(
-                                  columns: controller.columns.value
-                                      .map((element) => element.columnName)
-                                      .toList(),
-                                  rows: _dataSource.effectiveRows
-                                      .map((DataGridRow row) => row
-                                          .getCells()
-                                          .map((DataGridCell e) =>
-                                              e.value.toString())
-                                          .toList())
-                                      .toList(),
-                                  companyName: companyName,
-                                  reportType: reportType,
-                                  reportTitle: reportTitle,
-                                  createdDate: DateTime.now(),
-                                  dateTimeRange: controller.dateTimeRange)
-                              .generatePDF();
+                      color: Colors.yellow.shade900,
+                      width: 70.0,
+                      height: 35.0,
+                      icon: Icons.picture_as_pdf_rounded,
+                      onPressed: () async {
+                        String companyName = StoreDB().getStore().companyName;
+                        String reportType = controller.title.value.keys.first;
+                        String reportTitle =
+                            controller.title.value.values.first;
+                        var pdf = await ReportPdf(
+                                columns: controller.columns.value
+                                    .map((element) => element.columnName)
+                                    .toList(),
+                                rows: _dataSource.effectiveRows
+                                    .map((DataGridRow row) => row
+                                        .getCells()
+                                        .map((DataGridCell e) =>
+                                            e.value.toString())
+                                        .toList())
+                                    .toList(),
+                                companyName: companyName,
+                                reportType: reportType,
+                                reportTitle: reportTitle,
+                                createdDate: DateTime.now(),
+                                dateTimeRange: controller.dateTimeRange)
+                            .generatePDF();
 
-                          await showExport(pdf, reportType, reportTitle);
-                        }),
+                        await showExport(pdf, reportType, reportTitle);
+                      },
+                      text: '',
+                    ),
                   ],
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
                 Expanded(
                   child: SfDataGrid(
                     key: pdfKey,
                     allowColumnsResizing: true,
-                    rowHeight: 40.0,
+                    rowHeight: Const.tableRowHeight,
                     controller: _dataGridController,
                     gridLinesVisibility: GridLinesVisibility.both,
                     headerGridLinesVisibility: GridLinesVisibility.both,
@@ -238,10 +233,10 @@ class DataSource extends DataGridSource {
       String summaryValue) {
     return Container(
       alignment: Alignment.centerRight,
-      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      padding: Const.tableValuesPadding,
       child: Text(
         MyFormat.formatCurrency(double.parse(summaryValue)),
-        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+        style: Const.tableValuesTextStyle,
       ),
     );
   }
@@ -254,55 +249,41 @@ class DataSource extends DataGridSource {
       if (e.columnName == ReportController.salepriceKey ||
           e.columnName == ReportController.receiptsPriceKey) {
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          padding: Const.tableValuesPadding,
           alignment: Alignment.centerRight,
-          child: Text(
-            e.value.toString(),
-            style: const TextStyle(fontSize: 13.0),
-          ),
+          child: Text(e.value.toString(), style: Const.tableValuesTextStyle),
         );
       }
 
       if (e.value is int) {
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          padding: Const.tableValuesPadding,
           alignment: Alignment.centerRight,
-          child: Text(
-            e.value.toString(),
-            style: const TextStyle(fontSize: 13.0),
-          ),
+          child: Text(e.value.toString(), style: Const.tableValuesTextStyle),
         );
       }
 
       if (e.value is double) {
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          padding: Const.tableValuesPadding,
           alignment: Alignment.centerRight,
-          child: Text(
-            MyFormat.formatPrice(e.value),
-            style: const TextStyle(fontSize: 13.0),
-          ),
+          child: Text(MyFormat.formatPrice(e.value),
+              style: Const.tableValuesTextStyle),
         );
       }
 
       if (e.value is String) {
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          padding: Const.tableValuesPadding,
           alignment: Alignment.centerLeft,
-          child: Text(
-            e.value.toString(),
-            style: const TextStyle(fontSize: 13.0),
-          ),
+          child: Text(e.value.toString(), style: Const.tableValuesTextStyle),
         );
       }
 
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        padding: Const.tableValuesPadding,
         alignment: Alignment.center,
-        child: Text(
-          e.value.toString(),
-          style: const TextStyle(fontSize: 13.0),
-        ),
+        child: Text(e.value.toString(), style: Const.tableValuesTextStyle),
       );
     }).toList());
   }

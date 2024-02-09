@@ -5,6 +5,7 @@ import 'package:pos/Pages/main_window.dart';
 import 'package:pos/database/supplyer_db_service.dart';
 import 'package:pos/models/address.dart';
 import 'package:pos/theme/t_colors.dart';
+import 'package:pos/utils/constant.dart';
 import 'package:pos/widgets/pos_appbar.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -45,7 +46,7 @@ class SupplyerPage extends StatelessWidget {
                     headerGridLinesVisibility: GridLinesVisibility.both,
                     allowFiltering: true,
                     allowColumnsResizing: true,
-                    rowHeight: 30.0,
+                    rowHeight: Const.tableRowHeight,
                     showFilterIconOnHover: true,
                     columnWidthMode: ColumnWidthMode.auto,
                     source: supplyerDataSource,
@@ -64,35 +65,35 @@ class SupplyerPage extends StatelessWidget {
                     columns: [
                       GridColumn(
                           columnName: Supplyer.idKey,
-                          label: Center(child: const Text('ID'))),
+                          label: const Center(child: Text('ID'))),
                       GridColumn(
                           columnName: Supplyer.firstNameKey,
-                          label: Center(child: const Text('First Name'))),
+                          label: const Center(child: Text('First Name'))),
                       GridColumn(
                           columnName: Supplyer.lastNameKey,
-                          label: Center(child: const Text('Last Name'))),
+                          label: const Center(child: Text('Last Name'))),
                       GridColumn(
                           columnName: Supplyer.mobileNumberKey,
-                          label: Center(child: const Text('Mobile Number'))),
+                          label: const Center(child: Text('Mobile Number'))),
                       GridColumn(
                           columnName: Supplyer.emailKey,
-                          label: Center(child: const Text('Email'))),
+                          label: const Center(child: Text('Email'))),
                       GridColumn(
                           columnName: Address.streetKey,
-                          label: Center(child: const Text('Street'))),
+                          label: const Center(child: Text('Street'))),
 
                       GridColumn(
                           columnName: Address.cityKey,
-                          label: Center(child: const Text('City'))),
+                          label: const Center(child: Text('City'))),
                       GridColumn(
                           columnName: Address.stateKey,
-                          label: Center(child: const Text('State'))),
+                          label: const Center(child: Text('State'))),
                       GridColumn(
                           columnName: Address.postalCodeKey,
-                          label: Center(child: const Text('Postal Code'))),
+                          label: const Center(child: Text('Postal Code'))),
                       GridColumn(
                           columnName: Address.areaCodeKey,
-                          label: Center(child: const Text('Area Code'))),
+                          label: const Center(child: Text('Area Code'))),
 
                       // Add more columns as needed
                     ],
@@ -145,11 +146,8 @@ class SupplyerDataSource extends DataGridSource {
         cells: row.getCells().map<Widget>((e) {
       return Container(
         alignment: Alignment.center,
-        padding: const EdgeInsets.all(4.0),
-        child: Text(
-          e.value.toString(),
-          style: const TextStyle(fontSize: 13.0),
-        ),
+        padding: Const.tableValuesPadding,
+        child: Text(e.value.toString(), style: Const.tableValuesTextStyle),
       );
     }).toList());
   }

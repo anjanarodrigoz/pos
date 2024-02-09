@@ -8,6 +8,7 @@ import 'package:pos/database/item_db_service.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/extra_charges.dart';
 import 'package:pos/utils/alert_message.dart';
+import 'package:pos/utils/constant.dart';
 import '../../models/invoice_row.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../models/cart.dart';
@@ -35,6 +36,7 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
 
   final dbService = CartDB();
   InvoiceDataSource invoiceDataSource = InvoiceDataSource(invoiceData: []);
+  @override
   late BuildContext context;
 
   @override
@@ -141,7 +143,8 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
         ),
         Text(
           value,
-          style: TextStyle(color: TColors.blue, fontWeight: FontWeight.bold),
+          style:
+              const TextStyle(color: TColors.blue, fontWeight: FontWeight.bold),
         )
       ],
     );
@@ -153,7 +156,7 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
               gridLinesVisibility: GridLinesVisibility.both,
               headerGridLinesVisibility: GridLinesVisibility.both,
               allowColumnsResizing: true,
-              rowHeight: 27.0,
+              rowHeight: Const.tableRowHeight,
               columnWidthMode: ColumnWidthMode.fitByCellValue,
               allowSwiping: true,
               onCellDoubleTap: (details) {
@@ -181,22 +184,22 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                     label: const Center(child: Text('Item ID'))),
                 GridColumn(
                     columnName: InvoiceRow.nameKey,
-                    label: Center(child: const Text('Item Name'))),
+                    label: const Center(child: Text('Item Name'))),
                 GridColumn(
                     columnName: InvoiceRow.qtyKey,
-                    label: Center(child: const Text('Qty'))),
+                    label: const Center(child: Text('Qty'))),
                 GridColumn(
                     columnName: InvoiceRow.netPriceKey,
-                    label: Center(child: const Text('Net Price'))),
+                    label: const Center(child: Text('Net Price'))),
                 GridColumn(
                     columnName: InvoiceRow.gstKey,
-                    label: Center(child: const Text('GST'))),
+                    label: const Center(child: Text('GST'))),
                 GridColumn(
                     columnName: InvoiceRow.itemPriceKey,
-                    label: Center(child: const Text('Item Price'))),
+                    label: const Center(child: Text('Item Price'))),
                 GridColumn(
                     columnName: InvoiceRow.totalKey,
-                    label: Center(child: const Text('Total'))),
+                    label: const Center(child: Text('Total'))),
 
                 // Add more columns as needed
               ],
@@ -360,15 +363,15 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                           }
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       PosTextFormField(
                         width: 100.0,
                         controller: totalPriceController,
                         labelText: 'Total Price',
-                        keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
                               RegExp(r'^\d*\.?\d*')),
@@ -384,7 +387,7 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                           }
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       PosTextFormField(
@@ -518,8 +521,8 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                         width: 100.0,
                         labelText: 'Net price',
                         controller: netPriceController,
-                        keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
                               RegExp(r'^\d*\.?\d*')),
@@ -606,7 +609,7 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
                 }
                 Navigator.of(context).pop();
               },
-              child: Text('Update Item'),
+              child: const Text('Update Item'),
             ),
           ],
         );
