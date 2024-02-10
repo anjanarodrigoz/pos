@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pos/database/credit_db_serive.dart';
@@ -111,6 +113,8 @@ class ReportController extends GetxController {
         await generateItemsSummeryReport(reportType);
       case ReportType.stockBuyingValue:
         await generateStockBuyingValueReport();
+      case ReportType.customerPurchase:
+        await generateCustomerPurchaseReport();
     }
   }
 
@@ -999,5 +1003,91 @@ class ReportController extends GetxController {
 
   bool isDateFilter() {
     return !(dateTimeRange.start == DateTime(0));
+  }
+
+  generateCustomerPurchaseReport() async {
+    List<Invoice> searchInvoiceList = [];
+
+    Map purchasingData = {};
+
+    isRequiredTableSummery = true;
+
+    searchInvoiceList = await InvoiceDB()
+        .searchInvoiceByDate(dateTimeRange, ReportPaymentFilter.all);
+
+    if (searchInvoiceList.isEmpty) {
+      isrecordAvaliable = false;
+      return;
+    }
+
+    isrecordAvaliable = true;
+
+    columns.value = {
+      customerNameKey: 'Name',
+      customerIdKey: 'ID',
+      netKey: 'Net Total',
+      gstKey: 'Gst Total',
+      totalKey: 'Total',
+    }.entries.map(
+      (e) {
+        if (e.key == customerIdKey || e.key == customerNameKey) {
+          return GridColumn(
+              allowFiltering: true,
+              columnName: e.key,
+              label: Center(child: Text(e.value)));
+        }
+
+        if (e.key == netKey || e.key == gstKey || e.key == totalKey) {
+          return GridColumn(
+              allowFiltering: false,
+              columnName: e.key,
+              label: Center(child: Text(e.value)));
+        }
+
+        return GridColumn(
+            allowFiltering: false,
+            columnName: e.key,
+            label: Center(child: Text(e.value)));
+      },
+    ).toList();
+
+    for (Invoice invoice in searchInvoiceList) {
+      Map customer = purchasingData[invoice.customerId] ?? {};
+
+      customer[nameKey] = invoice.customerName;
+      customer[customerIdKey] = invoice.customerId;
+      customer[netKey] = (customer[netKey] ?? 0.00) + invoice.totalNetPrice;
+      customer[gstKey] = (customer[gstKey] ?? 0.00) + invoice.totalGstPrice;
+      customer[totalKey] = (customer[totalKey] ?? 0.00) + invoice.total;
+
+      purchasingData[invoice.customerId] = customer;
+    }
+
+    rows.value = purchasingData.values
+        .map((customer) => {
+              customerNameKey: customer[nameKey],
+              customerIdKey: customer[customerIdKey],
+              netKey: customer[netKey],
+              gstKey: customer[gstKey],
+              totalKey: customer[totalKey],
+            })
+        .toList()
+        .map((e) => DataGridRow(
+                cells: e.entries.map((cell) {
+              if (cell.key == netKey) {
+                return DataGridCell<double>(
+                    columnName: cell.key,
+                    value: double.parse(
+                        (cell.value as double).toStringAsFixed(2)));
+              }
+
+              if (cell.value is DateTime) {
+                return DataGridCell(
+                    columnName: cell.key,
+                    value: MyFormat.formatDateTwo(cell.value as DateTime));
+              }
+              return DataGridCell(columnName: cell.key, value: cell.value);
+            }).toList()))
+        .toList();
   }
 }

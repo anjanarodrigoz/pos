@@ -26,7 +26,8 @@ enum ReportType {
   itemReturn,
   supplyTotal,
   supplyItemTotal,
-  stockBuyingValue
+  stockBuyingValue,
+  customerPurchase
 }
 
 extension InvoiceTypeCaps on InvoiceType {

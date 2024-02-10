@@ -45,55 +45,55 @@ class _ReportHomePageState extends State<ReportHomePage> {
             Column(children: [
               PosButton(
                   width: width,
-                  text: 'Transcation Summary',
+                  text: 'Transaction Summary',
                   onPressed: () {
                     showReportTypes({
                       'Invoice Report': () {
                         showFilterDialog(ReportType.invoice,
-                            {'Transcation Summary': 'Invoice'},
+                            {'Transaction Summary': 'Invoice'},
                             showPaidStatus: true);
                       },
                       'Turnover Summery Report': () {
                         showFilterDialog(
-                            ReportType.summery, {'Transcation Summary': ''});
+                            ReportType.summery, {'Transaction Summary': ''});
                       },
                       'Credit Note Report': () {
                         showFilterDialog(ReportType.creditNote,
-                            {'Transcation Summary': 'Credit Note'});
+                            {'Transaction Summary': 'Credit Note'});
                       },
                       'Quote Report': () {
                         showFilterDialog(ReportType.quote,
-                            {'Transcation Summary': 'Quotation'});
+                            {'Transaction Summary': 'Quotation'});
                       },
                     });
                   }),
               PosButton(
                   width: width,
-                  text: 'Transcation Items',
+                  text: 'Transaction Items',
                   onPressed: () {
                     showReportTypes({
                       'Invoice': () {
                         showFilterDialog(
                           ReportType.itemInvoice,
-                          {'Transcation Items': 'Invoice'},
+                          {'Transaction Items': 'Invoice'},
                         );
                       },
                       'Credit Note': () {
                         showFilterDialog(
                           ReportType.itemCreditNote,
-                          {'Transcation Items': 'Credit Note'},
+                          {'Transaction Items': 'Credit Note'},
                         );
                       },
                       'Quote': () {
                         showFilterDialog(
                           ReportType.itemQuote,
-                          {'Transcation Items': 'Quotation'},
+                          {'Transaction Items': 'Quotation'},
                         );
                       },
                       'Invoiced  Items': () {
                         showFilterDialog(
                           ReportType.itemInvoicedItem,
-                          {'Transcation Items': 'Invoiced Items'},
+                          {'Transaction Items': 'Invoiced Items'},
                         );
                       },
                     });
@@ -134,43 +134,43 @@ class _ReportHomePageState extends State<ReportHomePage> {
                   }),
               PosButton(
                   width: width,
-                  text: 'Supply Transcation',
+                  text: 'Supply Transaction',
                   onPressed: () {
                     showReportTypes({
                       'Supply Invoice Report': () {
                         showFilterDialog(
                           ReportType.supplyInvoice,
-                          {'Supply Transcation': 'Supply Invoice'},
+                          {'Supply Transaction': 'Supply Invoice'},
                         );
                       },
                       'Supply Item Report': () {
                         showFilterDialog(
                           ReportType.supplyItem,
-                          {'Supply Transcation': 'Supply Items'},
+                          {'Supply Transaction': 'Supply Items'},
                         );
                       },
                       'Supply Return Report': () {
                         showFilterDialog(
                           ReportType.retrunNotes,
-                          {'Supply Transcation': 'Return Notes'},
+                          {'Supply Transaction': 'Return Notes'},
                         );
                       },
                       'Supply Item Return Report': () {
                         showFilterDialog(
                           ReportType.itemReturn,
-                          {'Supply Transcation': 'Item Return Report'},
+                          {'Supply Transaction': 'Item Return Report'},
                         );
                       },
                       'Supply Total Invoice Report': () {
                         showFilterDialog(
                           ReportType.supplyTotal,
-                          {'Supply Transcation': 'Supply Total Invoice Report'},
+                          {'Supply Transaction': 'Supply Total Invoice Report'},
                         );
                       },
                       'Supply Total Item Report': () {
                         showFilterDialog(
                           ReportType.supplyItemTotal,
-                          {'Supply Transcation': 'Supply Item Total Report'},
+                          {'Supply Transaction': 'Supply Item Total Report'},
                         );
                       },
                     });
@@ -184,7 +184,7 @@ class _ReportHomePageState extends State<ReportHomePage> {
                         showFilterDialog(
                           showDatePicker: false,
                           ReportType.customerDetails,
-                          {'Customer': 'Customer Details'},
+                          {'Customer': 'Details'},
                         );
                       },
                       'Customer Outstanding': () {
@@ -192,6 +192,12 @@ class _ReportHomePageState extends State<ReportHomePage> {
                           showDatePicker: false,
                           ReportType.outstanding,
                           {'Customer': 'OutStanding'},
+                        );
+                      },
+                      'Customer Purchase': () {
+                        showFilterDialog(
+                          ReportType.customerPurchase,
+                          {'Customer': 'Purchase'},
                         );
                       },
                     });
