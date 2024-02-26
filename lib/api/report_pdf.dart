@@ -123,10 +123,10 @@ class ReportPdf {
           fontWeight: FontWeight.bold,
           fontSize: 8.0,
         ),
-        headerAlignment: Alignment.center,
+        headerAlignment: Alignment.centerLeft,
         cellPadding: const EdgeInsets.only(top: 1),
         cellStyle: const TextStyle(fontSize: 7.0),
-        cellAlignment: Alignment.center,
+        cellAlignment: Alignment.centerLeft,
         cellFormat: (index, data) {
           if (prices.contains(index)) {
             double? value = double.tryParse(data);

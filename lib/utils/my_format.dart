@@ -63,4 +63,9 @@ class MyFormat {
 
     return 'From ${MyFormat.formatDateTwo(start)} To  ${MyFormat.formatDateTwo(end)}';
   }
+
+  static String getMonthName(int month) {
+    DateTime date = DateTime(2022, month);
+    return DateFormat.MMMM().format(date);
+  }
 }
