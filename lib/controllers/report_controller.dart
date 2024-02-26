@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:pos/database/credit_db_serive.dart';
 import 'package:pos/database/customer_db_service.dart';
 import 'package:pos/database/invoice_db_service.dart';
@@ -115,6 +116,8 @@ class ReportController extends GetxController {
         await generateStockBuyingValueReport();
       case ReportType.customerPurchase:
         await generateCustomerPurchaseReport();
+      case ReportType.annualReport:
+        await generateAnnualReport();
     }
   }
 
@@ -1063,6 +1066,8 @@ class ReportController extends GetxController {
       purchasingData[invoice.customerId] = customer;
     }
 
+    log('Purchasing Data : ${purchasingData.values}');
+
     rows.value = purchasingData.values
         .map((customer) => {
               customerNameKey: customer[nameKey],
@@ -1085,6 +1090,128 @@ class ReportController extends GetxController {
                 return DataGridCell(
                     columnName: cell.key,
                     value: MyFormat.formatDateTwo(cell.value as DateTime));
+              }
+              return DataGridCell(columnName: cell.key, value: cell.value);
+            }).toList()))
+        .toList();
+  }
+
+  generateAnnualReport() async {
+    List<Invoice> searchInvoiceList = [];
+
+    isRequiredTableSummery = true;
+
+    searchInvoiceList = await InvoiceDB().getAllInvoices();
+
+    if (searchInvoiceList.isEmpty) {
+      isrecordAvaliable = false;
+      return;
+    }
+
+    isrecordAvaliable = true;
+
+    List<String> years = ['Month/Year'];
+    Map monthlyValues = {
+      1: {},
+      2: {},
+      3: {},
+      4: {},
+      5: {},
+      6: {},
+      7: {},
+      8: {},
+      9: {},
+      10: {},
+      11: {},
+      12: {},
+    };
+
+    String currentYear = '';
+
+    searchInvoiceList.sort(((a, b) => a.createdDate.compareTo(b.createdDate)));
+
+    for (Invoice invoice in searchInvoiceList) {
+      DateTime date = invoice.createdDate;
+
+      if (currentYear != date.year.toString()) {
+        currentYear = date.year.toString();
+        years.add(date.year.toString());
+        for (var key in monthlyValues.keys) {
+          Map yearlyValues = monthlyValues[key] ?? {};
+          yearlyValues[currentYear] = 0.00;
+        }
+      }
+
+      Map yearlyValues = monthlyValues[date.month] ?? {};
+
+      yearlyValues[currentYear] =
+          (yearlyValues[currentYear] ?? 0.0) + invoice.total;
+
+      monthlyValues[date.month] = yearlyValues;
+    }
+
+    columns.value = years.map(
+      (e) {
+        if (e == 'Month/Year') {
+          return GridColumn(
+              allowFiltering: false,
+              columnName: e,
+              label: Center(child: Text(e)));
+        }
+
+        return GridColumn(
+            allowFiltering: false,
+            columnName: e,
+            label: Center(child: Text(e)));
+      },
+    ).toList();
+
+    Map rowsData = {};
+
+    for (var value in monthlyValues.entries) {
+      rowsData[value.key] = {'Month/Year': MyFormat.getMonthName(value.key)};
+
+      for (var monthYear in value.value.entries) {
+        Map<String, dynamic> data = rowsData[value.key];
+        data['${monthYear.key}'] = monthYear.value.toString();
+        rowsData[value.key] = data;
+      }
+    }
+
+    log('${rowsData.values.toList()[0]}');
+
+    List<Map> rowList = [];
+
+    Map totalMap = {};
+
+    for (Map map in rowsData.values) {
+      rowList.add(map);
+
+      for (var entries in map.entries) {
+        if (entries.key == 'Month/Year') {
+          totalMap['Month/Year'] = 'Total';
+          continue;
+        }
+
+        totalMap['${entries.key}'] =
+            (double.parse((totalMap['${entries.key}'] ?? 0.0).toString()) +
+                    double.parse(entries.value))
+                .toString();
+
+        log('${entries.key}  :  ${entries.value}');
+      }
+    }
+
+    rowList.add(totalMap);
+
+    rows.value = rowList
+        .map((e) => DataGridRow(
+                cells: e.entries.map((cell) {
+              if (cell.key != 'Month/Year') {
+                DataGridCell<double>(
+                    columnName: cell.key,
+                    value: double.parse(
+                        (double.parse(cell.value)).toStringAsFixed(2)));
               }
               return DataGridCell(columnName: cell.key, value: cell.value);
             }).toList()))

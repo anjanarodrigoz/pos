@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pos/controllers/report_controller.dart';
@@ -7,6 +9,7 @@ import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/alert_message.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/widgets/pos_button.dart';
+import 'package:pos/widgets/pos_progress_button.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class FilterDialog extends StatefulWidget {
@@ -150,28 +153,38 @@ class _FilterDialogState extends State<FilterDialog> {
             ),
             Align(
                 alignment: Alignment.center,
-                child: PosButton(
+                child: POSProgressButton(
                     text: 'Generate Report',
                     onPressed: () async {
-                      _startDate = _startDate ?? DateTime(0);
-                      _endDate = _endDate ?? (_startDate ?? DateTime(0));
-                      if (_startDate != null) {
-                        DateTimeRange dateTimeRange = DateTimeRange(
-                            start: _startDate!,
-                            end: _endDate!.add(const Duration(days: 1)));
-                        await reportController.generateReport(
-                            title: widget.title,
-                            dateTimeRange: dateTimeRange,
-                            reportType: widget.reportType,
-                            paidStatus: reportPaymentFilter);
-                      }
+                      try {
+                        _startDate = _startDate ?? DateTime(0);
+                        _endDate = _endDate ?? (_startDate ?? DateTime(0));
+                        if (_startDate != null) {
+                          DateTimeRange dateTimeRange = DateTimeRange(
+                              start: _startDate!,
+                              end: _endDate!.add(const Duration(days: 1)));
+                          await reportController.generateReport(
+                              title: widget.title,
+                              dateTimeRange: dateTimeRange,
+                              reportType: widget.reportType,
+                              paidStatus: reportPaymentFilter);
+                        }
 
-                      if (!reportController.isrecordAvaliable) {
+                        if (!reportController.isrecordAvaliable) {
+                          AlertMessage.snakMessage(
+                              'No record exsits this time frame', context,
+                              duration: 3);
+                          Get.back();
+                        } else {
+                          Get.back();
+                        }
+                      } catch (e) {
                         AlertMessage.snakMessage(
-                            'No record exsits this time frame', context,
+                            'There is something wrong', context,
                             duration: 3);
+                        log(e.toString());
+                        Get.back();
                       }
-                      Get.back();
                     }))
           ],
         ),

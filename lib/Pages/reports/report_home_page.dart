@@ -65,6 +65,12 @@ class _ReportHomePageState extends State<ReportHomePage> {
                         showFilterDialog(ReportType.quote,
                             {'Transaction Summary': 'Quotation'});
                       },
+                      'Annual Report': () {
+                        showFilterDialog(
+                            showDatePicker: false,
+                            ReportType.annualReport,
+                            {'Transaction Summary': 'Annual Report'});
+                      },
                     });
                   }),
               PosButton(
