@@ -6,7 +6,7 @@ import '../api/printer_manager.dart';
 class PrintSetupButton extends StatefulWidget {
   final Function(Printer?) onPrinterSelected;
 
-  PrintSetupButton({required this.onPrinterSelected});
+  const PrintSetupButton({super.key, required this.onPrinterSelected});
 
   @override
   _PrintSetupButtonState createState() => _PrintSetupButtonState();
@@ -27,7 +27,13 @@ class _PrintSetupButtonState extends State<PrintSetupButton> {
   Widget build(BuildContext context) {
     return PosButton(
       color: isPrinterAvailable ? Colors.green : Colors.amber.shade600,
-      text: 'Printer Setup',
+      widget: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        const Text('Setup Printer'),
+        Text(
+          printer?.name ?? '',
+          style: const TextStyle(fontSize: 8.0),
+        ),
+      ]),
       onPressed: () async {
         await showPrinters();
         widget.onPrinterSelected(printer);

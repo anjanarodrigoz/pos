@@ -115,18 +115,18 @@ class _ReportHomePageState extends State<ReportHomePage> {
                           {'Stock': 'Stock Required'},
                         );
                       },
-                      'Balanced Stock Report': () {
+                      'Balance Stock Report': () {
                         showFilterDialog(
                           showDatePicker: false,
                           ReportType.balancedStock,
-                          {'Stock': 'Balanced Stock'},
+                          {'Stock': 'Balance Stock'},
                         );
                       },
-                      'Balanced Stock Selling value': () {
+                      'Balance Stock Selling value': () {
                         showFilterDialog(
                           showDatePicker: false,
                           ReportType.stockSellingValue,
-                          {'Stock': 'Balanced Stock Selling Value'},
+                          {'Stock': 'Balance Stock Selling Value'},
                         );
                       },
                       'Stock Buying Value': () {

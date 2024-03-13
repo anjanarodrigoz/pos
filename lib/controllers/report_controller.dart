@@ -15,6 +15,7 @@ import 'package:pos/models/extra_charges.dart';
 import 'package:pos/models/invoice_item.dart';
 import 'package:pos/models/payment.dart';
 import 'package:pos/models/supply_invoice.dart';
+import 'package:pos/models/tm/stock_sold_required.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../models/invoice.dart';
@@ -31,12 +32,12 @@ class ReportController extends GetxController {
   bool isRequiredTableSummery = false;
 
   static const createdDateKey = "Date";
-  static const invoiceIdKey = "Id";
+  static const invoiceIdKey = "Invoice";
   static const customerNameKey = "Name";
-  static const customerIdKey = "Cus. Id";
+  static const customerIdKey = "Id";
   static const customerMobileKey = "Mobile";
   static const supplyerNameKey = "Name";
-  static const supplyerIdKey = "Sup. Id";
+  static const supplyerIdKey = "Id";
   static const supplyerMobileKey = "Mobile";
   static const netKey = "Net Total";
   static const gstKey = "GST Total";
@@ -48,7 +49,7 @@ class ReportController extends GetxController {
   static const receiptsPriceKey = "Receipt Price";
   static const salepriceKey = "Sales Price";
   static const receiptsKey = "Receipts";
-  static const itemIdKey = "Item Id";
+  static const itemIdKey = "Item";
   static const nameKey = "Item Name";
   static const quantityKey = "Quantity";
   static const soldKey = "Stock Sold";
@@ -62,6 +63,10 @@ class ReportController extends GetxController {
   static const streetKey = "Street";
   static const outstanigKey = "Days";
   static const postalCodeKey = "Postal Code";
+  static const pcityKey = "P/City";
+  static const pstateKey = "P/State";
+  static const pstreetKey = "P/Street";
+  static const ppostalCodeKey = "P/Postal Code";
 
   Future<void> generateReport(
       {required DateTimeRange dateTimeRange,
@@ -554,26 +559,49 @@ class ReportController extends GetxController {
   Future<void> generateStockRequiredReport() async {
     isRequiredTableSummery = false;
     List searchInvoiceList = [];
+    List returnSupplyInvoiceList = [];
 
     searchInvoiceList =
         await InvoiceDB().searchInvoiceByDate(dateTimeRange, paidStatus);
 
-    if (searchInvoiceList.isEmpty) {
+    returnSupplyInvoiceList = await SupplyerInvoiceDB()
+        .searchInvoiceByDate(dateTimeRange, isReturnNote: true);
+
+    if (searchInvoiceList.isEmpty && returnSupplyInvoiceList.isEmpty) {
       isrecordAvaliable = false;
       return;
     }
 
     isrecordAvaliable = true;
-    Map<String, InvoicedItem> itemMap = {};
+    Map<String, StockSoldRequired> itemMap = {};
 
     for (var invoice in searchInvoiceList) {
       for (InvoicedItem item in invoice.itemList) {
         String itemkey = item.itemId;
 
         itemMap[itemkey] == null
-            ? itemMap[itemkey] = item
+            ? itemMap[itemkey] = StockSoldRequired(
+                itemId: item.itemId,
+                name: item.name,
+                sold: item.qty,
+                required: item.qty)
+            : itemMap[itemkey] = itemMap[itemkey]!
+                .updateQuantity(sold: item.qty, required: item.qty);
+      }
+    }
+
+    for (var invoice in returnSupplyInvoiceList) {
+      for (InvoicedItem item in invoice.itemList) {
+        String itemkey = item.itemId;
+
+        itemMap[itemkey] == null
+            ? itemMap[itemkey] = StockSoldRequired(
+                itemId: item.itemId,
+                name: item.name,
+                sold: 0,
+                required: item.qty)
             : itemMap[itemkey] =
-                itemMap[itemkey]!.updateQuantity(qty: item.qty);
+                itemMap[itemkey]!.updateQuantity(required: -item.qty);
       }
     }
 
@@ -599,8 +627,8 @@ class ReportController extends GetxController {
           cells: {
         itemIdKey: value.itemId,
         nameKey: value.name,
-        soldKey: value.qty,
-        requireKey: value.qty,
+        soldKey: value.sold,
+        requireKey: value.required,
       }.entries.map((cell) {
         return DataGridCell(columnName: cell.key, value: cell.value);
       }).toList()));
@@ -632,8 +660,6 @@ class ReportController extends GetxController {
       nameKey: nameKey,
       quantityKey: quantityKey,
       priceKey: priceKey,
-      price2Key: price2Key,
-      price3Key: price3Key,
     }
         .entries
         .map(
@@ -651,8 +677,6 @@ class ReportController extends GetxController {
               nameKey: item.name,
               quantityKey: item.qty,
               priceKey: item.price,
-              price2Key: item.priceTwo,
-              price3Key: item.priceThree,
             }
                     .entries
                     .map((e) => DataGridCell(columnName: e.key, value: e.value))
@@ -690,6 +714,10 @@ class ReportController extends GetxController {
       cityKey: cityKey,
       stateKey: stateKey,
       postalCodeKey: postalCodeKey,
+      pstreetKey: pstreetKey,
+      pcityKey: pcityKey,
+      pstateKey: pstateKey,
+      ppostalCodeKey: ppostalCodeKey,
     }
         .entries
         .map((e) => GridColumn(
@@ -716,6 +744,18 @@ class ReportController extends GetxController {
               postalCodeKey: customer.deliveryAddress == null
                   ? " "
                   : customer.deliveryAddress!.postalCode,
+              pstreetKey: customer.postalAddress == null
+                  ? " "
+                  : customer.postalAddress!.street,
+              pcityKey: customer.postalAddress == null
+                  ? " "
+                  : customer.postalAddress!.city,
+              pstateKey: customer.postalAddress == null
+                  ? " "
+                  : customer.postalAddress!.state,
+              ppostalCodeKey: customer.postalAddress == null
+                  ? " "
+                  : customer.postalAddress!.postalCode,
             }
                     .entries
                     .map((e) => DataGridCell(columnName: e.key, value: e.value))
