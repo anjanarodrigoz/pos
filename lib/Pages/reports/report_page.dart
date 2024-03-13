@@ -181,10 +181,18 @@ class _ReportPageState extends State<ReportPage> {
                     text: 'Print',
                     onPressed: () async {
                       if (printerManager.printer != null) {
-                        await Printing.directPrintPdf(
-                            printer: printerManager.printer!,
-                            onLayout: (format) async =>
-                                Uint8List.fromList(await pdf.save()));
+                        try {
+                          await Printing.directPrintPdf(
+                              printer: printerManager.printer!,
+                              onLayout: (format) async =>
+                                  Uint8List.fromList(await pdf.save()));
+                        } catch (e) {
+                          Get.dialog(
+                              barrierDismissible: true,
+                              AlertDialog(
+                                content: Text('$e'),
+                              ));
+                        }
                       } else {
                         showDialog(
                             context: context,

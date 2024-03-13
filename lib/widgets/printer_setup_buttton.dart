@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:printing/printing.dart';
@@ -29,10 +31,11 @@ class _PrintSetupButtonState extends State<PrintSetupButton> {
       color: isPrinterAvailable ? Colors.green : Colors.amber.shade600,
       widget: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         const Text('Setup Printer'),
-        Text(
-          printer?.name ?? '',
-          style: const TextStyle(fontSize: 8.0),
-        ),
+        if (printer?.name != null)
+          Text(
+            printer!.name,
+            style: const TextStyle(fontSize: 8.0),
+          ),
       ]),
       onPressed: () async {
         await showPrinters();
