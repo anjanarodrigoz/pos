@@ -62,11 +62,10 @@ class ReportController extends GetxController {
   static const stateKey = "State";
   static const streetKey = "Street";
   static const outstanigKey = "Days";
-  static const postalCodeKey = "Postal Code";
-  static const pcityKey = "P/City";
-  static const pstateKey = "P/State";
-  static const pstreetKey = "P/Street";
-  static const ppostalCodeKey = "P/Postal Code";
+  static const postalCodeKey = "PC";
+  static const pcityKey = "P City";
+  static const pstreetKey = "PO Box";
+  static const ppostalCodeKey = "P/PC";
 
   Future<void> generateReport(
       {required DateTimeRange dateTimeRange,
@@ -163,7 +162,7 @@ class ReportController extends GetxController {
 
     columns.value = {
       createdDateKey: 'Date',
-      invoiceIdKey: 'Invoice Id',
+      invoiceIdKey: 'Invoice',
       customerNameKey: 'Name',
       customerIdKey: 'ID',
       customerMobileKey: 'Mobile',
@@ -716,7 +715,6 @@ class ReportController extends GetxController {
       postalCodeKey: postalCodeKey,
       pstreetKey: pstreetKey,
       pcityKey: pcityKey,
-      pstateKey: pstateKey,
       ppostalCodeKey: ppostalCodeKey,
     }
         .entries
@@ -750,9 +748,6 @@ class ReportController extends GetxController {
               pcityKey: customer.postalAddress == null
                   ? " "
                   : customer.postalAddress!.city,
-              pstateKey: customer.postalAddress == null
-                  ? " "
-                  : customer.postalAddress!.state,
               ppostalCodeKey: customer.postalAddress == null
                   ? " "
                   : customer.postalAddress!.postalCode,

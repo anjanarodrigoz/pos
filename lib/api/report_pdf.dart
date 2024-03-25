@@ -56,7 +56,7 @@ class ReportPdf {
   Widget buildTitle() => Column(children: [
         Text(
           '$reportType - $reportTitle',
-          style: TextStyle(fontSize: 8, fontWeight: FontWeight.normal),
+          style: TextStyle(fontSize: 7, fontWeight: FontWeight.normal),
         ),
         SizedBox(height: 0.1 * PdfPageFormat.cm),
         if (dateTimeRange.start.year != 0)
@@ -81,7 +81,7 @@ class ReportPdf {
         SizedBox(height: 0.1 * PdfPageFormat.cm),
         Text(
           'Created Date : ${MyFormat.formatDate(createdDate)}',
-          style: TextStyle(fontSize: 8, fontWeight: FontWeight.normal),
+          style: TextStyle(fontSize: 7, fontWeight: FontWeight.normal),
         ),
         SizedBox(height: 0.1 * PdfPageFormat.cm),
       ],
@@ -125,7 +125,7 @@ class ReportPdf {
         ),
         headerAlignment: Alignment.centerLeft,
         cellPadding: const EdgeInsets.only(top: 1),
-        cellStyle: const TextStyle(fontSize: 7.0),
+        cellStyle: const TextStyle(fontSize: 8.0),
         cellAlignment: Alignment.centerLeft,
         cellFormat: (index, data) {
           if (prices.contains(index)) {

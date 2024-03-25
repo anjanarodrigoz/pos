@@ -61,7 +61,7 @@ class MyFormat {
     DateTime start = dateTimeRange.start;
     DateTime end = dateTimeRange.end.subtract(const Duration(days: 1));
 
-    return 'From ${MyFormat.formatDateTwo(start)} To  ${MyFormat.formatDateTwo(end)}';
+    return '${MyFormat.formatDateTwo(start)} - ${MyFormat.formatDateTwo(end)}';
   }
 
   static String getMonthName(int month) {
