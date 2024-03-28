@@ -1,17 +1,13 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:get/get.dart';
 import 'package:pos/api/printer_manager.dart';
 import 'package:pos/models/address.dart';
-import 'package:pos/utils/alert_message.dart';
+
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/printer_setup_buttton.dart';
 import 'package:printing/printing.dart';
 
-import '../api/pdf_api.dart';
-import '../api/pdf_invoice_api.dart';
-import '../enums/enums.dart';
 import '../models/invoice.dart';
 import 'pos_text_form_field.dart';
 

@@ -35,7 +35,7 @@ extension InvoiceTypeCaps on InvoiceType {
   String name() {
     switch (this) {
       case InvoiceType.invoice:
-        return ('Invoice');
+        return ('Tax Invoice');
 
       case InvoiceType.supplyInvoice:
         return ('Supply Invoice');
