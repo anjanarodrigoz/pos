@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -9,14 +10,13 @@ import 'package:pos/api/printer_manager.dart';
 import 'package:pos/api/report_pdf.dart';
 import 'package:pos/controllers/report_controller.dart';
 import 'package:pos/database/store_db.dart';
+import 'package:pos/enums/enums.dart';
 import 'package:pos/utils/constant.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/printer_setup_buttton.dart';
 import 'package:printing/printing.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:syncfusion_flutter_datagrid_export/export.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class ReportPage extends StatefulWidget {
   const ReportPage({super.key});
@@ -158,6 +158,15 @@ class _ReportPageState extends State<ReportPage> {
                                 name: 'Sum',
                                 columnName: ReportController.paykey,
                                 summaryType: GridSummaryType.sum),
+                            if (controller.reportType ==
+                                    ReportType.supplyItem ||
+                                controller.reportType ==
+                                    ReportType.supplyItemTotal ||
+                                controller.reportType == ReportType.itemReturn)
+                              const GridSummaryColumn(
+                                  name: 'Sum',
+                                  columnName: ReportController.quantityKey,
+                                  summaryType: GridSummaryType.sum),
                           ],
                           position: GridTableSummaryRowPosition.bottom)
                     ],
@@ -239,6 +248,17 @@ class DataSource extends DataGridSource {
       GridSummaryColumn? summaryColumn,
       RowColumnIndex rowColumnIndex,
       String summaryValue) {
+    if (summaryColumn?.columnName == ReportController.quantityKey) {
+      return Container(
+        alignment: Alignment.centerRight,
+        padding: Const.tableValuesPadding,
+        child: Text(
+          summaryValue,
+          style: Const.tableValuesTextStyle,
+        ),
+      );
+    }
+
     return Container(
       alignment: Alignment.centerRight,
       padding: Const.tableValuesPadding,

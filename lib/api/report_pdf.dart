@@ -1,6 +1,9 @@
+import 'dart:ffi';
+
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 import 'package:pos/controllers/report_controller.dart';
+import 'package:pos/enums/enums.dart';
 import 'package:pos/utils/my_format.dart';
 import '../database/store_db.dart';
 import '../models/store.dart';
@@ -152,6 +155,7 @@ class ReportPdf {
     double gstTotal = 0.0;
     double totalTotal = 0.0;
     double toPayTotal = 0.0;
+    int qtyTotal = 0;
 
     if (headers.contains(ReportController.netKey)) {
       if (headers.contains(ReportController.paykey)) {
@@ -178,6 +182,7 @@ class ReportPdf {
           if (e == ReportController.paykey) {
             return MyFormat.formatPrice(toPayTotal);
           }
+
           return '';
         }).toList();
       } else {
@@ -188,6 +193,8 @@ class ReportPdf {
               data.elementAt(headers.indexOf(ReportController.gstKey)));
           totalTotal += double.parse(
               data.elementAt(headers.indexOf(ReportController.totalKey)));
+          qtyTotal += int.parse(
+              data.elementAt(headers.indexOf(ReportController.quantityKey)));
         }
         return headers.map((e) {
           if (headers.indexOf(e) == 0) {
@@ -201,6 +208,13 @@ class ReportPdf {
           }
           if (e == ReportController.totalKey) {
             return MyFormat.formatPrice(totalTotal);
+          }
+          if (reportTitle == 'Supply Items' ||
+              reportTitle == 'Item Return Report' ||
+              reportTitle == 'Supply Item Total Report') {
+            if (e == ReportController.quantityKey) {
+              return qtyTotal.toString();
+            }
           }
 
           return '';
