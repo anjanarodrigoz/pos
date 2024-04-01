@@ -85,11 +85,16 @@ class PdfInvoiceApi {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                buildCompanyInfo(),
-                buildTitle(invoiceType),
+                Expanded(child: buildTitle(invoiceType)),
+                Expanded(
+                  child: companyName(),
+                ),
+                Expanded(
+                  child: buildCompanyInfo(),
+                ),
               ]),
           SizedBox(height: 1 * PdfPageFormat.cm),
           Row(
@@ -123,10 +128,16 @@ class PdfInvoiceApi {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                buildCompanyInfo(),
-                buildTitle(invoice.isReturnNote
-                    ? InvoiceType.returnNote
-                    : InvoiceType.supplyInvoice)
+                Expanded(
+                    child: buildTitle(invoice.isReturnNote
+                        ? InvoiceType.returnNote
+                        : InvoiceType.supplyInvoice)),
+                Expanded(
+                  child: companyName(),
+                ),
+                Expanded(
+                  child: buildCompanyInfo(),
+                )
               ]),
           SizedBox(height: 1 * PdfPageFormat.cm),
           Row(
@@ -186,14 +197,9 @@ class PdfInvoiceApi {
     Store store = StoreDB().getStore();
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.end,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text(store.companyName.toUpperCase(),
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        if (store.slogan.isNotEmpty)
-          Text(store.slogan,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10.0)),
         Text('ABN ${store.abn}', style: const TextStyle(fontSize: 10.0)),
         Text('${store.street},${store.city},${store.state},${store.postalcode}',
             style: const TextStyle(fontSize: 10.0)),
@@ -204,12 +210,23 @@ class PdfInvoiceApi {
     );
   }
 
+  static Widget companyName() {
+    Store store = StoreDB().getStore();
+    return Column(children: [
+      Text(store.companyName.toUpperCase(),
+          style: TextStyle(fontWeight: FontWeight.bold)),
+      if (store.slogan.isNotEmpty)
+        Text(store.slogan,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10.0))
+    ]);
+  }
+
   static Widget buildTitle(InvoiceType type) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             type.name(),
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 0.2 * PdfPageFormat.cm),
         ],
@@ -356,7 +373,7 @@ class PdfInvoiceApi {
                 ),
                 Divider(thickness: 0.2),
                 buildText(
-                  title: 'Total amount due',
+                  title: 'Total Amount Due',
                   titleStyle: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -397,7 +414,7 @@ class PdfInvoiceApi {
                 style: const TextStyle(fontSize: 10.0)),
           ]),
           Column(children: [
-            buildSimpleText(title: 'Invoice ID', value: invoice.invoiceId),
+            buildSimpleText(title: 'Invoice', value: invoice.invoiceId),
             buildSimpleText(title: 'Customer ID', value: invoice.customerId),
             buildSimpleText(
                 title: 'Date',

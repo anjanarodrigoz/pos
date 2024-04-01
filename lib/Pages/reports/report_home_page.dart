@@ -5,7 +5,6 @@ import 'package:pos/Pages/reports/report_page.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:pos/widgets/filter_dialog.dart';
-import 'package:pos/widgets/paid_status_widget.dart';
 import 'package:pos/widgets/pos_button.dart';
 
 class ReportHomePage extends StatefulWidget {

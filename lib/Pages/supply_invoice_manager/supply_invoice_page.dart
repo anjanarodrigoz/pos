@@ -109,9 +109,18 @@ class SupplyInvoicePage extends StatelessWidget {
                         ? InvoiceType.returnNote
                         : InvoiceType.supplyInvoice);
               },
+              onViewPressed: (SupplyInvoice invoice) async {
+                viewInvoice(invoice);
+              },
             ),
           );
         });
+  }
+
+  Future<void> viewInvoice(invoice) async {
+    SupplyInvoice oldInvoice = invoice.copyWith();
+    final file = await PdfInvoiceApi.generateSupplyInvoicePDF(oldInvoice);
+    await PdfApi.openFile(file);
   }
 
   Future<void> deleteInvoice() async {

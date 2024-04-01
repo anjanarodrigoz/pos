@@ -1,8 +1,6 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:pos/database/credit_db_serive.dart';
 import 'package:pos/database/customer_db_service.dart';
 import 'package:pos/database/invoice_db_service.dart';
@@ -30,6 +28,7 @@ class ReportController extends GetxController {
   RxList<DataGridRow> rows = <DataGridRow>[].obs;
   RxMap<String, String> title = <String, String>{}.obs;
   bool isRequiredTableSummery = false;
+  ReportType? reportType;
 
   static const createdDateKey = "Date";
   static const invoiceIdKey = "Invoice";
@@ -76,6 +75,7 @@ class ReportController extends GetxController {
     this.paidStatus = paidStatus;
     this.title.value = title;
     this.paidStatus = paidStatus;
+    this.reportType = reportType;
 
     switch (reportType) {
       case ReportType.invoice:

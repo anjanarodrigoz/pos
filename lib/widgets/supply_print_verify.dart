@@ -13,11 +13,13 @@ class SupplyPrintVerify extends StatelessWidget {
       {super.key,
       required this.invoice,
       required this.onPrintPressed,
+      required this.onViewPressed,
       required this.onEmailPressed});
 
   final Function(Printer printer, SupplyInvoice invoice) onPrintPressed;
   final Function(SupplyInvoice invoice) onEmailPressed;
   final SupplyInvoice invoice;
+  final Function(SupplyInvoice invoice) onViewPressed;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -30,7 +32,7 @@ class SupplyPrintVerify extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 500.0,
+      width: 800.0,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Form(
@@ -69,6 +71,12 @@ class SupplyPrintVerify extends StatelessWidget {
                                     content: Text('Please setup printer'),
                                   ));
                         }
+                      }),
+                  PosButton(
+                      text: 'View',
+                      onPressed: () {
+                        updateInvoice();
+                        onViewPressed(invoice);
                       }),
                   PosButton(
                       text: 'Email',
