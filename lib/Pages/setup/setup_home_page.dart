@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:pos/Pages/setup/backup_page.dart';
 import 'package:pos/Pages/setup/company_details_page.dart';
-import 'package:pos/database/main_db.dart';
-import 'package:pos/theme/t_colors.dart';
 import 'package:pos/widgets/pos_appbar.dart';
-import 'package:pos/widgets/pos_button.dart';
-import 'package:pos/widgets/pos_text_form_field.dart';
 import 'package:pos/widgets/rounded_icon_button.dart';
-import 'package:pos/widgets/verify_dialog.dart';
-
 import 'email_setup_page.dart';
 
 class SetupHomePage extends StatefulWidget {
