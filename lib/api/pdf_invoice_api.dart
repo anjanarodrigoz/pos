@@ -22,6 +22,7 @@ class PdfInvoiceApi {
     final pdf = Document();
 
     pdf.addPage(MultiPage(
+      maxPages: 100,
       pageFormat: PdfPageFormat.a4,
       margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
       build: (context) => [
@@ -31,7 +32,7 @@ class PdfInvoiceApi {
         Spacer(),
         buildTotal(invoice),
       ],
-      footer: (context) => buildFooter(invoice),
+      footer: (context) => buildFooter(invoice, context, invoiceType),
     ));
 
     return PdfApi.saveDocument(
@@ -65,6 +66,7 @@ class PdfInvoiceApi {
     final pdf = Document();
 
     pdf.addPage(MultiPage(
+      maxPages: 100,
       pageFormat: PdfPageFormat.a4,
       margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
       build: (context) => [
@@ -74,28 +76,40 @@ class PdfInvoiceApi {
         Spacer(),
         buildTotal(invoice),
       ],
-      footer: (context) => buildSupplyFooter(invoice),
+      footer: (context) => buildSupplyFooter(invoice, context),
     ));
 
     return PdfApi.saveDocument(
         name: 'supply_invoice_${invoice.invoiceId}.pdf', pdf: pdf);
   }
 
-  static Widget buildHeader(Invoice invoice, invoiceType) => Column(
+  static Widget buildHeader(Invoice invoice, InvoiceType invoiceType) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+          // Row(
+          //     mainAxisAlignment: MainAxisAlignment.start,
+          //     crossAxisAlignment: CrossAxisAlignment.start,
+          //     children: [
+          //       Expanded(
+          //           flex: 1,
+          //           child: Align(
+          //               alignment: Alignment.centerLeft,
+          //               child: buildTitle(invoiceType))),
+          //       Expanded(
+          //         flex: 2,
+          //         child: companyName(),
+          //       ),
+          //       Expanded(child: SizedBox(), flex: 1),
+          //     ]),
+          Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Expanded(child: buildCompanyInfo(), flex: 1),
-                Expanded(
-                  flex: 2,
-                  child: companyName(),
-                ),
-                Expanded(flex: 1, child: buildTitle(invoiceType)),
+                companyName(),
+                Align(
+                    alignment: Alignment.center,
+                    child: buildTitle(invoiceType)),
               ]),
-          SizedBox(height: 0.5 * PdfPageFormat.cm),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -105,9 +119,10 @@ class PdfInvoiceApi {
                 invoice.customerName,
               ),
               Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-                buildInvoiceInfo('Invoice', invoice.invoiceId),
+                buildInvoiceInfo(
+                    '${invoiceType.name()} No.', invoice.invoiceId),
                 buildInvoiceInfo('Customer Id', invoice.customerId),
-                buildInvoiceInfo('Mobile No', invoice.customerMobile),
+                buildInvoiceInfo('Mobile No.', invoice.customerMobile),
                 buildInvoiceInfo(
                     'Date', MyFormat.formatDateOne(invoice.createdDate)),
               ]),
@@ -127,18 +142,17 @@ class PdfInvoiceApi {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Expanded(child: SizedBox(), flex: 1),
                 Expanded(
-                  child: buildCompanyInfo(),
-                ),
-                Expanded(
+                  flex: 2,
                   child: companyName(),
                 ),
                 Expanded(
+                    flex: 1,
                     child: buildTitle(invoice.isReturnNote
                         ? InvoiceType.returnNote
                         : InvoiceType.supplyInvoice)),
               ]),
-          SizedBox(height: 0.5 * PdfPageFormat.cm),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -151,7 +165,9 @@ class PdfInvoiceApi {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     buildInvoiceInfo(
-                        invoice.isReturnNote ? 'Return note' : 'Invoice',
+                        invoice.isReturnNote
+                            ? 'Return Note No.'
+                            : 'Supply Invoice No.',
                         invoice.invoiceId),
                     if (!invoice.isReturnNote)
                       buildInvoiceInfo('Ref', invoice.referenceId ?? ''),
@@ -199,7 +215,7 @@ class PdfInvoiceApi {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        SizedBox(height: 0.5 * PdfPageFormat.cm),
+        SizedBox(height: 1 * PdfPageFormat.cm),
         Text('ABN ${store.abn}', style: const TextStyle(fontSize: 9.0)),
         Text('${store.street},${store.city},${store.state},${store.postalcode}',
             style: const TextStyle(fontSize: 9.0)),
@@ -223,10 +239,10 @@ class PdfInvoiceApi {
   static Widget buildTitle(InvoiceType type) => Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          SizedBox(height: 0.5 * PdfPageFormat.cm),
+          // SizedBox(height: 0.5 * PdfPageFormat.cm),
           Text(
             type.name(),
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 0.2 * PdfPageFormat.cm),
         ],
@@ -264,17 +280,14 @@ class PdfInvoiceApi {
       ]);
       if (item.comment != null) {
         if (item.comment!.isNotEmpty) {
-          items.add(['', item.comment.toString(), '', '', '', '']);
-          items.add(['', '', '', '', '', '']);
-          items.add(['', '', '', '', '', '']);
-          items.add(['', '', '', '', '', '']);
+          items.add(['', '(${item.comment})', '', '', '', '']);
         }
-      } else {
-        items.add(['', '', '', '', '', '']);
-        items.add(['', '', '', '', '', '']);
-        items.add(['', '', '', '', '', '']);
       }
     }
+
+    items.add(['', '', '', '', '', '']);
+    items.add(['', '', '', '', '', '']);
+    items.add(['', '', '', '', '', '']);
 
     for (ExtraCharges extra in invoice.extraCharges ?? []) {
       final total = extra.netTotal * (1 + invoice.gstPrecentage);
@@ -289,21 +302,11 @@ class PdfInvoiceApi {
       ]);
       if (extra.comment != null) {
         if (extra.comment!.isNotEmpty) {
-          items.add(['', extra.comment.toString(), '', '', '', '']);
-          items.add(['', '', '', '', '', '']);
-          items.add(['', '', '', '', '', '']);
-          items.add(['', '', '', '', '', '']);
+          items.add(['', '(${extra.comment})', '', '', '', '']);
         }
-      } else {
-        items.add(['', '', '', '', '', '']);
-        items.add(['', '', '', '', '', '']);
-        items.add(['', '', '', '', '', '']);
       }
     }
 
-    items.add(['', '', '', '', '', '']);
-    items.add(['', '', '', '', '', '']);
-    items.add(['', '', '', '', '', '']);
     items.add(['', '', '', '', '', '']);
     items.add(['', '', '', '', '', '']);
     items.add(['', '', '', '', '', '']);
@@ -354,15 +357,21 @@ class PdfInvoiceApi {
     final total = isReturnNote ? -invoice.total : invoice.total;
 
     return Container(
-      alignment: Alignment.centerRight,
+      alignment: Alignment.bottomRight,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Spacer(flex: 6),
+          Expanded(
+            flex: 6,
+            child: Text('Thank you for your Business',
+                style: TextStyle(fontWeight: FontWeight.normal)),
+          ),
           Expanded(
             flex: 4,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Divider(thickness: 0.2),
                 buildText(
                   title: 'Sub Total',
                   value: MyFormat.formatCurrency(total),
@@ -373,7 +382,7 @@ class PdfInvoiceApi {
                   value: MyFormat.formatCurrency(vat),
                   unite: true,
                 ),
-                Divider(thickness: 0.2),
+                SizedBox(height: 0.1 * PdfPageFormat.cm),
                 buildText(
                   title: 'Total',
                   titleStyle: TextStyle(
@@ -391,46 +400,59 @@ class PdfInvoiceApi {
     );
   }
 
-  static Widget buildFooter(Invoice invoice) {
+  static Widget buildFooter(Invoice invoice, context, InvoiceType invoiceType) {
     Store store = StoreDB().getStore();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Thank you for your Business',
-            style: TextStyle(fontWeight: FontWeight.normal)),
+        Align(
+          alignment: Alignment.center,
+          child: Text('Page ${context.pageNumber} of ${context.pagesCount}',
+              style: const TextStyle(fontSize: 9.0)),
+        ),
         Divider(thickness: 0.2),
-        SizedBox(height: 0.5 * PdfPageFormat.mm),
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Column(children: [
-            buildCustomerAddress(invoice.billingAddress, invoice.customerName),
-          ]),
-          Column(children: [
-            Text(store.companyName,
-                style: TextStyle(fontWeight: FontWeight.normal)),
-            Text(store.slogan,
-                style:
-                    TextStyle(fontWeight: FontWeight.normal, fontSize: 10.0)),
-            Text('ABN ${store.abn}', style: const TextStyle(fontSize: 10.0)),
-            Text(
-                '${store.street},${store.city},${store.state},${store.postalcode}',
-                style: const TextStyle(fontSize: 10.0)),
-          ]),
-          Column(children: [
-            buildSimpleText(title: 'Invoice', value: invoice.invoiceId),
-            buildSimpleText(title: 'Customer ID', value: invoice.customerId),
-            buildSimpleText(
-                title: 'Date',
-                value: MyFormat.formatDateOne(invoice.createdDate)),
-            buildSimpleText(
-                title: 'Total', value: MyFormat.formatCurrency(invoice.total)),
-          ])
-        ]),
+        Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(children: [
+                buildCustomerAddress(
+                    invoice.billingAddress, invoice.customerName),
+              ]),
+              Column(children: [
+                Text(store.companyName,
+                    style: TextStyle(fontWeight: FontWeight.normal)),
+                Text(store.slogan,
+                    style: TextStyle(
+                        fontWeight: FontWeight.normal, fontSize: 9.0)),
+                Text('ABN ${store.abn}', style: const TextStyle(fontSize: 9.0)),
+                Text(
+                    '${store.street},${store.city},${store.state},${store.postalcode}',
+                    style: const TextStyle(fontSize: 9.0)),
+                Text(store.email, style: const TextStyle(fontSize: 9.0)),
+                Text(store.mobileNumber1,
+                    style: const TextStyle(fontSize: 9.0)),
+              ]),
+              Column(children: [
+                buildSimpleText(
+                    title: '${invoiceType.name()} No.',
+                    value: invoice.invoiceId),
+                buildSimpleText(
+                    title: 'Customer Id', value: invoice.customerId),
+                buildSimpleText(
+                    title: 'Date',
+                    value: MyFormat.formatDateOne(invoice.createdDate)),
+                buildSimpleText(
+                    title: 'Total',
+                    value: MyFormat.formatCurrency(invoice.total)),
+              ])
+            ]),
       ],
     );
   }
 
-  static Widget buildSupplyFooter(SupplyInvoice invoice) {
+  static Widget buildSupplyFooter(SupplyInvoice invoice, context) {
     Store store = StoreDB().getStore();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -456,8 +478,8 @@ class PdfInvoiceApi {
                 style: const TextStyle(fontSize: 10.0)),
           ]),
           Column(children: [
-            buildSimpleText(title: 'Invoice ID', value: invoice.invoiceId),
-            buildSimpleText(title: 'Supplyer ID', value: invoice.supplyerId),
+            buildSimpleText(title: 'Invoice No.', value: invoice.invoiceId),
+            buildSimpleText(title: 'Supplyer Id', value: invoice.supplyerId),
             buildSimpleText(
                 title: 'Date',
                 value: MyFormat.formatDateOne(invoice.createdDate)),
@@ -465,6 +487,7 @@ class PdfInvoiceApi {
                 title: 'Total', value: MyFormat.formatCurrency(invoice.total)),
           ])
         ]),
+        Text('Page ${context.pagesCount} of ${context.pagesCount}'),
       ],
     );
   }
