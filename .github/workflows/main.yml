@@ -33,7 +33,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
             artifacts: " build/windows/x64/runner/Release/MacRecoveryX-${{github.ref_name}}-windows.zip"
-            tag: v1.1.0
+            tag: v1.1.1
             token: ${{ secrets.POS_TOKEN }}
 
   
