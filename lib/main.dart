@@ -36,6 +36,15 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(debugShowCheckedModeBanner: false, home: LoginPage());
+    return GetMaterialApp(
+        theme: ThemeData(
+          textTheme: const TextTheme(
+            labelLarge: TextStyle(color: Colors.white),
+            bodyLarge:
+                TextStyle(color: Colors.white), // Set your desired white color
+          ),
+        ),
+        debugShowCheckedModeBanner: false,
+        home: LoginPage());
   }
 }
