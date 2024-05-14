@@ -39,10 +39,8 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
         theme: ThemeData(
           textTheme: const TextTheme(
-            labelLarge: TextStyle(color: Colors.white),
-            bodyLarge:
-                TextStyle(color: Colors.white), // Set your desired white color
-          ),
+              // your desired white color
+              ),
         ),
         debugShowCheckedModeBanner: false,
         home: LoginPage());
