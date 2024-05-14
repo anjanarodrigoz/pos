@@ -16,7 +16,9 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
-          
+      
+      - name: clean project dependencies
+        run: flutter clean    
       - name: Install project dependencies
         run: flutter pub get
       - name: Enable windows build
@@ -27,12 +29,12 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          filename: MacRecoveryX-${{github.ref_name}}-windows.zip
+          filename: ${{github.ref_name}}.zip
           directory: build/windows/x64/runner/Release
       - name: Push to Releases
         uses: ncipollo/release-action@v1
         with:
-            artifacts: " build/windows/x64/runner/Release/MacRecoveryX-${{github.ref_name}}-windows.zip"
+            artifacts: " build/windows/x64/runner/Release/${{github.ref_name}}.zip"
             tag: v1.1.2
             token: ${{ secrets.POS_TOKEN }}
 
