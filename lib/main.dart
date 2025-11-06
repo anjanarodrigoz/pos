@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:pos/Pages/initial_setup_page.dart';
 import 'package:pos/Pages/login_page.dart';
 import 'package:pos/database/cart_db_service.dart';
+import 'package:pos/services/auth_service.dart';
 import 'package:pos/services/encryption_service.dart';
 import 'package:pos/services/logger_service.dart';
 import 'package:pos/utils/val.dart';
@@ -49,19 +51,52 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Widget? _homePage;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPasswordSetup();
+  }
+
+  Future<void> _checkPasswordSetup() async {
+    // Check if password has been set
+    final hasPassword = await AuthService.hasPassword();
+
+    setState(() {
+      if (hasPassword) {
+        _homePage = LoginPage();
+        AppLogger.info('Password exists, showing login page');
+      } else {
+        _homePage = const InitialSetupPage();
+        AppLogger.info('No password set, showing initial setup page');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-        theme: ThemeData(
-          textTheme: const TextTheme(
-              // your desired white color
-              ),
-        ),
-        debugShowCheckedModeBanner: false,
-        home: LoginPage());
+      theme: ThemeData(
+        textTheme: const TextTheme(
+            // your desired white color
+            ),
+      ),
+      debugShowCheckedModeBanner: false,
+      home: _homePage ??
+          const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+    );
   }
 }
