@@ -56,6 +56,15 @@ dependencies:
   syncfusion_flutter_datagrid_export: ^22.2.12
   mailer: ^6.0.1
   archive: ^3.4.6
+  # Security & Encryption
+  crypto: ^3.0.3
+  flutter_secure_storage: ^9.0.0
+  # Logging
+  logger: ^2.0.2+1
+  # ID Generation
+  uuid: ^4.2.1
+  # Database
+  sqflite: ^2.3.0
 
 dev_dependencies:
   flutter_test:

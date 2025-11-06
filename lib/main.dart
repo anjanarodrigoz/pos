@@ -3,11 +3,26 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:pos/Pages/login_page.dart';
 import 'package:pos/database/cart_db_service.dart';
+import 'package:pos/services/encryption_service.dart';
+import 'package:pos/services/logger_service.dart';
 import 'package:pos/utils/val.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize logger
+  AppLogger.info('Initializing POS System...');
+
+  // Initialize encryption service FIRST (required for secure data storage)
+  try {
+    await EncryptionService.initialize();
+    AppLogger.info('Encryption service initialized');
+  } catch (e) {
+    AppLogger.error('Failed to initialize encryption service', e);
+  }
+
+  // Initialize GetStorage databases
   await GetStorage.init();
   await GetStorage.init(DBVal.customers);
   await GetStorage.init(DBVal.items);
@@ -20,12 +35,16 @@ void main() async {
   await GetStorage.init(DBVal.quatation);
   await GetStorage.init(DBVal.creditNote);
   await GetStorage.init(DBVal.store);
+  AppLogger.info('Storage initialized');
 
+  // Reset cart
   final storage = CartDB();
-
   await storage.resetCart();
 
+  // Initialize window manager
   await windowManager.ensureInitialized();
+
+  AppLogger.info('POS System initialized successfully');
 
   runApp(const MyApp());
 }
