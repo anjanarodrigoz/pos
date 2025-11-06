@@ -80,8 +80,12 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 
   # Drift code generation
-  drift_dev: ^2.14.0
-  build_runner: ^2.4.0
+  drift_dev: ^2.14.1
+  build_runner: ^2.4.6
+
+# Dependency overrides to fix version conflicts
+dependency_overrides:
+  args: ^2.5.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
