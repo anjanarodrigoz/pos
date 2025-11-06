@@ -59,11 +59,6 @@ class Invoices extends Table {
 
   @override
   Set<Column> get primaryKey => {invoiceId};
-
-  @override
-  List<Set<Column>> get uniqueKeys => [
-    {invoiceId}
-  ];
 }
 
 class InvoiceItems extends Table {
