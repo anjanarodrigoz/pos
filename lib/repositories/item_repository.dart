@@ -237,16 +237,12 @@ class ItemRepository {
           .then((row) => row.read(_database.invoiceItems.quantity.sum()) ?? 0);
 
       // Total revenue
+      final revenueExpression = _database.invoiceItems.quantity.cast<double>() * _database.invoiceItems.netPrice;
       final totalRevenue = await (_database.selectOnly(_database.invoiceItems)
-            ..addColumns([
-              (_database.invoiceItems.quantity * _database.invoiceItems.netPrice).sum()
-            ])
+            ..addColumns([revenueExpression.sum()])
             ..where(_database.invoiceItems.itemId.equals(itemId)))
           .getSingle()
-          .then((row) => row.read(
-                (_database.invoiceItems.quantity * _database.invoiceItems.netPrice).sum(),
-              ) ??
-              0.0);
+          .then((row) => (row.read(revenueExpression.sum()) ?? 0.0) as double);
 
       // Get current stock
       final item = await getItem(itemId);
