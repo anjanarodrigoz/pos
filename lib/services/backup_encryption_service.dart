@@ -1,23 +1,11 @@
 import 'dart:typed_data';
 import 'package:encrypt/encrypt.dart' as encrypt;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:pos/services/secure_storage_service.dart';
 
 /// Encryption service for database backups
 /// Ensures backup files are encrypted and cannot be read without credentials
 class BackupEncryptionService {
-  // Configure storage with macOS-specific options to avoid keychain entitlement issues during development
-  static const _storage = FlutterSecureStorage(
-    aOptions: AndroidOptions(
-      encryptedSharedPreferences: true,
-    ),
-    iOptions: IOSOptions(
-      accessibility: KeychainAccessibility.first_unlock,
-    ),
-    mOptions: MacOsOptions(
-      // Use account name instead of keychain during development to avoid signing requirements
-      accountName: 'pos_app_secure_storage',
-    ),
-  );
+  static final _storage = SecureStorageService();
   static const String _backupKeyKey = 'backup_encryption_key';
 
   /// Initialize backup encryption with user password

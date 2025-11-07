@@ -1,24 +1,12 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:pos/services/secure_storage_service.dart';
 
 /// Secure authentication service with password hashing
 /// Uses SHA-256 with salt for password security
 class AuthService {
-  // Configure storage with macOS-specific options to avoid keychain entitlement issues during development
-  static const _storage = FlutterSecureStorage(
-    aOptions: AndroidOptions(
-      encryptedSharedPreferences: true,
-    ),
-    iOptions: IOSOptions(
-      accessibility: KeychainAccessibility.first_unlock,
-    ),
-    mOptions: MacOsOptions(
-      // Use account name instead of keychain during development to avoid signing requirements
-      accountName: 'pos_app_secure_storage',
-    ),
-  );
+  static final _storage = SecureStorageService();
   static const String _passwordKey = 'hashed_password';
   static const String _saltKey = 'password_salt';
 
@@ -66,8 +54,7 @@ class AuthService {
 
   /// Check if a password has been set
   static Future<bool> hasPassword() async {
-    final storedHash = await _storage.read(key: _passwordKey);
-    return storedHash != null;
+    return await _storage.containsKey(key: _passwordKey);
   }
 
   /// Delete stored password (use with caution)

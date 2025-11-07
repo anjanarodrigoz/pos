@@ -7,6 +7,7 @@ import 'package:pos/database/cart_db_service.dart';
 import 'package:pos/services/auth_service.dart';
 import 'package:pos/services/encryption_service.dart';
 import 'package:pos/services/logger_service.dart';
+import 'package:pos/services/secure_storage_service.dart';
 import 'package:pos/utils/val.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -16,7 +17,16 @@ void main() async {
   // Initialize logger
   AppLogger.info('Initializing POS System...');
 
-  // Initialize encryption service FIRST (required for secure data storage)
+  // Initialize secure storage service FIRST (for passwords and credentials)
+  try {
+    final secureStorage = SecureStorageService();
+    await secureStorage.initialize();
+    AppLogger.info('Secure storage initialized');
+  } catch (e) {
+    AppLogger.error('Failed to initialize secure storage', e);
+  }
+
+  // Initialize encryption service (required for secure data storage)
   try {
     await EncryptionService.initialize();
     AppLogger.info('Encryption service initialized');
