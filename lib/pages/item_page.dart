@@ -347,6 +347,16 @@ class _ItemPageState extends State<ItemPage> {
                             Expanded(
                               flex: 2,
                               child: Text(
+                                'Item Code',
+                                style: AppTheme.labelLarge.copyWith(
+                                  color: AppTheme.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
                                 'Category',
                                 style: AppTheme.labelLarge.copyWith(
                                   color: AppTheme.textPrimary,
@@ -448,6 +458,20 @@ class _ItemPageState extends State<ItemPage> {
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                         ],
+                                      ),
+                                    ),
+
+                                    // Item Code
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        item.itemCode,
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: AppTheme.textSecondary,
+                                          fontFamily: 'monospace',
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
 

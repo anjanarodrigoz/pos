@@ -549,11 +549,18 @@ class _ItemViewPageState extends State<ItemViewPage> {
               style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
               decoration: AppTheme.inputDecoration(labelText: 'Category'),
             ),
-            SizedBox(height: AppTheme.spacingMd),
+            const SizedBox(height: AppTheme.spacingMd),
             TextField(
               controller: _itemCodeController,
-              style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-              decoration: AppTheme.inputDecoration(labelText: 'Item Code'),
+              enabled: false,
+              style: AppTheme.bodyMedium.copyWith(
+                color: AppTheme.textSecondary,
+                fontFamily: 'monospace',
+              ),
+              decoration: AppTheme.inputDecoration(
+                labelText: 'Item Code',
+                hintText: 'Cannot be changed once created',
+              ),
             ),
           ] else ...[
             _buildDetailRow('Description', item.description),
