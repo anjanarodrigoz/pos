@@ -71,7 +71,6 @@ class _ItemViewPageState extends State<ItemViewPage> {
           ? null
           : _barcodeController.text.trim(),
       // Keep original values for these fields
-      costPrice: originalItem.costPrice,
       isActive: originalItem.isActive,
       createdAt: originalItem.createdAt,
       updatedAt: DateTime.now(),
@@ -630,7 +629,7 @@ class _ItemViewPageState extends State<ItemViewPage> {
             ),
             SizedBox(height: AppTheme.spacingSm),
             Text(
-              'Note: Buying price and alternative pricing tiers are managed via supply invoices.',
+              'Note: Stock quantity is updated via supply invoices.',
               style: AppTheme.bodySmall.copyWith(
                 color: AppTheme.textHint,
                 fontStyle: FontStyle.italic,
@@ -638,8 +637,6 @@ class _ItemViewPageState extends State<ItemViewPage> {
             ),
           ] else ...[
             _buildDetailRow('Selling Price', currencyFormat.format(item.price)),
-            if (item.costPrice > 0)
-              _buildDetailRow('Cost Price', currencyFormat.format(item.costPrice)),
           ],
         ],
       ),

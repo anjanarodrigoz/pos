@@ -58,9 +58,8 @@ class ItemRepository {
     }
   }
 
-  /// Create new item
-  /// Note: Only accepts fields in current schema. After database regeneration,
-  /// this will be updated to support comment, buyingPrice, priceTwo-Five, lastInDate, lastOutDate
+  /// Create new item with selling price only
+  /// Note: Quantity defaults to 0 and is updated via supply invoices
   Future<Result<Item>> createItem({
     required String name,
     required double price,
@@ -68,20 +67,10 @@ class ItemRepository {
     String? description,
     String? category,
     String? barcode,
-    // Temporarily ignore these parameters until database is regenerated:
-    String? comment, // Will be supported after regeneration
-    double? buyingPrice, // Will be supported after regeneration
-    double? priceTwo, // Will be supported after regeneration
-    double? priceThree, // Will be supported after regeneration
-    double? priceFour, // Will be supported after regeneration
-    double? priceFive, // Will be supported after regeneration
-    DateTime? lastInDate, // Will be supported after regeneration
-    DateTime? lastOutDate, // Will be supported after regeneration
   }) async {
     try {
       final itemId = IDGenerator.generateItemId();
 
-      // Only use fields that exist in current generated schema
       final companion = ItemsCompanion.insert(
         id: itemId,
         name: name,
@@ -90,7 +79,7 @@ class ItemRepository {
         description: Value(description),
         category: Value(category),
         barcode: Value(barcode),
-        // costPrice field exists but not used on creation (set via supply invoice)
+        // Quantity defaults to 0, updated via supply invoice
       );
 
       await _database.into(_database.items).insert(companion);

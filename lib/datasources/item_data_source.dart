@@ -20,7 +20,6 @@ class ItemDataSource extends DataGridSource {
         DataGridCell<String>(
             columnName: 'description', value: item.description ?? ''),
         DataGridCell<double>(columnName: 'price', value: item.price),
-        DataGridCell<double>(columnName: 'costPrice', value: item.costPrice),
         DataGridCell<int>(columnName: 'quantity', value: item.quantity),
         DataGridCell<String>(columnName: 'category', value: item.category ?? ''),
       ]);
@@ -36,8 +35,7 @@ class ItemDataSource extends DataGridSource {
       cells: row.getCells().map<Widget>((dataGridCell) {
         return Container(
           alignment: dataGridCell.columnName == 'quantity' ||
-                  dataGridCell.columnName == 'price' ||
-                  dataGridCell.columnName == 'costPrice'
+                  dataGridCell.columnName == 'price'
               ? Alignment.centerRight
               : Alignment.centerLeft,
           padding: const EdgeInsets.symmetric(horizontal: 8.0),

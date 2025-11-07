@@ -47,20 +47,12 @@ class Items extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
   TextColumn get description => text().nullable()();
-  TextColumn get comment => text().nullable()();
 
-  // Pricing
-  RealColumn get price => real()(); // Main selling price
-  RealColumn get buyingPrice => real().withDefault(const Constant(0.0))(); // Cost price
-  RealColumn get priceTwo => real().withDefault(const Constant(0.0))();
-  RealColumn get priceThree => real().withDefault(const Constant(0.0))();
-  RealColumn get priceFour => real().withDefault(const Constant(0.0))();
-  RealColumn get priceFive => real().withDefault(const Constant(0.0))();
+  // Pricing - only selling price
+  RealColumn get price => real()(); // Selling price
 
-  // Inventory
+  // Inventory - quantity updated via supply invoices
   IntColumn get quantity => integer().withDefault(const Constant(0))();
-  DateTimeColumn get lastInDate => dateTime().nullable()();
-  DateTimeColumn get lastOutDate => dateTime().nullable()();
 
   // Additional info
   TextColumn get category => text().nullable()();
