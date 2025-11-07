@@ -4,10 +4,11 @@ import 'package:pos/database/pos_database.dart';
 import 'package:pos/repositories/customer_repository.dart';
 import 'package:pos/pages/customer_form.dart';
 import 'package:pos/pages/customer_view.dart';
+import 'package:pos/Pages/main_window.dart';
 import 'package:pos/theme/app_theme.dart';
 import 'package:pos/utils/result.dart';
 
-/// Modern customer list page with search and reactive updates
+/// Modern customer list page with professional table view
 class CustomerPage extends StatefulWidget {
   const CustomerPage({Key? key}) : super(key: key);
 
@@ -26,22 +27,30 @@ class _CustomerPageState extends State<CustomerPage> {
     super.dispose();
   }
 
+  void _navigateToMainMenu() {
+    Get.offAll(() => const MainWindow());
+  }
+
   void _navigateToAddCustomer() async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CustomerFormPage()),
     );
 
-    if (result == true) {
-      // Customer was created, list will auto-update via stream
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Customer created successfully'),
-            backgroundColor: AppTheme.successColor,
+    if (result == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Customer created successfully',
+            style: AppTheme.bodyMedium.copyWith(color: Colors.white),
           ),
-        );
-      }
+          backgroundColor: AppTheme.successColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          ),
+        ),
+      );
     }
   }
 
@@ -56,8 +65,15 @@ class _CustomerPageState extends State<CustomerPage> {
     if (result == 'deleted' && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Customer deleted successfully'),
+          content: Text(
+            'Customer deleted successfully',
+            style: AppTheme.bodyMedium.copyWith(color: Colors.white),
+          ),
           backgroundColor: AppTheme.successColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          ),
         ),
       );
     }
@@ -66,50 +82,116 @@ class _CustomerPageState extends State<CustomerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.backgroundGrey,
       appBar: AppBar(
-        title: const Text('Customers'),
+        title: Text(
+          'Customer Management',
+          style: AppTheme.headlineMedium.copyWith(color: AppTheme.textPrimary),
+        ),
+        backgroundColor: Colors.white,
         elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+          onPressed: _navigateToMainMenu,
+          tooltip: 'Back to Main Menu',
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.spacingMd,
+              vertical: 8,
+            ),
+            child: ElevatedButton.icon(
+              onPressed: _navigateToAddCustomer,
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('New Customer'),
+              style: AppTheme.primaryButtonStyle(),
+            ),
+          ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            height: 1,
+            color: AppTheme.borderColor,
+          ),
+        ),
       ),
       body: Column(
         children: [
           // Search Bar
           Container(
-            padding: const EdgeInsets.all(AppTheme.spacingMd),
-            color: AppTheme.surfaceColor,
-            child: TextField(
-              controller: _searchController,
-              decoration: AppTheme.inputDecoration(
-                labelText: 'Search customers',
-                hintText: 'Search by name, email, or mobile number',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() {
-                            _searchQuery = '';
-                          });
-                        },
-                      )
-                    : null,
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
+            padding: const EdgeInsets.all(AppTheme.spacingLg),
+            color: Colors.white,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppTheme.backgroundGrey,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                      border: Border.all(color: AppTheme.borderColor),
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      style: AppTheme.bodyMedium.copyWith(
+                        color: AppTheme.textPrimary,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Search customers by name, email, or mobile...',
+                        hintStyle: AppTheme.bodyMedium.copyWith(
+                          color: AppTheme.textHint,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: AppTheme.textSecondary,
+                          size: 20,
+                        ),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: Icon(
+                                  Icons.clear,
+                                  color: AppTheme.textSecondary,
+                                  size: 20,
+                                ),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() {
+                                    _searchQuery = '';
+                                  });
+                                },
+                              )
+                            : null,
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: AppTheme.spacingMd,
+                          vertical: AppTheme.spacingMd,
+                        ),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
 
-          // Customer List
+          // Customer Table
           Expanded(
             child: StreamBuilder<List<Customer>>(
               stream: _repository.watchAllCustomers(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
+                  return Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppTheme.primaryColor,
+                      ),
+                    ),
                   );
                 }
 
@@ -126,12 +208,16 @@ class _CustomerPageState extends State<CustomerPage> {
                         SizedBox(height: AppTheme.spacingMd),
                         Text(
                           'Failed to load customers',
-                          style: AppTheme.bodyLarge,
+                          style: AppTheme.headlineSmall.copyWith(
+                            color: AppTheme.textPrimary,
+                          ),
                         ),
                         SizedBox(height: AppTheme.spacingSm),
                         Text(
                           snapshot.error.toString(),
-                          style: AppTheme.bodySmall,
+                          style: AppTheme.bodySmall.copyWith(
+                            color: AppTheme.textSecondary,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -169,141 +255,234 @@ class _CustomerPageState extends State<CustomerPage> {
                           _searchQuery.isEmpty
                               ? 'No customers yet'
                               : 'No customers found',
-                          style: AppTheme.headlineSmall,
+                          style: AppTheme.headlineSmall.copyWith(
+                            color: AppTheme.textSecondary,
+                          ),
                         ),
                         SizedBox(height: AppTheme.spacingSm),
                         Text(
                           _searchQuery.isEmpty
-                              ? 'Tap + to add your first customer'
+                              ? 'Click "New Customer" to add your first customer'
                               : 'Try a different search term',
-                          style: AppTheme.bodySmall,
+                          style: AppTheme.bodySmall.copyWith(
+                            color: AppTheme.textHint,
+                          ),
                         ),
                       ],
                     ),
                   );
                 }
 
-                return ListView.builder(
-                  padding: const EdgeInsets.all(AppTheme.spacingMd),
-                  itemCount: customers.length,
-                  itemBuilder: (context, index) {
-                    final customer = customers[index];
-                    return _CustomerCard(
-                      customer: customer,
-                      onTap: () => _navigateToViewCustomer(customer),
-                    );
-                  },
+                return Container(
+                  margin: const EdgeInsets.all(AppTheme.spacingLg),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                    border: Border.all(color: AppTheme.borderColor),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      // Table Header
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppTheme.spacingMd,
+                          vertical: AppTheme.spacingSm,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.backgroundGrey,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(AppTheme.radiusLg),
+                            topRight: Radius.circular(AppTheme.radiusLg),
+                          ),
+                          border: Border(
+                            bottom: BorderSide(color: AppTheme.borderColor),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'Name',
+                                style: AppTheme.labelLarge.copyWith(
+                                  color: AppTheme.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'Email',
+                                style: AppTheme.labelLarge.copyWith(
+                                  color: AppTheme.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Text(
+                                'Mobile',
+                                style: AppTheme.labelLarge.copyWith(
+                                  color: AppTheme.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'City',
+                                style: AppTheme.labelLarge.copyWith(
+                                  color: AppTheme.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 60),
+                          ],
+                        ),
+                      ),
+
+                      // Table Body
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: customers.length,
+                          itemBuilder: (context, index) {
+                            final customer = customers[index];
+                            final isLast = index == customers.length - 1;
+
+                            return InkWell(
+                              onTap: () => _navigateToViewCustomer(customer),
+                              hoverColor: AppTheme.backgroundGrey.withOpacity(0.5),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppTheme.spacingMd,
+                                  vertical: AppTheme.spacingMd,
+                                ),
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: isLast
+                                        ? BorderSide.none
+                                        : BorderSide(
+                                            color: AppTheme.borderColor.withOpacity(0.5),
+                                          ),
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    // Name with Avatar
+                                    Expanded(
+                                      flex: 2,
+                                      child: Row(
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 16,
+                                            backgroundColor: AppTheme.primaryLight,
+                                            child: Text(
+                                              '${customer.firstName[0]}${customer.lastName[0]}'
+                                                  .toUpperCase(),
+                                              style: AppTheme.labelSmall.copyWith(
+                                                color: AppTheme.primaryDark,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: AppTheme.spacingSm),
+                                          Expanded(
+                                            child: Text(
+                                              '${customer.firstName} ${customer.lastName}',
+                                              style: AppTheme.bodyMedium.copyWith(
+                                                color: AppTheme.textPrimary,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    // Email
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        customer.email ?? '—',
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: customer.email != null
+                                              ? AppTheme.textSecondary
+                                              : AppTheme.textHint,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+
+                                    // Mobile
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        customer.mobileNumber ?? '—',
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: customer.mobileNumber != null
+                                              ? AppTheme.textSecondary
+                                              : AppTheme.textHint,
+                                        ),
+                                      ),
+                                    ),
+
+                                    // City
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        customer.billingCity ?? '—',
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: customer.billingCity != null
+                                              ? AppTheme.textSecondary
+                                              : AppTheme.textHint,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+
+                                    // Actions
+                                    SizedBox(
+                                      width: 60,
+                                      child: IconButton(
+                                        icon: Icon(
+                                          Icons.arrow_forward_ios,
+                                          size: 16,
+                                          color: AppTheme.textSecondary,
+                                        ),
+                                        onPressed: () =>
+                                            _navigateToViewCustomer(customer),
+                                        tooltip: 'View Details',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 );
               },
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _navigateToAddCustomer,
-        icon: const Icon(Icons.add),
-        label: const Text('Add Customer'),
-        backgroundColor: AppTheme.primaryColor,
-      ),
-    );
-  }
-}
-
-/// Modern customer card widget
-class _CustomerCard extends StatelessWidget {
-  final Customer customer;
-  final VoidCallback onTap;
-
-  const _CustomerCard({
-    required this.customer,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppTheme.spacingMd),
-      decoration: AppTheme.cardDecoration,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        child: Padding(
-          padding: const EdgeInsets.all(AppTheme.spacingMd),
-          child: Row(
-            children: [
-              // Avatar
-              CircleAvatar(
-                radius: 28,
-                backgroundColor: AppTheme.primaryLight,
-                child: Text(
-                  '${customer.firstName[0]}${customer.lastName[0]}'.toUpperCase(),
-                  style: AppTheme.headlineSmall.copyWith(
-                    color: AppTheme.primaryDark,
-                  ),
-                ),
-              ),
-              SizedBox(width: AppTheme.spacingMd),
-
-              // Customer Details
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${customer.firstName} ${customer.lastName}',
-                      style: AppTheme.headlineSmall,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: AppTheme.spacingXs),
-                    if (customer.email != null)
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.email_outlined,
-                            size: 14,
-                            color: AppTheme.textSecondary,
-                          ),
-                          SizedBox(width: AppTheme.spacingXs),
-                          Expanded(
-                            child: Text(
-                              customer.email!,
-                              style: AppTheme.bodySmall,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    if (customer.mobileNumber != null) ...[
-                      SizedBox(height: AppTheme.spacingXs),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.phone_outlined,
-                            size: 14,
-                            color: AppTheme.textSecondary,
-                          ),
-                          SizedBox(width: AppTheme.spacingXs),
-                          Text(
-                            customer.mobileNumber!,
-                            style: AppTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-
-              // Arrow Icon
-              Icon(
-                Icons.chevron_right,
-                color: AppTheme.textHint,
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

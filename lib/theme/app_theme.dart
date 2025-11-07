@@ -21,16 +21,17 @@ class AppTheme {
   static const Color infoColor = Color(0xFF2196F3);
 
   static const Color backgroundColor = Color(0xFFF5F5F5);
+  static const Color backgroundGrey = Color(0xFFF9FAFB); // Light grey background (shadcn style)
   static const Color surfaceColor = Color(0xFFFFFFFF);
   static const Color cardColor = Color(0xFFFFFFFF);
 
-  static const Color textPrimary = Color(0xFF212121);
-  static const Color textSecondary = Color(0xFF757575);
-  static const Color textHint = Color(0xFF9E9E9E);
-  static const Color textDisabled = Color(0xFFBDBDBD);
+  static const Color textPrimary = Color(0xFF0F172A); // Slate-900 (shadcn style)
+  static const Color textSecondary = Color(0xFF64748B); // Slate-500
+  static const Color textHint = Color(0xFF94A3B8); // Slate-400
+  static const Color textDisabled = Color(0xFFCBD5E1); // Slate-300
 
-  static const Color dividerColor = Color(0xFFE0E0E0);
-  static const Color borderColor = Color(0xFFBDBDBD);
+  static const Color dividerColor = Color(0xFFE2E8F0); // Slate-200
+  static const Color borderColor = Color(0xFFE2E8F0); // Slate-200 (shadcn style)
 
   // Status Colors
   static const Color statusPending = Color(0xFFFF9800);
