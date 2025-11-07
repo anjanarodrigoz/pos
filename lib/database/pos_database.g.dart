@@ -3691,28 +3691,98 @@ class $SuppliersTable extends Suppliers
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  static const VerificationMeta _firstNameMeta =
+      const VerificationMeta('firstName');
   @override
-  late final GeneratedColumn<String> name = GeneratedColumn<String>(
-      'name', aliasedName, false,
+  late final GeneratedColumn<String> firstName = GeneratedColumn<String>(
+      'first_name', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  static const VerificationMeta _lastNameMeta =
+      const VerificationMeta('lastName');
   @override
-  late final GeneratedColumn<String> email = GeneratedColumn<String>(
-      'email', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+  late final GeneratedColumn<String> lastName = GeneratedColumn<String>(
+      'last_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _mobileNumberMeta =
       const VerificationMeta('mobileNumber');
   @override
   late final GeneratedColumn<String> mobileNumber = GeneratedColumn<String>(
       'mobile_number', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _addressMeta =
-      const VerificationMeta('address');
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
   @override
-  late final GeneratedColumn<String> address = GeneratedColumn<String>(
-      'address', aliasedName, true,
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+      'email', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _faxMeta = const VerificationMeta('fax');
+  @override
+  late final GeneratedColumn<String> fax = GeneratedColumn<String>(
+      'fax', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _webMeta = const VerificationMeta('web');
+  @override
+  late final GeneratedColumn<String> web = GeneratedColumn<String>(
+      'web', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _abnMeta = const VerificationMeta('abn');
+  @override
+  late final GeneratedColumn<String> abn = GeneratedColumn<String>(
+      'abn', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _acnMeta = const VerificationMeta('acn');
+  @override
+  late final GeneratedColumn<String> acn = GeneratedColumn<String>(
+      'acn', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _commentMeta =
+      const VerificationMeta('comment');
+  @override
+  late final GeneratedColumn<String> comment = GeneratedColumn<String>(
+      'comment', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _streetMeta = const VerificationMeta('street');
+  @override
+  late final GeneratedColumn<String> street = GeneratedColumn<String>(
+      'street', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _cityMeta = const VerificationMeta('city');
+  @override
+  late final GeneratedColumn<String> city = GeneratedColumn<String>(
+      'city', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _stateMeta = const VerificationMeta('state');
+  @override
+  late final GeneratedColumn<String> state = GeneratedColumn<String>(
+      'state', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _areaCodeMeta =
+      const VerificationMeta('areaCode');
+  @override
+  late final GeneratedColumn<String> areaCode = GeneratedColumn<String>(
+      'area_code', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _postalCodeMeta =
+      const VerificationMeta('postalCode');
+  @override
+  late final GeneratedColumn<String> postalCode = GeneratedColumn<String>(
+      'postal_code', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _countryMeta =
+      const VerificationMeta('country');
+  @override
+  late final GeneratedColumn<String> country = GeneratedColumn<String>(
+      'country', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _isActiveMeta =
+      const VerificationMeta('isActive');
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+      'is_active', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_active" IN (0, 1))'),
+      defaultValue: const Constant(true));
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -3730,8 +3800,27 @@ class $SuppliersTable extends Suppliers
       requiredDuringInsert: false,
       defaultValue: currentDateAndTime);
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, name, email, mobileNumber, address, createdAt, updatedAt];
+  List<GeneratedColumn> get $columns => [
+        id,
+        firstName,
+        lastName,
+        mobileNumber,
+        email,
+        fax,
+        web,
+        abn,
+        acn,
+        comment,
+        street,
+        city,
+        state,
+        areaCode,
+        postalCode,
+        country,
+        isActive,
+        createdAt,
+        updatedAt
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3747,15 +3836,17 @@ class $SuppliersTable extends Suppliers
     } else if (isInserting) {
       context.missing(_idMeta);
     }
-    if (data.containsKey('name')) {
-      context.handle(
-          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    if (data.containsKey('first_name')) {
+      context.handle(_firstNameMeta,
+          firstName.isAcceptableOrUnknown(data['first_name']!, _firstNameMeta));
     } else if (isInserting) {
-      context.missing(_nameMeta);
+      context.missing(_firstNameMeta);
     }
-    if (data.containsKey('email')) {
-      context.handle(
-          _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
+    if (data.containsKey('last_name')) {
+      context.handle(_lastNameMeta,
+          lastName.isAcceptableOrUnknown(data['last_name']!, _lastNameMeta));
+    } else if (isInserting) {
+      context.missing(_lastNameMeta);
     }
     if (data.containsKey('mobile_number')) {
       context.handle(
@@ -3763,9 +3854,59 @@ class $SuppliersTable extends Suppliers
           mobileNumber.isAcceptableOrUnknown(
               data['mobile_number']!, _mobileNumberMeta));
     }
-    if (data.containsKey('address')) {
-      context.handle(_addressMeta,
-          address.isAcceptableOrUnknown(data['address']!, _addressMeta));
+    if (data.containsKey('email')) {
+      context.handle(
+          _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
+    }
+    if (data.containsKey('fax')) {
+      context.handle(
+          _faxMeta, fax.isAcceptableOrUnknown(data['fax']!, _faxMeta));
+    }
+    if (data.containsKey('web')) {
+      context.handle(
+          _webMeta, web.isAcceptableOrUnknown(data['web']!, _webMeta));
+    }
+    if (data.containsKey('abn')) {
+      context.handle(
+          _abnMeta, abn.isAcceptableOrUnknown(data['abn']!, _abnMeta));
+    }
+    if (data.containsKey('acn')) {
+      context.handle(
+          _acnMeta, acn.isAcceptableOrUnknown(data['acn']!, _acnMeta));
+    }
+    if (data.containsKey('comment')) {
+      context.handle(_commentMeta,
+          comment.isAcceptableOrUnknown(data['comment']!, _commentMeta));
+    }
+    if (data.containsKey('street')) {
+      context.handle(_streetMeta,
+          street.isAcceptableOrUnknown(data['street']!, _streetMeta));
+    }
+    if (data.containsKey('city')) {
+      context.handle(
+          _cityMeta, city.isAcceptableOrUnknown(data['city']!, _cityMeta));
+    }
+    if (data.containsKey('state')) {
+      context.handle(
+          _stateMeta, state.isAcceptableOrUnknown(data['state']!, _stateMeta));
+    }
+    if (data.containsKey('area_code')) {
+      context.handle(_areaCodeMeta,
+          areaCode.isAcceptableOrUnknown(data['area_code']!, _areaCodeMeta));
+    }
+    if (data.containsKey('postal_code')) {
+      context.handle(
+          _postalCodeMeta,
+          postalCode.isAcceptableOrUnknown(
+              data['postal_code']!, _postalCodeMeta));
+    }
+    if (data.containsKey('country')) {
+      context.handle(_countryMeta,
+          country.isAcceptableOrUnknown(data['country']!, _countryMeta));
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(_isActiveMeta,
+          isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta));
     }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
@@ -3786,14 +3927,38 @@ class $SuppliersTable extends Suppliers
     return Supplier(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      name: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
-      email: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}email']),
+      firstName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}first_name'])!,
+      lastName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}last_name'])!,
       mobileNumber: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}mobile_number']),
-      address: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}address']),
+      email: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}email']),
+      fax: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}fax']),
+      web: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}web']),
+      abn: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}abn']),
+      acn: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}acn']),
+      comment: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}comment']),
+      street: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}street']),
+      city: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}city']),
+      state: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}state']),
+      areaCode: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}area_code']),
+      postalCode: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}postal_code']),
+      country: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}country']),
+      isActive: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_active'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -3809,34 +3974,90 @@ class $SuppliersTable extends Suppliers
 
 class Supplier extends DataClass implements Insertable<Supplier> {
   final String id;
-  final String name;
-  final String? email;
+  final String firstName;
+  final String lastName;
   final String? mobileNumber;
-  final String? address;
+  final String? email;
+  final String? fax;
+  final String? web;
+  final String? abn;
+  final String? acn;
+  final String? comment;
+  final String? street;
+  final String? city;
+  final String? state;
+  final String? areaCode;
+  final String? postalCode;
+  final String? country;
+  final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
   const Supplier(
       {required this.id,
-      required this.name,
-      this.email,
+      required this.firstName,
+      required this.lastName,
       this.mobileNumber,
-      this.address,
+      this.email,
+      this.fax,
+      this.web,
+      this.abn,
+      this.acn,
+      this.comment,
+      this.street,
+      this.city,
+      this.state,
+      this.areaCode,
+      this.postalCode,
+      this.country,
+      required this.isActive,
       required this.createdAt,
       required this.updatedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
-    map['name'] = Variable<String>(name);
-    if (!nullToAbsent || email != null) {
-      map['email'] = Variable<String>(email);
-    }
+    map['first_name'] = Variable<String>(firstName);
+    map['last_name'] = Variable<String>(lastName);
     if (!nullToAbsent || mobileNumber != null) {
       map['mobile_number'] = Variable<String>(mobileNumber);
     }
-    if (!nullToAbsent || address != null) {
-      map['address'] = Variable<String>(address);
+    if (!nullToAbsent || email != null) {
+      map['email'] = Variable<String>(email);
     }
+    if (!nullToAbsent || fax != null) {
+      map['fax'] = Variable<String>(fax);
+    }
+    if (!nullToAbsent || web != null) {
+      map['web'] = Variable<String>(web);
+    }
+    if (!nullToAbsent || abn != null) {
+      map['abn'] = Variable<String>(abn);
+    }
+    if (!nullToAbsent || acn != null) {
+      map['acn'] = Variable<String>(acn);
+    }
+    if (!nullToAbsent || comment != null) {
+      map['comment'] = Variable<String>(comment);
+    }
+    if (!nullToAbsent || street != null) {
+      map['street'] = Variable<String>(street);
+    }
+    if (!nullToAbsent || city != null) {
+      map['city'] = Variable<String>(city);
+    }
+    if (!nullToAbsent || state != null) {
+      map['state'] = Variable<String>(state);
+    }
+    if (!nullToAbsent || areaCode != null) {
+      map['area_code'] = Variable<String>(areaCode);
+    }
+    if (!nullToAbsent || postalCode != null) {
+      map['postal_code'] = Variable<String>(postalCode);
+    }
+    if (!nullToAbsent || country != null) {
+      map['country'] = Variable<String>(country);
+    }
+    map['is_active'] = Variable<bool>(isActive);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -3845,15 +4066,35 @@ class Supplier extends DataClass implements Insertable<Supplier> {
   SuppliersCompanion toCompanion(bool nullToAbsent) {
     return SuppliersCompanion(
       id: Value(id),
-      name: Value(name),
-      email:
-          email == null && nullToAbsent ? const Value.absent() : Value(email),
+      firstName: Value(firstName),
+      lastName: Value(lastName),
       mobileNumber: mobileNumber == null && nullToAbsent
           ? const Value.absent()
           : Value(mobileNumber),
-      address: address == null && nullToAbsent
+      email:
+          email == null && nullToAbsent ? const Value.absent() : Value(email),
+      fax: fax == null && nullToAbsent ? const Value.absent() : Value(fax),
+      web: web == null && nullToAbsent ? const Value.absent() : Value(web),
+      abn: abn == null && nullToAbsent ? const Value.absent() : Value(abn),
+      acn: acn == null && nullToAbsent ? const Value.absent() : Value(acn),
+      comment: comment == null && nullToAbsent
           ? const Value.absent()
-          : Value(address),
+          : Value(comment),
+      street:
+          street == null && nullToAbsent ? const Value.absent() : Value(street),
+      city: city == null && nullToAbsent ? const Value.absent() : Value(city),
+      state:
+          state == null && nullToAbsent ? const Value.absent() : Value(state),
+      areaCode: areaCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(areaCode),
+      postalCode: postalCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postalCode),
+      country: country == null && nullToAbsent
+          ? const Value.absent()
+          : Value(country),
+      isActive: Value(isActive),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -3864,10 +4105,22 @@ class Supplier extends DataClass implements Insertable<Supplier> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Supplier(
       id: serializer.fromJson<String>(json['id']),
-      name: serializer.fromJson<String>(json['name']),
-      email: serializer.fromJson<String?>(json['email']),
+      firstName: serializer.fromJson<String>(json['firstName']),
+      lastName: serializer.fromJson<String>(json['lastName']),
       mobileNumber: serializer.fromJson<String?>(json['mobileNumber']),
-      address: serializer.fromJson<String?>(json['address']),
+      email: serializer.fromJson<String?>(json['email']),
+      fax: serializer.fromJson<String?>(json['fax']),
+      web: serializer.fromJson<String?>(json['web']),
+      abn: serializer.fromJson<String?>(json['abn']),
+      acn: serializer.fromJson<String?>(json['acn']),
+      comment: serializer.fromJson<String?>(json['comment']),
+      street: serializer.fromJson<String?>(json['street']),
+      city: serializer.fromJson<String?>(json['city']),
+      state: serializer.fromJson<String?>(json['state']),
+      areaCode: serializer.fromJson<String?>(json['areaCode']),
+      postalCode: serializer.fromJson<String?>(json['postalCode']),
+      country: serializer.fromJson<String?>(json['country']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -3877,10 +4130,22 @@ class Supplier extends DataClass implements Insertable<Supplier> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
-      'name': serializer.toJson<String>(name),
-      'email': serializer.toJson<String?>(email),
+      'firstName': serializer.toJson<String>(firstName),
+      'lastName': serializer.toJson<String>(lastName),
       'mobileNumber': serializer.toJson<String?>(mobileNumber),
-      'address': serializer.toJson<String?>(address),
+      'email': serializer.toJson<String?>(email),
+      'fax': serializer.toJson<String?>(fax),
+      'web': serializer.toJson<String?>(web),
+      'abn': serializer.toJson<String?>(abn),
+      'acn': serializer.toJson<String?>(acn),
+      'comment': serializer.toJson<String?>(comment),
+      'street': serializer.toJson<String?>(street),
+      'city': serializer.toJson<String?>(city),
+      'state': serializer.toJson<String?>(state),
+      'areaCode': serializer.toJson<String?>(areaCode),
+      'postalCode': serializer.toJson<String?>(postalCode),
+      'country': serializer.toJson<String?>(country),
+      'isActive': serializer.toJson<bool>(isActive),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -3888,31 +4153,68 @@ class Supplier extends DataClass implements Insertable<Supplier> {
 
   Supplier copyWith(
           {String? id,
-          String? name,
-          Value<String?> email = const Value.absent(),
+          String? firstName,
+          String? lastName,
           Value<String?> mobileNumber = const Value.absent(),
-          Value<String?> address = const Value.absent(),
+          Value<String?> email = const Value.absent(),
+          Value<String?> fax = const Value.absent(),
+          Value<String?> web = const Value.absent(),
+          Value<String?> abn = const Value.absent(),
+          Value<String?> acn = const Value.absent(),
+          Value<String?> comment = const Value.absent(),
+          Value<String?> street = const Value.absent(),
+          Value<String?> city = const Value.absent(),
+          Value<String?> state = const Value.absent(),
+          Value<String?> areaCode = const Value.absent(),
+          Value<String?> postalCode = const Value.absent(),
+          Value<String?> country = const Value.absent(),
+          bool? isActive,
           DateTime? createdAt,
           DateTime? updatedAt}) =>
       Supplier(
         id: id ?? this.id,
-        name: name ?? this.name,
-        email: email.present ? email.value : this.email,
+        firstName: firstName ?? this.firstName,
+        lastName: lastName ?? this.lastName,
         mobileNumber:
             mobileNumber.present ? mobileNumber.value : this.mobileNumber,
-        address: address.present ? address.value : this.address,
+        email: email.present ? email.value : this.email,
+        fax: fax.present ? fax.value : this.fax,
+        web: web.present ? web.value : this.web,
+        abn: abn.present ? abn.value : this.abn,
+        acn: acn.present ? acn.value : this.acn,
+        comment: comment.present ? comment.value : this.comment,
+        street: street.present ? street.value : this.street,
+        city: city.present ? city.value : this.city,
+        state: state.present ? state.value : this.state,
+        areaCode: areaCode.present ? areaCode.value : this.areaCode,
+        postalCode: postalCode.present ? postalCode.value : this.postalCode,
+        country: country.present ? country.value : this.country,
+        isActive: isActive ?? this.isActive,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
   Supplier copyWithCompanion(SuppliersCompanion data) {
     return Supplier(
       id: data.id.present ? data.id.value : this.id,
-      name: data.name.present ? data.name.value : this.name,
-      email: data.email.present ? data.email.value : this.email,
+      firstName: data.firstName.present ? data.firstName.value : this.firstName,
+      lastName: data.lastName.present ? data.lastName.value : this.lastName,
       mobileNumber: data.mobileNumber.present
           ? data.mobileNumber.value
           : this.mobileNumber,
-      address: data.address.present ? data.address.value : this.address,
+      email: data.email.present ? data.email.value : this.email,
+      fax: data.fax.present ? data.fax.value : this.fax,
+      web: data.web.present ? data.web.value : this.web,
+      abn: data.abn.present ? data.abn.value : this.abn,
+      acn: data.acn.present ? data.acn.value : this.acn,
+      comment: data.comment.present ? data.comment.value : this.comment,
+      street: data.street.present ? data.street.value : this.street,
+      city: data.city.present ? data.city.value : this.city,
+      state: data.state.present ? data.state.value : this.state,
+      areaCode: data.areaCode.present ? data.areaCode.value : this.areaCode,
+      postalCode:
+          data.postalCode.present ? data.postalCode.value : this.postalCode,
+      country: data.country.present ? data.country.value : this.country,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -3922,10 +4224,22 @@ class Supplier extends DataClass implements Insertable<Supplier> {
   String toString() {
     return (StringBuffer('Supplier(')
           ..write('id: $id, ')
-          ..write('name: $name, ')
-          ..write('email: $email, ')
+          ..write('firstName: $firstName, ')
+          ..write('lastName: $lastName, ')
           ..write('mobileNumber: $mobileNumber, ')
-          ..write('address: $address, ')
+          ..write('email: $email, ')
+          ..write('fax: $fax, ')
+          ..write('web: $web, ')
+          ..write('abn: $abn, ')
+          ..write('acn: $acn, ')
+          ..write('comment: $comment, ')
+          ..write('street: $street, ')
+          ..write('city: $city, ')
+          ..write('state: $state, ')
+          ..write('areaCode: $areaCode, ')
+          ..write('postalCode: $postalCode, ')
+          ..write('country: $country, ')
+          ..write('isActive: $isActive, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -3933,67 +4247,158 @@ class Supplier extends DataClass implements Insertable<Supplier> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, name, email, mobileNumber, address, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+      id,
+      firstName,
+      lastName,
+      mobileNumber,
+      email,
+      fax,
+      web,
+      abn,
+      acn,
+      comment,
+      street,
+      city,
+      state,
+      areaCode,
+      postalCode,
+      country,
+      isActive,
+      createdAt,
+      updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Supplier &&
           other.id == this.id &&
-          other.name == this.name &&
-          other.email == this.email &&
+          other.firstName == this.firstName &&
+          other.lastName == this.lastName &&
           other.mobileNumber == this.mobileNumber &&
-          other.address == this.address &&
+          other.email == this.email &&
+          other.fax == this.fax &&
+          other.web == this.web &&
+          other.abn == this.abn &&
+          other.acn == this.acn &&
+          other.comment == this.comment &&
+          other.street == this.street &&
+          other.city == this.city &&
+          other.state == this.state &&
+          other.areaCode == this.areaCode &&
+          other.postalCode == this.postalCode &&
+          other.country == this.country &&
+          other.isActive == this.isActive &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
 
 class SuppliersCompanion extends UpdateCompanion<Supplier> {
   final Value<String> id;
-  final Value<String> name;
-  final Value<String?> email;
+  final Value<String> firstName;
+  final Value<String> lastName;
   final Value<String?> mobileNumber;
-  final Value<String?> address;
+  final Value<String?> email;
+  final Value<String?> fax;
+  final Value<String?> web;
+  final Value<String?> abn;
+  final Value<String?> acn;
+  final Value<String?> comment;
+  final Value<String?> street;
+  final Value<String?> city;
+  final Value<String?> state;
+  final Value<String?> areaCode;
+  final Value<String?> postalCode;
+  final Value<String?> country;
+  final Value<bool> isActive;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const SuppliersCompanion({
     this.id = const Value.absent(),
-    this.name = const Value.absent(),
-    this.email = const Value.absent(),
+    this.firstName = const Value.absent(),
+    this.lastName = const Value.absent(),
     this.mobileNumber = const Value.absent(),
-    this.address = const Value.absent(),
+    this.email = const Value.absent(),
+    this.fax = const Value.absent(),
+    this.web = const Value.absent(),
+    this.abn = const Value.absent(),
+    this.acn = const Value.absent(),
+    this.comment = const Value.absent(),
+    this.street = const Value.absent(),
+    this.city = const Value.absent(),
+    this.state = const Value.absent(),
+    this.areaCode = const Value.absent(),
+    this.postalCode = const Value.absent(),
+    this.country = const Value.absent(),
+    this.isActive = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   SuppliersCompanion.insert({
     required String id,
-    required String name,
-    this.email = const Value.absent(),
+    required String firstName,
+    required String lastName,
     this.mobileNumber = const Value.absent(),
-    this.address = const Value.absent(),
+    this.email = const Value.absent(),
+    this.fax = const Value.absent(),
+    this.web = const Value.absent(),
+    this.abn = const Value.absent(),
+    this.acn = const Value.absent(),
+    this.comment = const Value.absent(),
+    this.street = const Value.absent(),
+    this.city = const Value.absent(),
+    this.state = const Value.absent(),
+    this.areaCode = const Value.absent(),
+    this.postalCode = const Value.absent(),
+    this.country = const Value.absent(),
+    this.isActive = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
-        name = Value(name);
+        firstName = Value(firstName),
+        lastName = Value(lastName);
   static Insertable<Supplier> custom({
     Expression<String>? id,
-    Expression<String>? name,
-    Expression<String>? email,
+    Expression<String>? firstName,
+    Expression<String>? lastName,
     Expression<String>? mobileNumber,
-    Expression<String>? address,
+    Expression<String>? email,
+    Expression<String>? fax,
+    Expression<String>? web,
+    Expression<String>? abn,
+    Expression<String>? acn,
+    Expression<String>? comment,
+    Expression<String>? street,
+    Expression<String>? city,
+    Expression<String>? state,
+    Expression<String>? areaCode,
+    Expression<String>? postalCode,
+    Expression<String>? country,
+    Expression<bool>? isActive,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (name != null) 'name': name,
-      if (email != null) 'email': email,
+      if (firstName != null) 'first_name': firstName,
+      if (lastName != null) 'last_name': lastName,
       if (mobileNumber != null) 'mobile_number': mobileNumber,
-      if (address != null) 'address': address,
+      if (email != null) 'email': email,
+      if (fax != null) 'fax': fax,
+      if (web != null) 'web': web,
+      if (abn != null) 'abn': abn,
+      if (acn != null) 'acn': acn,
+      if (comment != null) 'comment': comment,
+      if (street != null) 'street': street,
+      if (city != null) 'city': city,
+      if (state != null) 'state': state,
+      if (areaCode != null) 'area_code': areaCode,
+      if (postalCode != null) 'postal_code': postalCode,
+      if (country != null) 'country': country,
+      if (isActive != null) 'is_active': isActive,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -4002,19 +4407,43 @@ class SuppliersCompanion extends UpdateCompanion<Supplier> {
 
   SuppliersCompanion copyWith(
       {Value<String>? id,
-      Value<String>? name,
-      Value<String?>? email,
+      Value<String>? firstName,
+      Value<String>? lastName,
       Value<String?>? mobileNumber,
-      Value<String?>? address,
+      Value<String?>? email,
+      Value<String?>? fax,
+      Value<String?>? web,
+      Value<String?>? abn,
+      Value<String?>? acn,
+      Value<String?>? comment,
+      Value<String?>? street,
+      Value<String?>? city,
+      Value<String?>? state,
+      Value<String?>? areaCode,
+      Value<String?>? postalCode,
+      Value<String?>? country,
+      Value<bool>? isActive,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt,
       Value<int>? rowid}) {
     return SuppliersCompanion(
       id: id ?? this.id,
-      name: name ?? this.name,
-      email: email ?? this.email,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
       mobileNumber: mobileNumber ?? this.mobileNumber,
-      address: address ?? this.address,
+      email: email ?? this.email,
+      fax: fax ?? this.fax,
+      web: web ?? this.web,
+      abn: abn ?? this.abn,
+      acn: acn ?? this.acn,
+      comment: comment ?? this.comment,
+      street: street ?? this.street,
+      city: city ?? this.city,
+      state: state ?? this.state,
+      areaCode: areaCode ?? this.areaCode,
+      postalCode: postalCode ?? this.postalCode,
+      country: country ?? this.country,
+      isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -4027,17 +4456,53 @@ class SuppliersCompanion extends UpdateCompanion<Supplier> {
     if (id.present) {
       map['id'] = Variable<String>(id.value);
     }
-    if (name.present) {
-      map['name'] = Variable<String>(name.value);
+    if (firstName.present) {
+      map['first_name'] = Variable<String>(firstName.value);
     }
-    if (email.present) {
-      map['email'] = Variable<String>(email.value);
+    if (lastName.present) {
+      map['last_name'] = Variable<String>(lastName.value);
     }
     if (mobileNumber.present) {
       map['mobile_number'] = Variable<String>(mobileNumber.value);
     }
-    if (address.present) {
-      map['address'] = Variable<String>(address.value);
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
+    }
+    if (fax.present) {
+      map['fax'] = Variable<String>(fax.value);
+    }
+    if (web.present) {
+      map['web'] = Variable<String>(web.value);
+    }
+    if (abn.present) {
+      map['abn'] = Variable<String>(abn.value);
+    }
+    if (acn.present) {
+      map['acn'] = Variable<String>(acn.value);
+    }
+    if (comment.present) {
+      map['comment'] = Variable<String>(comment.value);
+    }
+    if (street.present) {
+      map['street'] = Variable<String>(street.value);
+    }
+    if (city.present) {
+      map['city'] = Variable<String>(city.value);
+    }
+    if (state.present) {
+      map['state'] = Variable<String>(state.value);
+    }
+    if (areaCode.present) {
+      map['area_code'] = Variable<String>(areaCode.value);
+    }
+    if (postalCode.present) {
+      map['postal_code'] = Variable<String>(postalCode.value);
+    }
+    if (country.present) {
+      map['country'] = Variable<String>(country.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -4055,10 +4520,22 @@ class SuppliersCompanion extends UpdateCompanion<Supplier> {
   String toString() {
     return (StringBuffer('SuppliersCompanion(')
           ..write('id: $id, ')
-          ..write('name: $name, ')
-          ..write('email: $email, ')
+          ..write('firstName: $firstName, ')
+          ..write('lastName: $lastName, ')
           ..write('mobileNumber: $mobileNumber, ')
-          ..write('address: $address, ')
+          ..write('email: $email, ')
+          ..write('fax: $fax, ')
+          ..write('web: $web, ')
+          ..write('abn: $abn, ')
+          ..write('acn: $acn, ')
+          ..write('comment: $comment, ')
+          ..write('street: $street, ')
+          ..write('city: $city, ')
+          ..write('state: $state, ')
+          ..write('areaCode: $areaCode, ')
+          ..write('postalCode: $postalCode, ')
+          ..write('country: $country, ')
+          ..write('isActive: $isActive, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -8249,20 +8726,44 @@ typedef $$ExtraChargesTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function({bool invoiceId})>;
 typedef $$SuppliersTableCreateCompanionBuilder = SuppliersCompanion Function({
   required String id,
-  required String name,
-  Value<String?> email,
+  required String firstName,
+  required String lastName,
   Value<String?> mobileNumber,
-  Value<String?> address,
+  Value<String?> email,
+  Value<String?> fax,
+  Value<String?> web,
+  Value<String?> abn,
+  Value<String?> acn,
+  Value<String?> comment,
+  Value<String?> street,
+  Value<String?> city,
+  Value<String?> state,
+  Value<String?> areaCode,
+  Value<String?> postalCode,
+  Value<String?> country,
+  Value<bool> isActive,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
   Value<int> rowid,
 });
 typedef $$SuppliersTableUpdateCompanionBuilder = SuppliersCompanion Function({
   Value<String> id,
-  Value<String> name,
-  Value<String?> email,
+  Value<String> firstName,
+  Value<String> lastName,
   Value<String?> mobileNumber,
-  Value<String?> address,
+  Value<String?> email,
+  Value<String?> fax,
+  Value<String?> web,
+  Value<String?> abn,
+  Value<String?> acn,
+  Value<String?> comment,
+  Value<String?> street,
+  Value<String?> city,
+  Value<String?> state,
+  Value<String?> areaCode,
+  Value<String?> postalCode,
+  Value<String?> country,
+  Value<bool> isActive,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
   Value<int> rowid,
@@ -8302,17 +8803,53 @@ class $$SuppliersTableFilterComposer
   ColumnFilters<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get firstName => $composableBuilder(
+      column: $table.firstName, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get email => $composableBuilder(
-      column: $table.email, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get lastName => $composableBuilder(
+      column: $table.lastName, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get mobileNumber => $composableBuilder(
       column: $table.mobileNumber, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get address => $composableBuilder(
-      column: $table.address, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get fax => $composableBuilder(
+      column: $table.fax, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get web => $composableBuilder(
+      column: $table.web, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get abn => $composableBuilder(
+      column: $table.abn, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get acn => $composableBuilder(
+      column: $table.acn, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get comment => $composableBuilder(
+      column: $table.comment, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get street => $composableBuilder(
+      column: $table.street, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get city => $composableBuilder(
+      column: $table.city, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get state => $composableBuilder(
+      column: $table.state, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get areaCode => $composableBuilder(
+      column: $table.areaCode, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get postalCode => $composableBuilder(
+      column: $table.postalCode, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get country => $composableBuilder(
+      column: $table.country, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+      column: $table.isActive, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
@@ -8354,18 +8891,54 @@ class $$SuppliersTableOrderingComposer
   ColumnOrderings<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get firstName => $composableBuilder(
+      column: $table.firstName, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get email => $composableBuilder(
-      column: $table.email, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get lastName => $composableBuilder(
+      column: $table.lastName, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get mobileNumber => $composableBuilder(
       column: $table.mobileNumber,
       builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get address => $composableBuilder(
-      column: $table.address, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get fax => $composableBuilder(
+      column: $table.fax, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get web => $composableBuilder(
+      column: $table.web, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get abn => $composableBuilder(
+      column: $table.abn, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get acn => $composableBuilder(
+      column: $table.acn, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get comment => $composableBuilder(
+      column: $table.comment, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get street => $composableBuilder(
+      column: $table.street, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get city => $composableBuilder(
+      column: $table.city, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get state => $composableBuilder(
+      column: $table.state, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get areaCode => $composableBuilder(
+      column: $table.areaCode, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get postalCode => $composableBuilder(
+      column: $table.postalCode, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get country => $composableBuilder(
+      column: $table.country, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+      column: $table.isActive, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
@@ -8386,17 +8959,53 @@ class $$SuppliersTableAnnotationComposer
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get name =>
-      $composableBuilder(column: $table.name, builder: (column) => column);
+  GeneratedColumn<String> get firstName =>
+      $composableBuilder(column: $table.firstName, builder: (column) => column);
 
-  GeneratedColumn<String> get email =>
-      $composableBuilder(column: $table.email, builder: (column) => column);
+  GeneratedColumn<String> get lastName =>
+      $composableBuilder(column: $table.lastName, builder: (column) => column);
 
   GeneratedColumn<String> get mobileNumber => $composableBuilder(
       column: $table.mobileNumber, builder: (column) => column);
 
-  GeneratedColumn<String> get address =>
-      $composableBuilder(column: $table.address, builder: (column) => column);
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
+
+  GeneratedColumn<String> get fax =>
+      $composableBuilder(column: $table.fax, builder: (column) => column);
+
+  GeneratedColumn<String> get web =>
+      $composableBuilder(column: $table.web, builder: (column) => column);
+
+  GeneratedColumn<String> get abn =>
+      $composableBuilder(column: $table.abn, builder: (column) => column);
+
+  GeneratedColumn<String> get acn =>
+      $composableBuilder(column: $table.acn, builder: (column) => column);
+
+  GeneratedColumn<String> get comment =>
+      $composableBuilder(column: $table.comment, builder: (column) => column);
+
+  GeneratedColumn<String> get street =>
+      $composableBuilder(column: $table.street, builder: (column) => column);
+
+  GeneratedColumn<String> get city =>
+      $composableBuilder(column: $table.city, builder: (column) => column);
+
+  GeneratedColumn<String> get state =>
+      $composableBuilder(column: $table.state, builder: (column) => column);
+
+  GeneratedColumn<String> get areaCode =>
+      $composableBuilder(column: $table.areaCode, builder: (column) => column);
+
+  GeneratedColumn<String> get postalCode => $composableBuilder(
+      column: $table.postalCode, builder: (column) => column);
+
+  GeneratedColumn<String> get country =>
+      $composableBuilder(column: $table.country, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -8450,40 +9059,88 @@ class $$SuppliersTableTableManager extends RootTableManager<
               $$SuppliersTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> id = const Value.absent(),
-            Value<String> name = const Value.absent(),
-            Value<String?> email = const Value.absent(),
+            Value<String> firstName = const Value.absent(),
+            Value<String> lastName = const Value.absent(),
             Value<String?> mobileNumber = const Value.absent(),
-            Value<String?> address = const Value.absent(),
+            Value<String?> email = const Value.absent(),
+            Value<String?> fax = const Value.absent(),
+            Value<String?> web = const Value.absent(),
+            Value<String?> abn = const Value.absent(),
+            Value<String?> acn = const Value.absent(),
+            Value<String?> comment = const Value.absent(),
+            Value<String?> street = const Value.absent(),
+            Value<String?> city = const Value.absent(),
+            Value<String?> state = const Value.absent(),
+            Value<String?> areaCode = const Value.absent(),
+            Value<String?> postalCode = const Value.absent(),
+            Value<String?> country = const Value.absent(),
+            Value<bool> isActive = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               SuppliersCompanion(
             id: id,
-            name: name,
-            email: email,
+            firstName: firstName,
+            lastName: lastName,
             mobileNumber: mobileNumber,
-            address: address,
+            email: email,
+            fax: fax,
+            web: web,
+            abn: abn,
+            acn: acn,
+            comment: comment,
+            street: street,
+            city: city,
+            state: state,
+            areaCode: areaCode,
+            postalCode: postalCode,
+            country: country,
+            isActive: isActive,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,
           ),
           createCompanionCallback: ({
             required String id,
-            required String name,
-            Value<String?> email = const Value.absent(),
+            required String firstName,
+            required String lastName,
             Value<String?> mobileNumber = const Value.absent(),
-            Value<String?> address = const Value.absent(),
+            Value<String?> email = const Value.absent(),
+            Value<String?> fax = const Value.absent(),
+            Value<String?> web = const Value.absent(),
+            Value<String?> abn = const Value.absent(),
+            Value<String?> acn = const Value.absent(),
+            Value<String?> comment = const Value.absent(),
+            Value<String?> street = const Value.absent(),
+            Value<String?> city = const Value.absent(),
+            Value<String?> state = const Value.absent(),
+            Value<String?> areaCode = const Value.absent(),
+            Value<String?> postalCode = const Value.absent(),
+            Value<String?> country = const Value.absent(),
+            Value<bool> isActive = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               SuppliersCompanion.insert(
             id: id,
-            name: name,
-            email: email,
+            firstName: firstName,
+            lastName: lastName,
             mobileNumber: mobileNumber,
-            address: address,
+            email: email,
+            fax: fax,
+            web: web,
+            abn: abn,
+            acn: acn,
+            comment: comment,
+            street: street,
+            city: city,
+            state: state,
+            areaCode: areaCode,
+            postalCode: postalCode,
+            country: country,
+            isActive: isActive,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,
