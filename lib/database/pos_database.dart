@@ -13,7 +13,29 @@ class Customers extends Table {
   TextColumn get lastName => text()();
   TextColumn get email => text().nullable()();
   TextColumn get mobileNumber => text().nullable()();
-  TextColumn get encryptedData => text().nullable()(); // For encrypted PII
+  TextColumn get fax => text().nullable()();
+  TextColumn get web => text().nullable()();
+  TextColumn get abn => text().nullable()();
+  TextColumn get acn => text().nullable()();
+  TextColumn get comment => text().nullable()();
+
+  // Billing/Delivery Address
+  TextColumn get billingStreet => text().nullable()();
+  TextColumn get billingCity => text().nullable()();
+  TextColumn get billingState => text().nullable()();
+  TextColumn get billingAreaCode => text().nullable()();
+  TextColumn get billingPostalCode => text().nullable()();
+  TextColumn get billingCountry => text().nullable()();
+
+  // Postal Address
+  TextColumn get postalStreet => text().nullable()();
+  TextColumn get postalCity => text().nullable()();
+  TextColumn get postalState => text().nullable()();
+  TextColumn get postalAreaCode => text().nullable()();
+  TextColumn get postalPostalCode => text().nullable()();
+  TextColumn get postalCountry => text().nullable()();
+
+  TextColumn get encryptedData => text().nullable()(); // For additional encrypted PII
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 
