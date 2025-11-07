@@ -125,10 +125,30 @@ class ExtraCharges extends Table {
 
 class Suppliers extends Table {
   TextColumn get id => text()();
-  TextColumn get name => text()();
-  TextColumn get email => text().nullable()();
+  TextColumn get firstName => text()();
+  TextColumn get lastName => text()();
+
+  // Contact Information
   TextColumn get mobileNumber => text().nullable()();
-  TextColumn get address => text().nullable()();
+  TextColumn get email => text().nullable()();
+  TextColumn get fax => text().nullable()();
+  TextColumn get web => text().nullable()();
+  TextColumn get abn => text().nullable()(); // Australian Business Number
+  TextColumn get acn => text().nullable()(); // Australian Company Number
+  TextColumn get comment => text().nullable()();
+
+  // Address Information
+  TextColumn get street => text().nullable()();
+  TextColumn get city => text().nullable()();
+  TextColumn get state => text().nullable()();
+  TextColumn get areaCode => text().nullable()();
+  TextColumn get postalCode => text().nullable()();
+  TextColumn get country => text().nullable()();
+
+  // Status
+  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+
+  // Timestamps
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 
@@ -195,7 +215,7 @@ class POSDatabase extends _$POSDatabase {
   POSDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -252,6 +272,61 @@ class POSDatabase extends _$POSDatabase {
             // Recreate index
             await customStatement('CREATE INDEX idx_items_name ON items(name)');
             await customStatement('CREATE INDEX idx_items_code ON items(item_code)');
+          }
+
+          // Migration from v2 to v3: Expand suppliers table with all fields
+          if (from == 2 && to == 3) {
+            // Create new suppliers table with full schema
+            await customStatement('''
+              CREATE TABLE suppliers_new (
+                id TEXT NOT NULL PRIMARY KEY,
+                first_name TEXT NOT NULL,
+                last_name TEXT NOT NULL,
+                mobile_number TEXT,
+                email TEXT,
+                fax TEXT,
+                web TEXT,
+                abn TEXT,
+                acn TEXT,
+                comment TEXT,
+                street TEXT,
+                city TEXT,
+                state TEXT,
+                area_code TEXT,
+                postal_code TEXT,
+                country TEXT,
+                is_active INTEGER NOT NULL DEFAULT 1,
+                created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+                updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+              )
+            ''');
+
+            // Copy data from old table to new table
+            // Split 'name' into firstName and lastName
+            await customStatement('''
+              INSERT INTO suppliers_new (id, first_name, last_name, mobile_number, email, street, city, is_active, created_at, updated_at)
+              SELECT id,
+                     CASE WHEN instr(name, ' ') > 0 THEN substr(name, 1, instr(name, ' ') - 1) ELSE name END as first_name,
+                     CASE WHEN instr(name, ' ') > 0 THEN substr(name, instr(name, ' ') + 1) ELSE '' END as last_name,
+                     mobile_number,
+                     email,
+                     CASE WHEN instr(COALESCE(address, ''), ',') > 0 THEN substr(address, 1, instr(address, ',') - 1) ELSE address END as street,
+                     CASE WHEN instr(COALESCE(address, ''), ',') > 0 THEN trim(substr(address, instr(address, ',') + 1)) ELSE NULL END as city,
+                     1 as is_active,
+                     created_at,
+                     updated_at
+              FROM suppliers
+            ''');
+
+            // Drop old table
+            await customStatement('DROP TABLE suppliers');
+
+            // Rename new table
+            await customStatement('ALTER TABLE suppliers_new RENAME TO suppliers');
+
+            // Create index
+            await customStatement('CREATE INDEX idx_suppliers_name ON suppliers(first_name, last_name)');
+            await customStatement('CREATE INDEX idx_suppliers_email ON suppliers(email)');
           }
         },
       );

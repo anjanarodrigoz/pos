@@ -11,12 +11,17 @@ class SupplierRepository {
   SupplierRepository(this._database);
 
   /// Get all suppliers
-  Future<Result<List<Supplier>>> getAllSuppliers() async {
+  Future<Result<List<Supplier>>> getAllSuppliers({bool activeOnly = false}) async {
     try {
-      final suppliers = await (_database.select(_database.suppliers)
-            ..orderBy([(s) => OrderingTerm.asc(s.name)]))
-          .get();
+      var query = _database.select(_database.suppliers);
 
+      if (activeOnly) {
+        query = query..where((s) => s.isActive.equals(true));
+      }
+
+      query = query..orderBy([(s) => OrderingTerm.asc(s.firstName)]);
+
+      final suppliers = await query.get();
       return Result.success(suppliers);
     } catch (e, stack) {
       AppLogger.error('Failed to get suppliers', e, stack);
@@ -38,12 +43,13 @@ class SupplierRepository {
     }
   }
 
-  /// Search suppliers by name
+  /// Search suppliers by name or email
   Future<Result<List<Supplier>>> searchSuppliers(String query) async {
     try {
       final suppliers = await (_database.select(_database.suppliers)
             ..where((s) =>
-                s.name.like('%$query%') |
+                s.firstName.like('%$query%') |
+                s.lastName.like('%$query%') |
                 s.email.like('%$query%') |
                 s.mobileNumber.like('%$query%')))
           .get();
@@ -57,26 +63,48 @@ class SupplierRepository {
 
   /// Create supplier
   Future<Result<Supplier>> createSupplier({
-    required String name,
+    required String firstName,
+    required String lastName,
+    required String mobileNumber,
     String? email,
-    String? mobileNumber,
-    String? address,
+    String? fax,
+    String? web,
+    String? abn,
+    String? acn,
+    String? comment,
+    String? street,
+    String? city,
+    String? state,
+    String? areaCode,
+    String? postalCode,
+    String? country,
   }) async {
     try {
       final supplierId = IDGenerator.generateSupplierId();
 
       final companion = SuppliersCompanion.insert(
         id: supplierId,
-        name: name,
-        email: Value(email),
+        firstName: firstName,
+        lastName: lastName,
         mobileNumber: Value(mobileNumber),
-        address: Value(address),
+        email: Value(email),
+        fax: Value(fax),
+        web: Value(web),
+        abn: Value(abn),
+        acn: Value(acn),
+        comment: Value(comment),
+        street: Value(street),
+        city: Value(city),
+        state: Value(state),
+        areaCode: Value(areaCode),
+        postalCode: Value(postalCode),
+        country: Value(country),
       );
 
       await _database.into(_database.suppliers).insert(companion);
 
       final supplier = await getSupplier(supplierId);
-      AppLogger.info('Supplier created: $supplierId - $name');
+      AppLogger.info('Supplier created: $supplierId - $firstName $lastName');
 
       return supplier;
     } catch (e, stack) {
@@ -86,61 +114,28 @@ class SupplierRepository {
   }
 
   /// Update supplier
-  Future<Result<Supplier>> updateSupplier({
-    required String supplierId,
-    String? name,
-    String? email,
-    String? mobileNumber,
-    String? address,
-  }) async {
+  Future<Result<Supplier>> updateSupplier(Supplier supplier) async {
     try {
-      final updates = SuppliersCompanion(
-        id: Value(supplierId),
-        name: name != null ? Value(name) : const Value.absent(),
-        email: email != null ? Value(email) : const Value.absent(),
-        mobileNumber:
-            mobileNumber != null ? Value(mobileNumber) : const Value.absent(),
-        address: address != null ? Value(address) : const Value.absent(),
-        updatedAt: Value(DateTime.now()),
-      );
-
       await (_database.update(_database.suppliers)
-            ..where((s) => s.id.equals(supplierId)))
-          .write(updates);
+            ..where((s) => s.id.equals(supplier.id)))
+          .write(supplier.toCompanion(true));
 
-      final supplier = await getSupplier(supplierId);
-      AppLogger.info('Supplier updated: $supplierId');
-
-      return supplier;
+      AppLogger.info('Supplier updated: ${supplier.id}');
+      return await getSupplier(supplier.id);
     } catch (e, stack) {
-      AppLogger.error('Failed to update supplier $supplierId', e, stack);
+      AppLogger.error('Failed to update supplier ${supplier.id}', e, stack);
       return Result.failure(AppError.generic('Failed to update supplier'));
     }
   }
 
-  /// Delete supplier
+  /// Delete supplier (soft delete)
   Future<Result<void>> deleteSupplier(String supplierId) async {
     try {
-      // Check if supplier has invoices
-      final invoiceCount = await (_database
-              .selectOnly(_database.supplierInvoices)
-            ..addColumns([_database.supplierInvoices.invoiceId.count()])
-            ..where(_database.supplierInvoices.supplierId.equals(supplierId)))
-          .getSingle()
-          .then((row) =>
-              row.read(_database.supplierInvoices.invoiceId.count()) ?? 0);
-
-      if (invoiceCount > 0) {
-        return Result.failure(AppError.validation(
-          'Cannot delete supplier with existing invoices',
-        ));
-      }
-
-      await (_database.delete(_database.suppliers)
+      await (_database.update(_database.suppliers)
             ..where((s) => s.id.equals(supplierId)))
-          .go();
+          .write(const SuppliersCompanion(isActive: Value(false)));
 
-      AppLogger.info('Supplier deleted: $supplierId');
+      AppLogger.info('Supplier deleted (soft): $supplierId');
       return Result.success(null);
     } catch (e, stack) {
       AppLogger.error('Failed to delete supplier $supplierId', e, stack);
@@ -148,11 +143,30 @@ class SupplierRepository {
     }
   }
 
+  /// Restore supplier
+  Future<Result<void>> restoreSupplier(String supplierId) async {
+    try {
+      await (_database.update(_database.suppliers)
+            ..where((s) => s.id.equals(supplierId)))
+          .write(const SuppliersCompanion(isActive: Value(true)));
+
+      AppLogger.info('Supplier restored: $supplierId');
+      return Result.success(null);
+    } catch (e, stack) {
+      AppLogger.error('Failed to restore supplier $supplierId', e, stack);
+      return Result.failure(AppError.generic('Failed to restore supplier'));
+    }
+  }
+
   /// Watch all suppliers (reactive)
-  Stream<List<Supplier>> watchAllSuppliers() {
-    return (_database.select(_database.suppliers)
-          ..orderBy([(s) => OrderingTerm.asc(s.name)]))
-        .watch();
+  Stream<List<Supplier>> watchAllSuppliers({bool activeOnly = false}) {
+    var query = _database.select(_database.suppliers);
+
+    if (activeOnly) {
+      query = query..where((s) => s.isActive.equals(true));
+    }
+
+    return (query..orderBy([(s) => OrderingTerm.asc(s.firstName)])).watch();
   }
 
   /// Watch single supplier
