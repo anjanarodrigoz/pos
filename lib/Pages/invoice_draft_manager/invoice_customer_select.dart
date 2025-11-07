@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pos/Pages/customer_manager/customer_page.dart';
 import 'package:pos/Pages/invoice_draft_manager/invoice_customer_view.dart';
 import 'package:pos/database/customer_db_service.dart';
+import 'package:pos/datasources/customer_data_source.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/alert_message.dart';
