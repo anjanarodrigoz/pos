@@ -6,10 +6,10 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 import 'package:pos/Pages/credit_note_manager/all_credit_note_page.dart';
 import 'package:pos/pages/customer_page.dart';
+import 'package:pos/pages/item_page.dart';
 import 'package:pos/Pages/payment_manager/payment_pdage.dart';
 import 'package:pos/Pages/quotation_manager/all_quotation_invoice.dart';
 import 'package:pos/Pages/setup/setup_home_page.dart';
-import 'package:pos/Pages/stock_manager.dart/stock_page.dart';
 import 'package:pos/Pages/supplyer_manager/supplyer_page.dart';
 import 'package:pos/controllers/size_controller.dart';
 import 'package:window_manager/window_manager.dart';
@@ -120,7 +120,7 @@ class _MainWindowState extends State<MainWindow> {
   openStockManager() async {
     await windowResizer(width: 900, height: 750);
 
-    Get.offAll(() => const StockPage());
+    Get.offAll(() => const ItemPage());
   }
 
   openSupplyerManager() async {
