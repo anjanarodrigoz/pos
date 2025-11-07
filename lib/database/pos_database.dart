@@ -195,7 +195,7 @@ class POSDatabase extends _$POSDatabase {
   POSDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -210,11 +210,49 @@ class POSDatabase extends _$POSDatabase {
             CREATE INDEX idx_invoice_items_invoice ON invoice_items(invoice_id);
             CREATE INDEX idx_payments_invoice ON payments(invoice_id);
             CREATE INDEX idx_items_name ON items(name);
+            CREATE INDEX idx_items_code ON items(item_code);
             CREATE INDEX idx_customers_email ON customers(email);
           ''');
         },
         onUpgrade: (Migrator m, int from, int to) async {
-          // Handle future migrations here
+          // Migration from v1 to v2: Rename barcode to itemCode, remove cost/buying prices
+          if (from == 1 && to == 2) {
+            // Create new items table with updated schema
+            await customStatement('''
+              CREATE TABLE items_new (
+                id TEXT NOT NULL PRIMARY KEY,
+                name TEXT NOT NULL,
+                description TEXT,
+                item_code TEXT NOT NULL UNIQUE,
+                price REAL NOT NULL,
+                quantity INTEGER NOT NULL DEFAULT 0,
+                category TEXT,
+                is_active INTEGER NOT NULL DEFAULT 1,
+                created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+                updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+              )
+            ''');
+
+            // Copy data from old table to new table
+            // barcode -> item_code, ignore costPrice and other removed fields
+            await customStatement('''
+              INSERT INTO items_new (id, name, description, item_code, price, quantity, category, is_active, created_at, updated_at)
+              SELECT id, name, description,
+                     COALESCE(barcode, 'ITEM-' || substr(id, -8)) as item_code,
+                     price, quantity, category, is_active, created_at, updated_at
+              FROM items
+            ''');
+
+            // Drop old table
+            await customStatement('DROP TABLE items');
+
+            // Rename new table
+            await customStatement('ALTER TABLE items_new RENAME TO items');
+
+            // Recreate index
+            await customStatement('CREATE INDEX idx_items_name ON items(name)');
+            await customStatement('CREATE INDEX idx_items_code ON items(item_code)');
+          }
         },
       );
 
