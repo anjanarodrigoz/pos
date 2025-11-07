@@ -47,16 +47,16 @@ class Items extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
   TextColumn get description => text().nullable()();
+  TextColumn get itemCode => text().unique()(); // Unique item code for each item
 
   // Pricing - only selling price
   RealColumn get price => real()(); // Selling price
 
-  // Inventory - quantity updated via supply invoices
+  // Inventory - quantity can ONLY be updated via supply invoices, NOT directly editable
   IntColumn get quantity => integer().withDefault(const Constant(0))();
 
   // Additional info
   TextColumn get category => text().nullable()();
-  TextColumn get barcode => text().nullable()();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 
   // Timestamps

@@ -41,14 +41,14 @@ class ItemRepository {
     }
   }
 
-  /// Search items by name
+  /// Search items by name, description, or item code
   Future<Result<List<Item>>> searchItems(String query) async {
     try {
       final items = await (_database.select(_database.items)
             ..where((i) =>
                 i.name.like('%$query%') |
                 i.description.like('%$query%') |
-                i.barcode.like('%$query%')))
+                i.itemCode.like('%$query%')))
           .get();
 
       return Result.success(items);
@@ -59,14 +59,14 @@ class ItemRepository {
   }
 
   /// Create new item with selling price only
-  /// Note: Quantity defaults to 0 and is updated via supply invoices
+  /// Note: Quantity defaults to 0 and is updated ONLY via supply invoices
   Future<Result<Item>> createItem({
     required String name,
+    required String itemCode,
     required double price,
     int quantity = 0,
     String? description,
     String? category,
-    String? barcode,
   }) async {
     try {
       final itemId = IDGenerator.generateItemId();
@@ -74,12 +74,12 @@ class ItemRepository {
       final companion = ItemsCompanion.insert(
         id: itemId,
         name: name,
+        itemCode: itemCode,
         price: price,
         quantity: Value(quantity),
         description: Value(description),
         category: Value(category),
-        barcode: Value(barcode),
-        // Quantity defaults to 0, updated via supply invoice
+        // Quantity defaults to 0, updated ONLY via supply invoice
       );
 
       await _database.into(_database.items).insert(companion);

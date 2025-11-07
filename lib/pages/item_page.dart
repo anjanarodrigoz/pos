@@ -143,7 +143,7 @@ class _ItemPageState extends State<ItemPage> {
                             color: AppTheme.textPrimary,
                           ),
                           decoration: InputDecoration(
-                            hintText: 'Search items by name, description, or barcode...',
+                            hintText: 'Search items by name, description, or item code...',
                             hintStyle: AppTheme.bodyMedium.copyWith(
                               color: AppTheme.textHint,
                             ),
@@ -261,7 +261,7 @@ class _ItemPageState extends State<ItemPage> {
                   items = items.where((i) {
                     return i.name.toLowerCase().contains(query) ||
                         (i.description?.toLowerCase().contains(query) ?? false) ||
-                        (i.barcode?.toLowerCase().contains(query) ?? false);
+                        i.itemCode.toLowerCase().contains(query);
                   }).toList();
                 }
 

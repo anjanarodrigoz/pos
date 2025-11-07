@@ -16,6 +16,7 @@ class ItemDataSource extends DataGridSource {
     dataGridRows = itemData.map<DataGridRow>((item) {
       return DataGridRow(cells: [
         DataGridCell<String>(columnName: 'id', value: item.id),
+        DataGridCell<String>(columnName: 'itemCode', value: item.itemCode),
         DataGridCell<String>(columnName: 'name', value: item.name),
         DataGridCell<String>(
             columnName: 'description', value: item.description ?? ''),

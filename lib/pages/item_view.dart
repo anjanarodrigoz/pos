@@ -26,18 +26,16 @@ class _ItemViewPageState extends State<ItemViewPage> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _categoryController = TextEditingController();
-  final _barcodeController = TextEditingController();
+  final _itemCodeController = TextEditingController();
   final _priceController = TextEditingController();
-  final _quantityController = TextEditingController();
 
   @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
     _categoryController.dispose();
-    _barcodeController.dispose();
+    _itemCodeController.dispose();
     _priceController.dispose();
-    _quantityController.dispose();
     super.dispose();
   }
 
@@ -45,9 +43,8 @@ class _ItemViewPageState extends State<ItemViewPage> {
     _nameController.text = item.name;
     _descriptionController.text = item.description ?? '';
     _categoryController.text = item.category ?? '';
-    _barcodeController.text = item.barcode ?? '';
+    _itemCodeController.text = item.itemCode;
     _priceController.text = item.price.toStringAsFixed(2);
-    _quantityController.text = item.quantity.toString();
   }
 
   Future<void> _saveChanges(Item originalItem) async {
@@ -56,21 +53,20 @@ class _ItemViewPageState extends State<ItemViewPage> {
     });
 
     // Create updated item with only editable fields
+    // Note: quantity cannot be edited here, only via supply invoices
     final updatedItem = Item(
       id: originalItem.id,
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim().isEmpty
           ? null
           : _descriptionController.text.trim(),
+      itemCode: _itemCodeController.text.trim(),
       price: double.parse(_priceController.text),
-      quantity: int.parse(_quantityController.text),
       category: _categoryController.text.trim().isEmpty
           ? null
           : _categoryController.text.trim(),
-      barcode: _barcodeController.text.trim().isEmpty
-          ? null
-          : _barcodeController.text.trim(),
       // Keep original values for these fields
+      quantity: originalItem.quantity, // Quantity can ONLY be updated via supply invoices
       isActive: originalItem.isActive,
       createdAt: originalItem.createdAt,
       updatedAt: DateTime.now(),
@@ -555,26 +551,15 @@ class _ItemViewPageState extends State<ItemViewPage> {
             ),
             SizedBox(height: AppTheme.spacingMd),
             TextField(
-              controller: _barcodeController,
+              controller: _itemCodeController,
               style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-              decoration: AppTheme.inputDecoration(labelText: 'Barcode'),
-            ),
-            SizedBox(height: AppTheme.spacingMd),
-            TextField(
-              controller: _quantityController,
-              style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-              decoration: AppTheme.inputDecoration(
-                labelText: 'Quantity',
-                hintText: 'Updated via supply invoices',
-              ),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: AppTheme.inputDecoration(labelText: 'Item Code'),
             ),
           ] else ...[
             _buildDetailRow('Description', item.description),
             _buildDetailRow('Category', item.category),
-            _buildDetailRow('Barcode', item.barcode),
-            _buildDetailRow('Quantity', item.quantity.toString()),
+            _buildDetailRow('Item Code', item.itemCode),
+            _buildDetailRow('Stock Quantity', '${item.quantity} (Updated via supply invoices only)'),
           ],
         ],
       ),

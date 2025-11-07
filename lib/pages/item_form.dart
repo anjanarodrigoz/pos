@@ -25,7 +25,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _categoryController = TextEditingController();
-  final _barcodeController = TextEditingController();
+  final _itemCodeController = TextEditingController();
 
   // Pricing
   final _priceController = TextEditingController();
@@ -35,7 +35,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
     _nameController.dispose();
     _descriptionController.dispose();
     _categoryController.dispose();
-    _barcodeController.dispose();
+    _itemCodeController.dispose();
     _priceController.dispose();
     super.dispose();
   }
@@ -51,17 +51,15 @@ class _ItemFormPageState extends State<ItemFormPage> {
 
     final result = await _repository.createItem(
       name: _nameController.text.trim(),
+      itemCode: _itemCodeController.text.trim(),
       price: double.parse(_priceController.text),
-      quantity: 0, // Start with 0, updated via supply invoice
+      quantity: 0, // Start with 0, updated ONLY via supply invoice
       description: _descriptionController.text.trim().isEmpty
           ? null
           : _descriptionController.text.trim(),
       category: _categoryController.text.trim().isEmpty
           ? null
           : _categoryController.text.trim(),
-      barcode: _barcodeController.text.trim().isEmpty
-          ? null
-          : _barcodeController.text.trim(),
     );
 
     setState(() {
@@ -161,12 +159,19 @@ class _ItemFormPageState extends State<ItemFormPage> {
                     SizedBox(width: AppTheme.spacingMd),
                     Expanded(
                       child: TextFormField(
-                        controller: _barcodeController,
+                        controller: _itemCodeController,
                         style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
                         decoration: AppTheme.inputDecoration(
-                          labelText: 'Barcode',
+                          labelText: 'Item Code *',
+                          hintText: 'Unique code for this item',
                           prefixIcon: const Icon(Icons.qr_code),
                         ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Item code is required';
+                          }
+                          return null;
+                        },
                       ),
                     ),
                   ],
@@ -205,7 +210,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
                 ),
                 SizedBox(height: AppTheme.spacingSm),
                 Text(
-                  'Note: Buying price and stock quantity will be set when you create a supply invoice.',
+                  'Note: Stock quantity starts at 0 and can ONLY be updated via supply invoices.',
                   style: AppTheme.bodySmall.copyWith(
                     color: AppTheme.textHint,
                     fontStyle: FontStyle.italic,
