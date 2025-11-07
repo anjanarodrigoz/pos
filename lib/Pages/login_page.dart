@@ -7,6 +7,7 @@ import 'package:pos/services/auth_service.dart';
 import 'package:pos/services/verification_service.dart';
 import 'package:pos/services/backup_encryption_service.dart';
 import 'package:pos/services/logger_service.dart';
+import 'package:pos/theme/app_theme.dart';
 import 'package:pos/utils/alert_message.dart';
 import 'package:pos/utils/validators.dart';
 import 'package:pos/widgets/pos_button.dart';
@@ -17,6 +18,7 @@ import 'package:window_manager/window_manager.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController passwordController = TextEditingController();
+  final RxBool obscurePassword = true.obs;
 
   LoginPage({super.key});
 
@@ -24,7 +26,7 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     if (Platform.isWindows || Platform.isMacOS) {
       WindowOptions windowOptions = const WindowOptions(
-        size: Size(500, 400),
+        size: Size(500, 600),
         center: true,
         skipTaskbar: false,
       );
@@ -34,60 +36,134 @@ class LoginPage extends StatelessWidget {
       });
     }
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text(
-                'POS System',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 32.0),
-              PosTextFormField(
-                controller: passwordController,
-                obscureText: true,
-                hintText: 'Password',
-                prefixIcon: const Icon(Icons.lock_outline),
-              ),
-              TextButton(
-                onPressed: () {
-                  Get.to(() => PasswordResetRequestPage());
-                },
-                child: const Text(
-                  'Reset Password',
-                  style: TextStyle(fontSize: 12.0),
+      backgroundColor: AppTheme.backgroundGrey,
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppTheme.spacingXl),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 400),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+              border: Border.all(color: AppTheme.borderColor),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
                 ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppTheme.spacingXl * 1.5),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Logo/Icon
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryLight,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                    ),
+                    child: Icon(
+                      Icons.storefront_rounded,
+                      size: 40,
+                      color: AppTheme.primaryDark,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.spacingLg),
+
+                  // Title
+                  Text(
+                    'POS System',
+                    style: AppTheme.headlineLarge.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.spacingSm),
+                  Text(
+                    'Enter your password to continue',
+                    style: AppTheme.bodyMedium.copyWith(
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.spacingXl),
+
+                  // Password Field
+                  Obx(() => TextFormField(
+                    controller: passwordController,
+                    obscureText: obscurePassword.value,
+                    style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
+                    decoration: AppTheme.inputDecoration(
+                      labelText: 'Password',
+                      hintText: 'Enter your password',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          obscurePassword.value
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                        ),
+                        onPressed: () => obscurePassword.toggle(),
+                      ),
+                    ),
+                  )),
+
+                  // Reset Password Link
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        Get.to(() => PasswordResetRequestPage());
+                      },
+                      child: Text(
+                        'Forgot Password?',
+                        style: AppTheme.labelMedium.copyWith(
+                          color: AppTheme.primaryColor,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: AppTheme.spacingMd),
+
+                  // Login Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final password = passwordController.text;
+
+                        if (password.isEmpty) {
+                          AlertMessage.snakMessage('Please enter password', context);
+                          return;
+                        }
+
+                        // Verify password using secure auth service
+                        final isValid = await AuthService.verifyPassword(password);
+
+                        if (isValid) {
+                          // Initialize backup encryption with user password
+                          await BackupEncryptionService.initializeBackupKey(password);
+
+                          AppLogger.info('User logged in successfully');
+                          Get.off(() => const MainWindow());
+                        } else {
+                          AppLogger.warning('Failed login attempt');
+                          AlertMessage.snakMessage('Invalid Password', context);
+                        }
+                      },
+                      style: AppTheme.primaryButtonStyle(),
+                      child: const Text('Login'),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16.0),
-              PosButton(
-                text: 'Login',
-                onPressed: () async {
-                  final password = passwordController.text;
-
-                  if (password.isEmpty) {
-                    AlertMessage.snakMessage('Please enter password', context);
-                    return;
-                  }
-
-                  // Verify password using secure auth service
-                  final isValid = await AuthService.verifyPassword(password);
-
-                  if (isValid) {
-                    // Initialize backup encryption with user password
-                    await BackupEncryptionService.initializeBackupKey(password);
-
-                    AppLogger.info('User logged in successfully');
-                    Get.off(() => const MainWindow());
-                  } else {
-                    AppLogger.warning('Failed login attempt');
-                    AlertMessage.snakMessage('Invalid Password', context);
-                  }
-                },
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -103,31 +179,80 @@ class PasswordResetRequestPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.backgroundGrey,
       appBar: AppBar(
-        toolbarHeight: 40.0,
-        title: const Text(
-          'Password Reset Request',
-          style: TextStyle(fontSize: 14.0),
+        title: Text(
+          'Reset Password',
+          style: AppTheme.headlineMedium.copyWith(color: AppTheme.textPrimary),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: IconThemeData(color: AppTheme.textPrimary),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(height: 1, color: AppTheme.borderColor),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text('Enter your email address to receive a reset code'),
-              const SizedBox(height: 20.0),
-              PosTextFormField(
-                controller: emailController,
-                hintText: 'E-mail',
-                keyboardType: TextInputType.emailAddress,
-                prefixIcon: const Icon(Icons.email_outlined),
-              ),
-              const SizedBox(height: 16.0),
-              POSProgressButton(
-                onPressed: () async {
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppTheme.spacingXl),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 400),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+              border: Border.all(color: AppTheme.borderColor),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppTheme.spacingXl * 1.5),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.email_outlined,
+                    size: 64,
+                    color: AppTheme.primaryColor,
+                  ),
+                  const SizedBox(height: AppTheme.spacingLg),
+                  Text(
+                    'Reset Your Password',
+                    style: AppTheme.headlineMedium.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.spacingSm),
+                  Text(
+                    'Enter your email address and we\'ll send you a verification code',
+                    style: AppTheme.bodyMedium.copyWith(
+                      color: AppTheme.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppTheme.spacingXl),
+                  TextFormField(
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
+                    decoration: AppTheme.inputDecoration(
+                      labelText: 'Email Address',
+                      hintText: 'Enter your email',
+                      prefixIcon: const Icon(Icons.email_outlined),
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.spacingXl),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () async {
                   final email = emailController.text.trim();
 
                   // Validate email
@@ -154,9 +279,13 @@ class PasswordResetRequestPage extends StatelessWidget {
                     Get.to(() => ResetCodeCheckPage(email));
                   }
                 },
-                text: 'Send Code',
+                      style: AppTheme.primaryButtonStyle(),
+                      child: const Text('Send Verification Code'),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
