@@ -37,6 +37,104 @@ class $CustomersTable extends Customers
   late final GeneratedColumn<String> mobileNumber = GeneratedColumn<String>(
       'mobile_number', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _faxMeta = const VerificationMeta('fax');
+  @override
+  late final GeneratedColumn<String> fax = GeneratedColumn<String>(
+      'fax', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _webMeta = const VerificationMeta('web');
+  @override
+  late final GeneratedColumn<String> web = GeneratedColumn<String>(
+      'web', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _abnMeta = const VerificationMeta('abn');
+  @override
+  late final GeneratedColumn<String> abn = GeneratedColumn<String>(
+      'abn', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _acnMeta = const VerificationMeta('acn');
+  @override
+  late final GeneratedColumn<String> acn = GeneratedColumn<String>(
+      'acn', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _commentMeta =
+      const VerificationMeta('comment');
+  @override
+  late final GeneratedColumn<String> comment = GeneratedColumn<String>(
+      'comment', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _billingStreetMeta =
+      const VerificationMeta('billingStreet');
+  @override
+  late final GeneratedColumn<String> billingStreet = GeneratedColumn<String>(
+      'billing_street', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _billingCityMeta =
+      const VerificationMeta('billingCity');
+  @override
+  late final GeneratedColumn<String> billingCity = GeneratedColumn<String>(
+      'billing_city', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _billingStateMeta =
+      const VerificationMeta('billingState');
+  @override
+  late final GeneratedColumn<String> billingState = GeneratedColumn<String>(
+      'billing_state', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _billingAreaCodeMeta =
+      const VerificationMeta('billingAreaCode');
+  @override
+  late final GeneratedColumn<String> billingAreaCode = GeneratedColumn<String>(
+      'billing_area_code', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _billingPostalCodeMeta =
+      const VerificationMeta('billingPostalCode');
+  @override
+  late final GeneratedColumn<String> billingPostalCode =
+      GeneratedColumn<String>('billing_postal_code', aliasedName, true,
+          type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _billingCountryMeta =
+      const VerificationMeta('billingCountry');
+  @override
+  late final GeneratedColumn<String> billingCountry = GeneratedColumn<String>(
+      'billing_country', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _postalStreetMeta =
+      const VerificationMeta('postalStreet');
+  @override
+  late final GeneratedColumn<String> postalStreet = GeneratedColumn<String>(
+      'postal_street', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _postalCityMeta =
+      const VerificationMeta('postalCity');
+  @override
+  late final GeneratedColumn<String> postalCity = GeneratedColumn<String>(
+      'postal_city', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _postalStateMeta =
+      const VerificationMeta('postalState');
+  @override
+  late final GeneratedColumn<String> postalState = GeneratedColumn<String>(
+      'postal_state', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _postalAreaCodeMeta =
+      const VerificationMeta('postalAreaCode');
+  @override
+  late final GeneratedColumn<String> postalAreaCode = GeneratedColumn<String>(
+      'postal_area_code', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _postalPostalCodeMeta =
+      const VerificationMeta('postalPostalCode');
+  @override
+  late final GeneratedColumn<String> postalPostalCode = GeneratedColumn<String>(
+      'postal_postal_code', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _postalCountryMeta =
+      const VerificationMeta('postalCountry');
+  @override
+  late final GeneratedColumn<String> postalCountry = GeneratedColumn<String>(
+      'postal_country', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _encryptedDataMeta =
       const VerificationMeta('encryptedData');
   @override
@@ -66,6 +164,23 @@ class $CustomersTable extends Customers
         lastName,
         email,
         mobileNumber,
+        fax,
+        web,
+        abn,
+        acn,
+        comment,
+        billingStreet,
+        billingCity,
+        billingState,
+        billingAreaCode,
+        billingPostalCode,
+        billingCountry,
+        postalStreet,
+        postalCity,
+        postalState,
+        postalAreaCode,
+        postalPostalCode,
+        postalCountry,
         encryptedData,
         createdAt,
         updatedAt
@@ -107,6 +222,98 @@ class $CustomersTable extends Customers
           mobileNumber.isAcceptableOrUnknown(
               data['mobile_number']!, _mobileNumberMeta));
     }
+    if (data.containsKey('fax')) {
+      context.handle(
+          _faxMeta, fax.isAcceptableOrUnknown(data['fax']!, _faxMeta));
+    }
+    if (data.containsKey('web')) {
+      context.handle(
+          _webMeta, web.isAcceptableOrUnknown(data['web']!, _webMeta));
+    }
+    if (data.containsKey('abn')) {
+      context.handle(
+          _abnMeta, abn.isAcceptableOrUnknown(data['abn']!, _abnMeta));
+    }
+    if (data.containsKey('acn')) {
+      context.handle(
+          _acnMeta, acn.isAcceptableOrUnknown(data['acn']!, _acnMeta));
+    }
+    if (data.containsKey('comment')) {
+      context.handle(_commentMeta,
+          comment.isAcceptableOrUnknown(data['comment']!, _commentMeta));
+    }
+    if (data.containsKey('billing_street')) {
+      context.handle(
+          _billingStreetMeta,
+          billingStreet.isAcceptableOrUnknown(
+              data['billing_street']!, _billingStreetMeta));
+    }
+    if (data.containsKey('billing_city')) {
+      context.handle(
+          _billingCityMeta,
+          billingCity.isAcceptableOrUnknown(
+              data['billing_city']!, _billingCityMeta));
+    }
+    if (data.containsKey('billing_state')) {
+      context.handle(
+          _billingStateMeta,
+          billingState.isAcceptableOrUnknown(
+              data['billing_state']!, _billingStateMeta));
+    }
+    if (data.containsKey('billing_area_code')) {
+      context.handle(
+          _billingAreaCodeMeta,
+          billingAreaCode.isAcceptableOrUnknown(
+              data['billing_area_code']!, _billingAreaCodeMeta));
+    }
+    if (data.containsKey('billing_postal_code')) {
+      context.handle(
+          _billingPostalCodeMeta,
+          billingPostalCode.isAcceptableOrUnknown(
+              data['billing_postal_code']!, _billingPostalCodeMeta));
+    }
+    if (data.containsKey('billing_country')) {
+      context.handle(
+          _billingCountryMeta,
+          billingCountry.isAcceptableOrUnknown(
+              data['billing_country']!, _billingCountryMeta));
+    }
+    if (data.containsKey('postal_street')) {
+      context.handle(
+          _postalStreetMeta,
+          postalStreet.isAcceptableOrUnknown(
+              data['postal_street']!, _postalStreetMeta));
+    }
+    if (data.containsKey('postal_city')) {
+      context.handle(
+          _postalCityMeta,
+          postalCity.isAcceptableOrUnknown(
+              data['postal_city']!, _postalCityMeta));
+    }
+    if (data.containsKey('postal_state')) {
+      context.handle(
+          _postalStateMeta,
+          postalState.isAcceptableOrUnknown(
+              data['postal_state']!, _postalStateMeta));
+    }
+    if (data.containsKey('postal_area_code')) {
+      context.handle(
+          _postalAreaCodeMeta,
+          postalAreaCode.isAcceptableOrUnknown(
+              data['postal_area_code']!, _postalAreaCodeMeta));
+    }
+    if (data.containsKey('postal_postal_code')) {
+      context.handle(
+          _postalPostalCodeMeta,
+          postalPostalCode.isAcceptableOrUnknown(
+              data['postal_postal_code']!, _postalPostalCodeMeta));
+    }
+    if (data.containsKey('postal_country')) {
+      context.handle(
+          _postalCountryMeta,
+          postalCountry.isAcceptableOrUnknown(
+              data['postal_country']!, _postalCountryMeta));
+    }
     if (data.containsKey('encrypted_data')) {
       context.handle(
           _encryptedDataMeta,
@@ -140,6 +347,40 @@ class $CustomersTable extends Customers
           .read(DriftSqlType.string, data['${effectivePrefix}email']),
       mobileNumber: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}mobile_number']),
+      fax: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}fax']),
+      web: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}web']),
+      abn: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}abn']),
+      acn: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}acn']),
+      comment: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}comment']),
+      billingStreet: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}billing_street']),
+      billingCity: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}billing_city']),
+      billingState: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}billing_state']),
+      billingAreaCode: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}billing_area_code']),
+      billingPostalCode: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}billing_postal_code']),
+      billingCountry: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}billing_country']),
+      postalStreet: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}postal_street']),
+      postalCity: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}postal_city']),
+      postalState: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}postal_state']),
+      postalAreaCode: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}postal_area_code']),
+      postalPostalCode: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}postal_postal_code']),
+      postalCountry: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}postal_country']),
       encryptedData: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}encrypted_data']),
       createdAt: attachedDatabase.typeMapping
@@ -161,6 +402,23 @@ class Customer extends DataClass implements Insertable<Customer> {
   final String lastName;
   final String? email;
   final String? mobileNumber;
+  final String? fax;
+  final String? web;
+  final String? abn;
+  final String? acn;
+  final String? comment;
+  final String? billingStreet;
+  final String? billingCity;
+  final String? billingState;
+  final String? billingAreaCode;
+  final String? billingPostalCode;
+  final String? billingCountry;
+  final String? postalStreet;
+  final String? postalCity;
+  final String? postalState;
+  final String? postalAreaCode;
+  final String? postalPostalCode;
+  final String? postalCountry;
   final String? encryptedData;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -170,6 +428,23 @@ class Customer extends DataClass implements Insertable<Customer> {
       required this.lastName,
       this.email,
       this.mobileNumber,
+      this.fax,
+      this.web,
+      this.abn,
+      this.acn,
+      this.comment,
+      this.billingStreet,
+      this.billingCity,
+      this.billingState,
+      this.billingAreaCode,
+      this.billingPostalCode,
+      this.billingCountry,
+      this.postalStreet,
+      this.postalCity,
+      this.postalState,
+      this.postalAreaCode,
+      this.postalPostalCode,
+      this.postalCountry,
       this.encryptedData,
       required this.createdAt,
       required this.updatedAt});
@@ -184,6 +459,57 @@ class Customer extends DataClass implements Insertable<Customer> {
     }
     if (!nullToAbsent || mobileNumber != null) {
       map['mobile_number'] = Variable<String>(mobileNumber);
+    }
+    if (!nullToAbsent || fax != null) {
+      map['fax'] = Variable<String>(fax);
+    }
+    if (!nullToAbsent || web != null) {
+      map['web'] = Variable<String>(web);
+    }
+    if (!nullToAbsent || abn != null) {
+      map['abn'] = Variable<String>(abn);
+    }
+    if (!nullToAbsent || acn != null) {
+      map['acn'] = Variable<String>(acn);
+    }
+    if (!nullToAbsent || comment != null) {
+      map['comment'] = Variable<String>(comment);
+    }
+    if (!nullToAbsent || billingStreet != null) {
+      map['billing_street'] = Variable<String>(billingStreet);
+    }
+    if (!nullToAbsent || billingCity != null) {
+      map['billing_city'] = Variable<String>(billingCity);
+    }
+    if (!nullToAbsent || billingState != null) {
+      map['billing_state'] = Variable<String>(billingState);
+    }
+    if (!nullToAbsent || billingAreaCode != null) {
+      map['billing_area_code'] = Variable<String>(billingAreaCode);
+    }
+    if (!nullToAbsent || billingPostalCode != null) {
+      map['billing_postal_code'] = Variable<String>(billingPostalCode);
+    }
+    if (!nullToAbsent || billingCountry != null) {
+      map['billing_country'] = Variable<String>(billingCountry);
+    }
+    if (!nullToAbsent || postalStreet != null) {
+      map['postal_street'] = Variable<String>(postalStreet);
+    }
+    if (!nullToAbsent || postalCity != null) {
+      map['postal_city'] = Variable<String>(postalCity);
+    }
+    if (!nullToAbsent || postalState != null) {
+      map['postal_state'] = Variable<String>(postalState);
+    }
+    if (!nullToAbsent || postalAreaCode != null) {
+      map['postal_area_code'] = Variable<String>(postalAreaCode);
+    }
+    if (!nullToAbsent || postalPostalCode != null) {
+      map['postal_postal_code'] = Variable<String>(postalPostalCode);
+    }
+    if (!nullToAbsent || postalCountry != null) {
+      map['postal_country'] = Variable<String>(postalCountry);
     }
     if (!nullToAbsent || encryptedData != null) {
       map['encrypted_data'] = Variable<String>(encryptedData);
@@ -203,6 +529,49 @@ class Customer extends DataClass implements Insertable<Customer> {
       mobileNumber: mobileNumber == null && nullToAbsent
           ? const Value.absent()
           : Value(mobileNumber),
+      fax: fax == null && nullToAbsent ? const Value.absent() : Value(fax),
+      web: web == null && nullToAbsent ? const Value.absent() : Value(web),
+      abn: abn == null && nullToAbsent ? const Value.absent() : Value(abn),
+      acn: acn == null && nullToAbsent ? const Value.absent() : Value(acn),
+      comment: comment == null && nullToAbsent
+          ? const Value.absent()
+          : Value(comment),
+      billingStreet: billingStreet == null && nullToAbsent
+          ? const Value.absent()
+          : Value(billingStreet),
+      billingCity: billingCity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(billingCity),
+      billingState: billingState == null && nullToAbsent
+          ? const Value.absent()
+          : Value(billingState),
+      billingAreaCode: billingAreaCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(billingAreaCode),
+      billingPostalCode: billingPostalCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(billingPostalCode),
+      billingCountry: billingCountry == null && nullToAbsent
+          ? const Value.absent()
+          : Value(billingCountry),
+      postalStreet: postalStreet == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postalStreet),
+      postalCity: postalCity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postalCity),
+      postalState: postalState == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postalState),
+      postalAreaCode: postalAreaCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postalAreaCode),
+      postalPostalCode: postalPostalCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postalPostalCode),
+      postalCountry: postalCountry == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postalCountry),
       encryptedData: encryptedData == null && nullToAbsent
           ? const Value.absent()
           : Value(encryptedData),
@@ -220,6 +589,24 @@ class Customer extends DataClass implements Insertable<Customer> {
       lastName: serializer.fromJson<String>(json['lastName']),
       email: serializer.fromJson<String?>(json['email']),
       mobileNumber: serializer.fromJson<String?>(json['mobileNumber']),
+      fax: serializer.fromJson<String?>(json['fax']),
+      web: serializer.fromJson<String?>(json['web']),
+      abn: serializer.fromJson<String?>(json['abn']),
+      acn: serializer.fromJson<String?>(json['acn']),
+      comment: serializer.fromJson<String?>(json['comment']),
+      billingStreet: serializer.fromJson<String?>(json['billingStreet']),
+      billingCity: serializer.fromJson<String?>(json['billingCity']),
+      billingState: serializer.fromJson<String?>(json['billingState']),
+      billingAreaCode: serializer.fromJson<String?>(json['billingAreaCode']),
+      billingPostalCode:
+          serializer.fromJson<String?>(json['billingPostalCode']),
+      billingCountry: serializer.fromJson<String?>(json['billingCountry']),
+      postalStreet: serializer.fromJson<String?>(json['postalStreet']),
+      postalCity: serializer.fromJson<String?>(json['postalCity']),
+      postalState: serializer.fromJson<String?>(json['postalState']),
+      postalAreaCode: serializer.fromJson<String?>(json['postalAreaCode']),
+      postalPostalCode: serializer.fromJson<String?>(json['postalPostalCode']),
+      postalCountry: serializer.fromJson<String?>(json['postalCountry']),
       encryptedData: serializer.fromJson<String?>(json['encryptedData']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -234,6 +621,23 @@ class Customer extends DataClass implements Insertable<Customer> {
       'lastName': serializer.toJson<String>(lastName),
       'email': serializer.toJson<String?>(email),
       'mobileNumber': serializer.toJson<String?>(mobileNumber),
+      'fax': serializer.toJson<String?>(fax),
+      'web': serializer.toJson<String?>(web),
+      'abn': serializer.toJson<String?>(abn),
+      'acn': serializer.toJson<String?>(acn),
+      'comment': serializer.toJson<String?>(comment),
+      'billingStreet': serializer.toJson<String?>(billingStreet),
+      'billingCity': serializer.toJson<String?>(billingCity),
+      'billingState': serializer.toJson<String?>(billingState),
+      'billingAreaCode': serializer.toJson<String?>(billingAreaCode),
+      'billingPostalCode': serializer.toJson<String?>(billingPostalCode),
+      'billingCountry': serializer.toJson<String?>(billingCountry),
+      'postalStreet': serializer.toJson<String?>(postalStreet),
+      'postalCity': serializer.toJson<String?>(postalCity),
+      'postalState': serializer.toJson<String?>(postalState),
+      'postalAreaCode': serializer.toJson<String?>(postalAreaCode),
+      'postalPostalCode': serializer.toJson<String?>(postalPostalCode),
+      'postalCountry': serializer.toJson<String?>(postalCountry),
       'encryptedData': serializer.toJson<String?>(encryptedData),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -246,6 +650,23 @@ class Customer extends DataClass implements Insertable<Customer> {
           String? lastName,
           Value<String?> email = const Value.absent(),
           Value<String?> mobileNumber = const Value.absent(),
+          Value<String?> fax = const Value.absent(),
+          Value<String?> web = const Value.absent(),
+          Value<String?> abn = const Value.absent(),
+          Value<String?> acn = const Value.absent(),
+          Value<String?> comment = const Value.absent(),
+          Value<String?> billingStreet = const Value.absent(),
+          Value<String?> billingCity = const Value.absent(),
+          Value<String?> billingState = const Value.absent(),
+          Value<String?> billingAreaCode = const Value.absent(),
+          Value<String?> billingPostalCode = const Value.absent(),
+          Value<String?> billingCountry = const Value.absent(),
+          Value<String?> postalStreet = const Value.absent(),
+          Value<String?> postalCity = const Value.absent(),
+          Value<String?> postalState = const Value.absent(),
+          Value<String?> postalAreaCode = const Value.absent(),
+          Value<String?> postalPostalCode = const Value.absent(),
+          Value<String?> postalCountry = const Value.absent(),
           Value<String?> encryptedData = const Value.absent(),
           DateTime? createdAt,
           DateTime? updatedAt}) =>
@@ -256,6 +677,35 @@ class Customer extends DataClass implements Insertable<Customer> {
         email: email.present ? email.value : this.email,
         mobileNumber:
             mobileNumber.present ? mobileNumber.value : this.mobileNumber,
+        fax: fax.present ? fax.value : this.fax,
+        web: web.present ? web.value : this.web,
+        abn: abn.present ? abn.value : this.abn,
+        acn: acn.present ? acn.value : this.acn,
+        comment: comment.present ? comment.value : this.comment,
+        billingStreet:
+            billingStreet.present ? billingStreet.value : this.billingStreet,
+        billingCity: billingCity.present ? billingCity.value : this.billingCity,
+        billingState:
+            billingState.present ? billingState.value : this.billingState,
+        billingAreaCode: billingAreaCode.present
+            ? billingAreaCode.value
+            : this.billingAreaCode,
+        billingPostalCode: billingPostalCode.present
+            ? billingPostalCode.value
+            : this.billingPostalCode,
+        billingCountry:
+            billingCountry.present ? billingCountry.value : this.billingCountry,
+        postalStreet:
+            postalStreet.present ? postalStreet.value : this.postalStreet,
+        postalCity: postalCity.present ? postalCity.value : this.postalCity,
+        postalState: postalState.present ? postalState.value : this.postalState,
+        postalAreaCode:
+            postalAreaCode.present ? postalAreaCode.value : this.postalAreaCode,
+        postalPostalCode: postalPostalCode.present
+            ? postalPostalCode.value
+            : this.postalPostalCode,
+        postalCountry:
+            postalCountry.present ? postalCountry.value : this.postalCountry,
         encryptedData:
             encryptedData.present ? encryptedData.value : this.encryptedData,
         createdAt: createdAt ?? this.createdAt,
@@ -270,6 +720,44 @@ class Customer extends DataClass implements Insertable<Customer> {
       mobileNumber: data.mobileNumber.present
           ? data.mobileNumber.value
           : this.mobileNumber,
+      fax: data.fax.present ? data.fax.value : this.fax,
+      web: data.web.present ? data.web.value : this.web,
+      abn: data.abn.present ? data.abn.value : this.abn,
+      acn: data.acn.present ? data.acn.value : this.acn,
+      comment: data.comment.present ? data.comment.value : this.comment,
+      billingStreet: data.billingStreet.present
+          ? data.billingStreet.value
+          : this.billingStreet,
+      billingCity:
+          data.billingCity.present ? data.billingCity.value : this.billingCity,
+      billingState: data.billingState.present
+          ? data.billingState.value
+          : this.billingState,
+      billingAreaCode: data.billingAreaCode.present
+          ? data.billingAreaCode.value
+          : this.billingAreaCode,
+      billingPostalCode: data.billingPostalCode.present
+          ? data.billingPostalCode.value
+          : this.billingPostalCode,
+      billingCountry: data.billingCountry.present
+          ? data.billingCountry.value
+          : this.billingCountry,
+      postalStreet: data.postalStreet.present
+          ? data.postalStreet.value
+          : this.postalStreet,
+      postalCity:
+          data.postalCity.present ? data.postalCity.value : this.postalCity,
+      postalState:
+          data.postalState.present ? data.postalState.value : this.postalState,
+      postalAreaCode: data.postalAreaCode.present
+          ? data.postalAreaCode.value
+          : this.postalAreaCode,
+      postalPostalCode: data.postalPostalCode.present
+          ? data.postalPostalCode.value
+          : this.postalPostalCode,
+      postalCountry: data.postalCountry.present
+          ? data.postalCountry.value
+          : this.postalCountry,
       encryptedData: data.encryptedData.present
           ? data.encryptedData.value
           : this.encryptedData,
@@ -286,6 +774,23 @@ class Customer extends DataClass implements Insertable<Customer> {
           ..write('lastName: $lastName, ')
           ..write('email: $email, ')
           ..write('mobileNumber: $mobileNumber, ')
+          ..write('fax: $fax, ')
+          ..write('web: $web, ')
+          ..write('abn: $abn, ')
+          ..write('acn: $acn, ')
+          ..write('comment: $comment, ')
+          ..write('billingStreet: $billingStreet, ')
+          ..write('billingCity: $billingCity, ')
+          ..write('billingState: $billingState, ')
+          ..write('billingAreaCode: $billingAreaCode, ')
+          ..write('billingPostalCode: $billingPostalCode, ')
+          ..write('billingCountry: $billingCountry, ')
+          ..write('postalStreet: $postalStreet, ')
+          ..write('postalCity: $postalCity, ')
+          ..write('postalState: $postalState, ')
+          ..write('postalAreaCode: $postalAreaCode, ')
+          ..write('postalPostalCode: $postalPostalCode, ')
+          ..write('postalCountry: $postalCountry, ')
           ..write('encryptedData: $encryptedData, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -294,8 +799,33 @@ class Customer extends DataClass implements Insertable<Customer> {
   }
 
   @override
-  int get hashCode => Object.hash(id, firstName, lastName, email, mobileNumber,
-      encryptedData, createdAt, updatedAt);
+  int get hashCode => Object.hashAll([
+        id,
+        firstName,
+        lastName,
+        email,
+        mobileNumber,
+        fax,
+        web,
+        abn,
+        acn,
+        comment,
+        billingStreet,
+        billingCity,
+        billingState,
+        billingAreaCode,
+        billingPostalCode,
+        billingCountry,
+        postalStreet,
+        postalCity,
+        postalState,
+        postalAreaCode,
+        postalPostalCode,
+        postalCountry,
+        encryptedData,
+        createdAt,
+        updatedAt
+      ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -305,6 +835,23 @@ class Customer extends DataClass implements Insertable<Customer> {
           other.lastName == this.lastName &&
           other.email == this.email &&
           other.mobileNumber == this.mobileNumber &&
+          other.fax == this.fax &&
+          other.web == this.web &&
+          other.abn == this.abn &&
+          other.acn == this.acn &&
+          other.comment == this.comment &&
+          other.billingStreet == this.billingStreet &&
+          other.billingCity == this.billingCity &&
+          other.billingState == this.billingState &&
+          other.billingAreaCode == this.billingAreaCode &&
+          other.billingPostalCode == this.billingPostalCode &&
+          other.billingCountry == this.billingCountry &&
+          other.postalStreet == this.postalStreet &&
+          other.postalCity == this.postalCity &&
+          other.postalState == this.postalState &&
+          other.postalAreaCode == this.postalAreaCode &&
+          other.postalPostalCode == this.postalPostalCode &&
+          other.postalCountry == this.postalCountry &&
           other.encryptedData == this.encryptedData &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -316,6 +863,23 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
   final Value<String> lastName;
   final Value<String?> email;
   final Value<String?> mobileNumber;
+  final Value<String?> fax;
+  final Value<String?> web;
+  final Value<String?> abn;
+  final Value<String?> acn;
+  final Value<String?> comment;
+  final Value<String?> billingStreet;
+  final Value<String?> billingCity;
+  final Value<String?> billingState;
+  final Value<String?> billingAreaCode;
+  final Value<String?> billingPostalCode;
+  final Value<String?> billingCountry;
+  final Value<String?> postalStreet;
+  final Value<String?> postalCity;
+  final Value<String?> postalState;
+  final Value<String?> postalAreaCode;
+  final Value<String?> postalPostalCode;
+  final Value<String?> postalCountry;
   final Value<String?> encryptedData;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
@@ -326,6 +890,23 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     this.lastName = const Value.absent(),
     this.email = const Value.absent(),
     this.mobileNumber = const Value.absent(),
+    this.fax = const Value.absent(),
+    this.web = const Value.absent(),
+    this.abn = const Value.absent(),
+    this.acn = const Value.absent(),
+    this.comment = const Value.absent(),
+    this.billingStreet = const Value.absent(),
+    this.billingCity = const Value.absent(),
+    this.billingState = const Value.absent(),
+    this.billingAreaCode = const Value.absent(),
+    this.billingPostalCode = const Value.absent(),
+    this.billingCountry = const Value.absent(),
+    this.postalStreet = const Value.absent(),
+    this.postalCity = const Value.absent(),
+    this.postalState = const Value.absent(),
+    this.postalAreaCode = const Value.absent(),
+    this.postalPostalCode = const Value.absent(),
+    this.postalCountry = const Value.absent(),
     this.encryptedData = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -337,6 +918,23 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     required String lastName,
     this.email = const Value.absent(),
     this.mobileNumber = const Value.absent(),
+    this.fax = const Value.absent(),
+    this.web = const Value.absent(),
+    this.abn = const Value.absent(),
+    this.acn = const Value.absent(),
+    this.comment = const Value.absent(),
+    this.billingStreet = const Value.absent(),
+    this.billingCity = const Value.absent(),
+    this.billingState = const Value.absent(),
+    this.billingAreaCode = const Value.absent(),
+    this.billingPostalCode = const Value.absent(),
+    this.billingCountry = const Value.absent(),
+    this.postalStreet = const Value.absent(),
+    this.postalCity = const Value.absent(),
+    this.postalState = const Value.absent(),
+    this.postalAreaCode = const Value.absent(),
+    this.postalPostalCode = const Value.absent(),
+    this.postalCountry = const Value.absent(),
     this.encryptedData = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -350,6 +948,23 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     Expression<String>? lastName,
     Expression<String>? email,
     Expression<String>? mobileNumber,
+    Expression<String>? fax,
+    Expression<String>? web,
+    Expression<String>? abn,
+    Expression<String>? acn,
+    Expression<String>? comment,
+    Expression<String>? billingStreet,
+    Expression<String>? billingCity,
+    Expression<String>? billingState,
+    Expression<String>? billingAreaCode,
+    Expression<String>? billingPostalCode,
+    Expression<String>? billingCountry,
+    Expression<String>? postalStreet,
+    Expression<String>? postalCity,
+    Expression<String>? postalState,
+    Expression<String>? postalAreaCode,
+    Expression<String>? postalPostalCode,
+    Expression<String>? postalCountry,
     Expression<String>? encryptedData,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -361,6 +976,23 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
       if (lastName != null) 'last_name': lastName,
       if (email != null) 'email': email,
       if (mobileNumber != null) 'mobile_number': mobileNumber,
+      if (fax != null) 'fax': fax,
+      if (web != null) 'web': web,
+      if (abn != null) 'abn': abn,
+      if (acn != null) 'acn': acn,
+      if (comment != null) 'comment': comment,
+      if (billingStreet != null) 'billing_street': billingStreet,
+      if (billingCity != null) 'billing_city': billingCity,
+      if (billingState != null) 'billing_state': billingState,
+      if (billingAreaCode != null) 'billing_area_code': billingAreaCode,
+      if (billingPostalCode != null) 'billing_postal_code': billingPostalCode,
+      if (billingCountry != null) 'billing_country': billingCountry,
+      if (postalStreet != null) 'postal_street': postalStreet,
+      if (postalCity != null) 'postal_city': postalCity,
+      if (postalState != null) 'postal_state': postalState,
+      if (postalAreaCode != null) 'postal_area_code': postalAreaCode,
+      if (postalPostalCode != null) 'postal_postal_code': postalPostalCode,
+      if (postalCountry != null) 'postal_country': postalCountry,
       if (encryptedData != null) 'encrypted_data': encryptedData,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -374,6 +1006,23 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
       Value<String>? lastName,
       Value<String?>? email,
       Value<String?>? mobileNumber,
+      Value<String?>? fax,
+      Value<String?>? web,
+      Value<String?>? abn,
+      Value<String?>? acn,
+      Value<String?>? comment,
+      Value<String?>? billingStreet,
+      Value<String?>? billingCity,
+      Value<String?>? billingState,
+      Value<String?>? billingAreaCode,
+      Value<String?>? billingPostalCode,
+      Value<String?>? billingCountry,
+      Value<String?>? postalStreet,
+      Value<String?>? postalCity,
+      Value<String?>? postalState,
+      Value<String?>? postalAreaCode,
+      Value<String?>? postalPostalCode,
+      Value<String?>? postalCountry,
       Value<String?>? encryptedData,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt,
@@ -384,6 +1033,23 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
       lastName: lastName ?? this.lastName,
       email: email ?? this.email,
       mobileNumber: mobileNumber ?? this.mobileNumber,
+      fax: fax ?? this.fax,
+      web: web ?? this.web,
+      abn: abn ?? this.abn,
+      acn: acn ?? this.acn,
+      comment: comment ?? this.comment,
+      billingStreet: billingStreet ?? this.billingStreet,
+      billingCity: billingCity ?? this.billingCity,
+      billingState: billingState ?? this.billingState,
+      billingAreaCode: billingAreaCode ?? this.billingAreaCode,
+      billingPostalCode: billingPostalCode ?? this.billingPostalCode,
+      billingCountry: billingCountry ?? this.billingCountry,
+      postalStreet: postalStreet ?? this.postalStreet,
+      postalCity: postalCity ?? this.postalCity,
+      postalState: postalState ?? this.postalState,
+      postalAreaCode: postalAreaCode ?? this.postalAreaCode,
+      postalPostalCode: postalPostalCode ?? this.postalPostalCode,
+      postalCountry: postalCountry ?? this.postalCountry,
       encryptedData: encryptedData ?? this.encryptedData,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -409,6 +1075,57 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     if (mobileNumber.present) {
       map['mobile_number'] = Variable<String>(mobileNumber.value);
     }
+    if (fax.present) {
+      map['fax'] = Variable<String>(fax.value);
+    }
+    if (web.present) {
+      map['web'] = Variable<String>(web.value);
+    }
+    if (abn.present) {
+      map['abn'] = Variable<String>(abn.value);
+    }
+    if (acn.present) {
+      map['acn'] = Variable<String>(acn.value);
+    }
+    if (comment.present) {
+      map['comment'] = Variable<String>(comment.value);
+    }
+    if (billingStreet.present) {
+      map['billing_street'] = Variable<String>(billingStreet.value);
+    }
+    if (billingCity.present) {
+      map['billing_city'] = Variable<String>(billingCity.value);
+    }
+    if (billingState.present) {
+      map['billing_state'] = Variable<String>(billingState.value);
+    }
+    if (billingAreaCode.present) {
+      map['billing_area_code'] = Variable<String>(billingAreaCode.value);
+    }
+    if (billingPostalCode.present) {
+      map['billing_postal_code'] = Variable<String>(billingPostalCode.value);
+    }
+    if (billingCountry.present) {
+      map['billing_country'] = Variable<String>(billingCountry.value);
+    }
+    if (postalStreet.present) {
+      map['postal_street'] = Variable<String>(postalStreet.value);
+    }
+    if (postalCity.present) {
+      map['postal_city'] = Variable<String>(postalCity.value);
+    }
+    if (postalState.present) {
+      map['postal_state'] = Variable<String>(postalState.value);
+    }
+    if (postalAreaCode.present) {
+      map['postal_area_code'] = Variable<String>(postalAreaCode.value);
+    }
+    if (postalPostalCode.present) {
+      map['postal_postal_code'] = Variable<String>(postalPostalCode.value);
+    }
+    if (postalCountry.present) {
+      map['postal_country'] = Variable<String>(postalCountry.value);
+    }
     if (encryptedData.present) {
       map['encrypted_data'] = Variable<String>(encryptedData.value);
     }
@@ -432,6 +1149,23 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
           ..write('lastName: $lastName, ')
           ..write('email: $email, ')
           ..write('mobileNumber: $mobileNumber, ')
+          ..write('fax: $fax, ')
+          ..write('web: $web, ')
+          ..write('abn: $abn, ')
+          ..write('acn: $acn, ')
+          ..write('comment: $comment, ')
+          ..write('billingStreet: $billingStreet, ')
+          ..write('billingCity: $billingCity, ')
+          ..write('billingState: $billingState, ')
+          ..write('billingAreaCode: $billingAreaCode, ')
+          ..write('billingPostalCode: $billingPostalCode, ')
+          ..write('billingCountry: $billingCountry, ')
+          ..write('postalStreet: $postalStreet, ')
+          ..write('postalCity: $postalCity, ')
+          ..write('postalState: $postalState, ')
+          ..write('postalAreaCode: $postalAreaCode, ')
+          ..write('postalPostalCode: $postalPostalCode, ')
+          ..write('postalCountry: $postalCountry, ')
           ..write('encryptedData: $encryptedData, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -4775,6 +5509,23 @@ typedef $$CustomersTableCreateCompanionBuilder = CustomersCompanion Function({
   required String lastName,
   Value<String?> email,
   Value<String?> mobileNumber,
+  Value<String?> fax,
+  Value<String?> web,
+  Value<String?> abn,
+  Value<String?> acn,
+  Value<String?> comment,
+  Value<String?> billingStreet,
+  Value<String?> billingCity,
+  Value<String?> billingState,
+  Value<String?> billingAreaCode,
+  Value<String?> billingPostalCode,
+  Value<String?> billingCountry,
+  Value<String?> postalStreet,
+  Value<String?> postalCity,
+  Value<String?> postalState,
+  Value<String?> postalAreaCode,
+  Value<String?> postalPostalCode,
+  Value<String?> postalCountry,
   Value<String?> encryptedData,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
@@ -4786,6 +5537,23 @@ typedef $$CustomersTableUpdateCompanionBuilder = CustomersCompanion Function({
   Value<String> lastName,
   Value<String?> email,
   Value<String?> mobileNumber,
+  Value<String?> fax,
+  Value<String?> web,
+  Value<String?> abn,
+  Value<String?> acn,
+  Value<String?> comment,
+  Value<String?> billingStreet,
+  Value<String?> billingCity,
+  Value<String?> billingState,
+  Value<String?> billingAreaCode,
+  Value<String?> billingPostalCode,
+  Value<String?> billingCountry,
+  Value<String?> postalStreet,
+  Value<String?> postalCity,
+  Value<String?> postalState,
+  Value<String?> postalAreaCode,
+  Value<String?> postalPostalCode,
+  Value<String?> postalCountry,
   Value<String?> encryptedData,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
@@ -4865,6 +5633,62 @@ class $$CustomersTableFilterComposer
 
   ColumnFilters<String> get mobileNumber => $composableBuilder(
       column: $table.mobileNumber, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get fax => $composableBuilder(
+      column: $table.fax, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get web => $composableBuilder(
+      column: $table.web, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get abn => $composableBuilder(
+      column: $table.abn, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get acn => $composableBuilder(
+      column: $table.acn, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get comment => $composableBuilder(
+      column: $table.comment, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get billingStreet => $composableBuilder(
+      column: $table.billingStreet, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get billingCity => $composableBuilder(
+      column: $table.billingCity, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get billingState => $composableBuilder(
+      column: $table.billingState, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get billingAreaCode => $composableBuilder(
+      column: $table.billingAreaCode,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get billingPostalCode => $composableBuilder(
+      column: $table.billingPostalCode,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get billingCountry => $composableBuilder(
+      column: $table.billingCountry,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get postalStreet => $composableBuilder(
+      column: $table.postalStreet, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get postalCity => $composableBuilder(
+      column: $table.postalCity, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get postalState => $composableBuilder(
+      column: $table.postalState, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get postalAreaCode => $composableBuilder(
+      column: $table.postalAreaCode,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get postalPostalCode => $composableBuilder(
+      column: $table.postalPostalCode,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get postalCountry => $composableBuilder(
+      column: $table.postalCountry, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get encryptedData => $composableBuilder(
       column: $table.encryptedData, builder: (column) => ColumnFilters(column));
@@ -4964,6 +5788,66 @@ class $$CustomersTableOrderingComposer
       column: $table.mobileNumber,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get fax => $composableBuilder(
+      column: $table.fax, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get web => $composableBuilder(
+      column: $table.web, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get abn => $composableBuilder(
+      column: $table.abn, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get acn => $composableBuilder(
+      column: $table.acn, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get comment => $composableBuilder(
+      column: $table.comment, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get billingStreet => $composableBuilder(
+      column: $table.billingStreet,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get billingCity => $composableBuilder(
+      column: $table.billingCity, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get billingState => $composableBuilder(
+      column: $table.billingState,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get billingAreaCode => $composableBuilder(
+      column: $table.billingAreaCode,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get billingPostalCode => $composableBuilder(
+      column: $table.billingPostalCode,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get billingCountry => $composableBuilder(
+      column: $table.billingCountry,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get postalStreet => $composableBuilder(
+      column: $table.postalStreet,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get postalCity => $composableBuilder(
+      column: $table.postalCity, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get postalState => $composableBuilder(
+      column: $table.postalState, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get postalAreaCode => $composableBuilder(
+      column: $table.postalAreaCode,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get postalPostalCode => $composableBuilder(
+      column: $table.postalPostalCode,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get postalCountry => $composableBuilder(
+      column: $table.postalCountry,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get encryptedData => $composableBuilder(
       column: $table.encryptedData,
       builder: (column) => ColumnOrderings(column));
@@ -4998,6 +5882,57 @@ class $$CustomersTableAnnotationComposer
 
   GeneratedColumn<String> get mobileNumber => $composableBuilder(
       column: $table.mobileNumber, builder: (column) => column);
+
+  GeneratedColumn<String> get fax =>
+      $composableBuilder(column: $table.fax, builder: (column) => column);
+
+  GeneratedColumn<String> get web =>
+      $composableBuilder(column: $table.web, builder: (column) => column);
+
+  GeneratedColumn<String> get abn =>
+      $composableBuilder(column: $table.abn, builder: (column) => column);
+
+  GeneratedColumn<String> get acn =>
+      $composableBuilder(column: $table.acn, builder: (column) => column);
+
+  GeneratedColumn<String> get comment =>
+      $composableBuilder(column: $table.comment, builder: (column) => column);
+
+  GeneratedColumn<String> get billingStreet => $composableBuilder(
+      column: $table.billingStreet, builder: (column) => column);
+
+  GeneratedColumn<String> get billingCity => $composableBuilder(
+      column: $table.billingCity, builder: (column) => column);
+
+  GeneratedColumn<String> get billingState => $composableBuilder(
+      column: $table.billingState, builder: (column) => column);
+
+  GeneratedColumn<String> get billingAreaCode => $composableBuilder(
+      column: $table.billingAreaCode, builder: (column) => column);
+
+  GeneratedColumn<String> get billingPostalCode => $composableBuilder(
+      column: $table.billingPostalCode, builder: (column) => column);
+
+  GeneratedColumn<String> get billingCountry => $composableBuilder(
+      column: $table.billingCountry, builder: (column) => column);
+
+  GeneratedColumn<String> get postalStreet => $composableBuilder(
+      column: $table.postalStreet, builder: (column) => column);
+
+  GeneratedColumn<String> get postalCity => $composableBuilder(
+      column: $table.postalCity, builder: (column) => column);
+
+  GeneratedColumn<String> get postalState => $composableBuilder(
+      column: $table.postalState, builder: (column) => column);
+
+  GeneratedColumn<String> get postalAreaCode => $composableBuilder(
+      column: $table.postalAreaCode, builder: (column) => column);
+
+  GeneratedColumn<String> get postalPostalCode => $composableBuilder(
+      column: $table.postalPostalCode, builder: (column) => column);
+
+  GeneratedColumn<String> get postalCountry => $composableBuilder(
+      column: $table.postalCountry, builder: (column) => column);
 
   GeneratedColumn<String> get encryptedData => $composableBuilder(
       column: $table.encryptedData, builder: (column) => column);
@@ -5101,6 +6036,23 @@ class $$CustomersTableTableManager extends RootTableManager<
             Value<String> lastName = const Value.absent(),
             Value<String?> email = const Value.absent(),
             Value<String?> mobileNumber = const Value.absent(),
+            Value<String?> fax = const Value.absent(),
+            Value<String?> web = const Value.absent(),
+            Value<String?> abn = const Value.absent(),
+            Value<String?> acn = const Value.absent(),
+            Value<String?> comment = const Value.absent(),
+            Value<String?> billingStreet = const Value.absent(),
+            Value<String?> billingCity = const Value.absent(),
+            Value<String?> billingState = const Value.absent(),
+            Value<String?> billingAreaCode = const Value.absent(),
+            Value<String?> billingPostalCode = const Value.absent(),
+            Value<String?> billingCountry = const Value.absent(),
+            Value<String?> postalStreet = const Value.absent(),
+            Value<String?> postalCity = const Value.absent(),
+            Value<String?> postalState = const Value.absent(),
+            Value<String?> postalAreaCode = const Value.absent(),
+            Value<String?> postalPostalCode = const Value.absent(),
+            Value<String?> postalCountry = const Value.absent(),
             Value<String?> encryptedData = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
@@ -5112,6 +6064,23 @@ class $$CustomersTableTableManager extends RootTableManager<
             lastName: lastName,
             email: email,
             mobileNumber: mobileNumber,
+            fax: fax,
+            web: web,
+            abn: abn,
+            acn: acn,
+            comment: comment,
+            billingStreet: billingStreet,
+            billingCity: billingCity,
+            billingState: billingState,
+            billingAreaCode: billingAreaCode,
+            billingPostalCode: billingPostalCode,
+            billingCountry: billingCountry,
+            postalStreet: postalStreet,
+            postalCity: postalCity,
+            postalState: postalState,
+            postalAreaCode: postalAreaCode,
+            postalPostalCode: postalPostalCode,
+            postalCountry: postalCountry,
             encryptedData: encryptedData,
             createdAt: createdAt,
             updatedAt: updatedAt,
@@ -5123,6 +6092,23 @@ class $$CustomersTableTableManager extends RootTableManager<
             required String lastName,
             Value<String?> email = const Value.absent(),
             Value<String?> mobileNumber = const Value.absent(),
+            Value<String?> fax = const Value.absent(),
+            Value<String?> web = const Value.absent(),
+            Value<String?> abn = const Value.absent(),
+            Value<String?> acn = const Value.absent(),
+            Value<String?> comment = const Value.absent(),
+            Value<String?> billingStreet = const Value.absent(),
+            Value<String?> billingCity = const Value.absent(),
+            Value<String?> billingState = const Value.absent(),
+            Value<String?> billingAreaCode = const Value.absent(),
+            Value<String?> billingPostalCode = const Value.absent(),
+            Value<String?> billingCountry = const Value.absent(),
+            Value<String?> postalStreet = const Value.absent(),
+            Value<String?> postalCity = const Value.absent(),
+            Value<String?> postalState = const Value.absent(),
+            Value<String?> postalAreaCode = const Value.absent(),
+            Value<String?> postalPostalCode = const Value.absent(),
+            Value<String?> postalCountry = const Value.absent(),
             Value<String?> encryptedData = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
@@ -5134,6 +6120,23 @@ class $$CustomersTableTableManager extends RootTableManager<
             lastName: lastName,
             email: email,
             mobileNumber: mobileNumber,
+            fax: fax,
+            web: web,
+            abn: abn,
+            acn: acn,
+            comment: comment,
+            billingStreet: billingStreet,
+            billingCity: billingCity,
+            billingState: billingState,
+            billingAreaCode: billingAreaCode,
+            billingPostalCode: billingPostalCode,
+            billingCountry: billingCountry,
+            postalStreet: postalStreet,
+            postalCity: postalCity,
+            postalState: postalState,
+            postalAreaCode: postalAreaCode,
+            postalPostalCode: postalPostalCode,
+            postalCountry: postalCountry,
             encryptedData: encryptedData,
             createdAt: createdAt,
             updatedAt: updatedAt,
