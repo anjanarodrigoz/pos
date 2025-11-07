@@ -4,6 +4,14 @@ import 'package:get_storage/get_storage.dart';
 import 'package:pos/Pages/initial_setup_page.dart';
 import 'package:pos/Pages/login_page.dart';
 import 'package:pos/database/cart_db_service.dart';
+import 'package:pos/database/pos_database.dart';
+import 'package:pos/repositories/customer_repository.dart';
+import 'package:pos/repositories/item_repository.dart';
+import 'package:pos/repositories/invoice_repository.dart';
+import 'package:pos/repositories/supplier_repository.dart';
+import 'package:pos/repositories/payment_repository.dart';
+import 'package:pos/repositories/quotation_repository.dart';
+import 'package:pos/repositories/credit_note_repository.dart';
 import 'package:pos/services/auth_service.dart';
 import 'package:pos/services/encryption_service.dart';
 import 'package:pos/services/logger_service.dart';
@@ -52,6 +60,25 @@ void main() async {
   // Reset cart
   final storage = CartDB();
   await storage.resetCart();
+
+  // Initialize Drift database and repositories
+  try {
+    final database = POSDatabase();
+    Get.put(database);
+    AppLogger.info('Drift database initialized');
+
+    // Register repositories with GetX
+    Get.put(CustomerRepository(database));
+    Get.put(ItemRepository(database));
+    Get.put(InvoiceRepository(database));
+    Get.put(SupplierRepository(database));
+    Get.put(PaymentRepository(database));
+    Get.put(QuotationRepository(database));
+    Get.put(CreditNoteRepository(database));
+    AppLogger.info('Repositories registered with GetX');
+  } catch (e, stack) {
+    AppLogger.error('Failed to initialize database and repositories', e, stack);
+  }
 
   // Initialize window manager
   await windowManager.ensureInitialized();
