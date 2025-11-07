@@ -15,7 +15,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../database/item_db_service.dart';
 import '../../models/cart.dart';
 import '../../models/item.dart';
-import '../Pages/stock_manager.dart/stock_page.dart';
+import 'package:pos/datasources/item_data_source.dart';
 
 class ItemSelectWidget extends StatefulWidget {
   final invoiceController;
