@@ -6,7 +6,19 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 /// Secure authentication service with password hashing
 /// Uses SHA-256 with salt for password security
 class AuthService {
-  static const _storage = FlutterSecureStorage();
+  // Configure storage with macOS-specific options to avoid keychain entitlement issues during development
+  static const _storage = FlutterSecureStorage(
+    aOptions: AndroidOptions(
+      encryptedSharedPreferences: true,
+    ),
+    iOptions: IOSOptions(
+      accessibility: KeychainAccessibility.first_unlock,
+    ),
+    mOptions: MacOsOptions(
+      // Use account name instead of keychain during development to avoid signing requirements
+      accountName: 'pos_app_secure_storage',
+    ),
+  );
   static const String _passwordKey = 'hashed_password';
   static const String _saltKey = 'password_salt';
 

@@ -3,7 +3,19 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 /// Secure storage for SMTP email credentials
 /// Prevents credentials from being stored in plain text or backups
 class EmailCredentialsService {
-  static const _storage = FlutterSecureStorage();
+  // Configure storage with macOS-specific options to avoid keychain entitlement issues during development
+  static const _storage = FlutterSecureStorage(
+    aOptions: AndroidOptions(
+      encryptedSharedPreferences: true,
+    ),
+    iOptions: IOSOptions(
+      accessibility: KeychainAccessibility.first_unlock,
+    ),
+    mOptions: MacOsOptions(
+      // Use account name instead of keychain during development to avoid signing requirements
+      accountName: 'pos_app_secure_storage',
+    ),
+  );
   static const String _smtpPasswordKey = 'smtp_password_encrypted';
   static const String _smtpUsernameKey = 'smtp_username';
   static const String _smtpServerKey = 'smtp_server';
