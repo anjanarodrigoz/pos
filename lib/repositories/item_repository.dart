@@ -76,7 +76,7 @@ class ItemRepository {
         name: name,
         itemCode: itemCode,
         price: price,
-        quantity: quantity,
+        quantity: Value(quantity),
         description: Value(description),
         category: Value(category),
         // Quantity defaults to 0, updated ONLY via supply invoice
