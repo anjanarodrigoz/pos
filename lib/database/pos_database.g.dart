@@ -1196,6 +1196,14 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
   late final GeneratedColumn<String> description = GeneratedColumn<String>(
       'description', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _itemCodeMeta =
+      const VerificationMeta('itemCode');
+  @override
+  late final GeneratedColumn<String> itemCode = GeneratedColumn<String>(
+      'item_code', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
   static const VerificationMeta _priceMeta = const VerificationMeta('price');
   @override
   late final GeneratedColumn<double> price = GeneratedColumn<double>(
@@ -1206,24 +1214,14 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
   @override
   late final GeneratedColumn<int> quantity = GeneratedColumn<int>(
       'quantity', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _costPriceMeta =
-      const VerificationMeta('costPrice');
-  @override
-  late final GeneratedColumn<double> costPrice = GeneratedColumn<double>(
-      'cost_price', aliasedName, true,
-      type: DriftSqlType.double, requiredDuringInsert: false);
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
   static const VerificationMeta _categoryMeta =
       const VerificationMeta('category');
   @override
   late final GeneratedColumn<String> category = GeneratedColumn<String>(
       'category', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _barcodeMeta =
-      const VerificationMeta('barcode');
-  @override
-  late final GeneratedColumn<String> barcode = GeneratedColumn<String>(
-      'barcode', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _isActiveMeta =
       const VerificationMeta('isActive');
@@ -1256,11 +1254,10 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
         id,
         name,
         description,
+        itemCode,
         price,
         quantity,
-        costPrice,
         category,
-        barcode,
         isActive,
         createdAt,
         updatedAt
@@ -1292,6 +1289,12 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
           description.isAcceptableOrUnknown(
               data['description']!, _descriptionMeta));
     }
+    if (data.containsKey('item_code')) {
+      context.handle(_itemCodeMeta,
+          itemCode.isAcceptableOrUnknown(data['item_code']!, _itemCodeMeta));
+    } else if (isInserting) {
+      context.missing(_itemCodeMeta);
+    }
     if (data.containsKey('price')) {
       context.handle(
           _priceMeta, price.isAcceptableOrUnknown(data['price']!, _priceMeta));
@@ -1301,20 +1304,10 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
     if (data.containsKey('quantity')) {
       context.handle(_quantityMeta,
           quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta));
-    } else if (isInserting) {
-      context.missing(_quantityMeta);
-    }
-    if (data.containsKey('cost_price')) {
-      context.handle(_costPriceMeta,
-          costPrice.isAcceptableOrUnknown(data['cost_price']!, _costPriceMeta));
     }
     if (data.containsKey('category')) {
       context.handle(_categoryMeta,
           category.isAcceptableOrUnknown(data['category']!, _categoryMeta));
-    }
-    if (data.containsKey('barcode')) {
-      context.handle(_barcodeMeta,
-          barcode.isAcceptableOrUnknown(data['barcode']!, _barcodeMeta));
     }
     if (data.containsKey('is_active')) {
       context.handle(_isActiveMeta,
@@ -1343,16 +1336,14 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
+      itemCode: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}item_code'])!,
       price: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}price'])!,
       quantity: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}quantity'])!,
-      costPrice: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}cost_price']),
       category: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}category']),
-      barcode: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}barcode']),
       isActive: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_active'])!,
       createdAt: attachedDatabase.typeMapping
@@ -1372,11 +1363,10 @@ class Item extends DataClass implements Insertable<Item> {
   final String id;
   final String name;
   final String? description;
+  final String itemCode;
   final double price;
   final int quantity;
-  final double? costPrice;
   final String? category;
-  final String? barcode;
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -1384,11 +1374,10 @@ class Item extends DataClass implements Insertable<Item> {
       {required this.id,
       required this.name,
       this.description,
+      required this.itemCode,
       required this.price,
       required this.quantity,
-      this.costPrice,
       this.category,
-      this.barcode,
       required this.isActive,
       required this.createdAt,
       required this.updatedAt});
@@ -1400,16 +1389,11 @@ class Item extends DataClass implements Insertable<Item> {
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
+    map['item_code'] = Variable<String>(itemCode);
     map['price'] = Variable<double>(price);
     map['quantity'] = Variable<int>(quantity);
-    if (!nullToAbsent || costPrice != null) {
-      map['cost_price'] = Variable<double>(costPrice);
-    }
     if (!nullToAbsent || category != null) {
       map['category'] = Variable<String>(category);
-    }
-    if (!nullToAbsent || barcode != null) {
-      map['barcode'] = Variable<String>(barcode);
     }
     map['is_active'] = Variable<bool>(isActive);
     map['created_at'] = Variable<DateTime>(createdAt);
@@ -1424,17 +1408,12 @@ class Item extends DataClass implements Insertable<Item> {
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
+      itemCode: Value(itemCode),
       price: Value(price),
       quantity: Value(quantity),
-      costPrice: costPrice == null && nullToAbsent
-          ? const Value.absent()
-          : Value(costPrice),
       category: category == null && nullToAbsent
           ? const Value.absent()
           : Value(category),
-      barcode: barcode == null && nullToAbsent
-          ? const Value.absent()
-          : Value(barcode),
       isActive: Value(isActive),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -1448,11 +1427,10 @@ class Item extends DataClass implements Insertable<Item> {
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String?>(json['description']),
+      itemCode: serializer.fromJson<String>(json['itemCode']),
       price: serializer.fromJson<double>(json['price']),
       quantity: serializer.fromJson<int>(json['quantity']),
-      costPrice: serializer.fromJson<double?>(json['costPrice']),
       category: serializer.fromJson<String?>(json['category']),
-      barcode: serializer.fromJson<String?>(json['barcode']),
       isActive: serializer.fromJson<bool>(json['isActive']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -1465,11 +1443,10 @@ class Item extends DataClass implements Insertable<Item> {
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'description': serializer.toJson<String?>(description),
+      'itemCode': serializer.toJson<String>(itemCode),
       'price': serializer.toJson<double>(price),
       'quantity': serializer.toJson<int>(quantity),
-      'costPrice': serializer.toJson<double?>(costPrice),
       'category': serializer.toJson<String?>(category),
-      'barcode': serializer.toJson<String?>(barcode),
       'isActive': serializer.toJson<bool>(isActive),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -1480,11 +1457,10 @@ class Item extends DataClass implements Insertable<Item> {
           {String? id,
           String? name,
           Value<String?> description = const Value.absent(),
+          String? itemCode,
           double? price,
           int? quantity,
-          Value<double?> costPrice = const Value.absent(),
           Value<String?> category = const Value.absent(),
-          Value<String?> barcode = const Value.absent(),
           bool? isActive,
           DateTime? createdAt,
           DateTime? updatedAt}) =>
@@ -1492,11 +1468,10 @@ class Item extends DataClass implements Insertable<Item> {
         id: id ?? this.id,
         name: name ?? this.name,
         description: description.present ? description.value : this.description,
+        itemCode: itemCode ?? this.itemCode,
         price: price ?? this.price,
         quantity: quantity ?? this.quantity,
-        costPrice: costPrice.present ? costPrice.value : this.costPrice,
         category: category.present ? category.value : this.category,
-        barcode: barcode.present ? barcode.value : this.barcode,
         isActive: isActive ?? this.isActive,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
@@ -1507,11 +1482,10 @@ class Item extends DataClass implements Insertable<Item> {
       name: data.name.present ? data.name.value : this.name,
       description:
           data.description.present ? data.description.value : this.description,
+      itemCode: data.itemCode.present ? data.itemCode.value : this.itemCode,
       price: data.price.present ? data.price.value : this.price,
       quantity: data.quantity.present ? data.quantity.value : this.quantity,
-      costPrice: data.costPrice.present ? data.costPrice.value : this.costPrice,
       category: data.category.present ? data.category.value : this.category,
-      barcode: data.barcode.present ? data.barcode.value : this.barcode,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -1524,11 +1498,10 @@ class Item extends DataClass implements Insertable<Item> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('description: $description, ')
+          ..write('itemCode: $itemCode, ')
           ..write('price: $price, ')
           ..write('quantity: $quantity, ')
-          ..write('costPrice: $costPrice, ')
           ..write('category: $category, ')
-          ..write('barcode: $barcode, ')
           ..write('isActive: $isActive, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -1537,8 +1510,8 @@ class Item extends DataClass implements Insertable<Item> {
   }
 
   @override
-  int get hashCode => Object.hash(id, name, description, price, quantity,
-      costPrice, category, barcode, isActive, createdAt, updatedAt);
+  int get hashCode => Object.hash(id, name, description, itemCode, price,
+      quantity, category, isActive, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1546,11 +1519,10 @@ class Item extends DataClass implements Insertable<Item> {
           other.id == this.id &&
           other.name == this.name &&
           other.description == this.description &&
+          other.itemCode == this.itemCode &&
           other.price == this.price &&
           other.quantity == this.quantity &&
-          other.costPrice == this.costPrice &&
           other.category == this.category &&
-          other.barcode == this.barcode &&
           other.isActive == this.isActive &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -1560,11 +1532,10 @@ class ItemsCompanion extends UpdateCompanion<Item> {
   final Value<String> id;
   final Value<String> name;
   final Value<String?> description;
+  final Value<String> itemCode;
   final Value<double> price;
   final Value<int> quantity;
-  final Value<double?> costPrice;
   final Value<String?> category;
-  final Value<String?> barcode;
   final Value<bool> isActive;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
@@ -1573,11 +1544,10 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.description = const Value.absent(),
+    this.itemCode = const Value.absent(),
     this.price = const Value.absent(),
     this.quantity = const Value.absent(),
-    this.costPrice = const Value.absent(),
     this.category = const Value.absent(),
-    this.barcode = const Value.absent(),
     this.isActive = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -1587,28 +1557,26 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     required String id,
     required String name,
     this.description = const Value.absent(),
+    required String itemCode,
     required double price,
-    required int quantity,
-    this.costPrice = const Value.absent(),
+    this.quantity = const Value.absent(),
     this.category = const Value.absent(),
-    this.barcode = const Value.absent(),
     this.isActive = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         name = Value(name),
-        price = Value(price),
-        quantity = Value(quantity);
+        itemCode = Value(itemCode),
+        price = Value(price);
   static Insertable<Item> custom({
     Expression<String>? id,
     Expression<String>? name,
     Expression<String>? description,
+    Expression<String>? itemCode,
     Expression<double>? price,
     Expression<int>? quantity,
-    Expression<double>? costPrice,
     Expression<String>? category,
-    Expression<String>? barcode,
     Expression<bool>? isActive,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -1618,11 +1586,10 @@ class ItemsCompanion extends UpdateCompanion<Item> {
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (description != null) 'description': description,
+      if (itemCode != null) 'item_code': itemCode,
       if (price != null) 'price': price,
       if (quantity != null) 'quantity': quantity,
-      if (costPrice != null) 'cost_price': costPrice,
       if (category != null) 'category': category,
-      if (barcode != null) 'barcode': barcode,
       if (isActive != null) 'is_active': isActive,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -1634,11 +1601,10 @@ class ItemsCompanion extends UpdateCompanion<Item> {
       {Value<String>? id,
       Value<String>? name,
       Value<String?>? description,
+      Value<String>? itemCode,
       Value<double>? price,
       Value<int>? quantity,
-      Value<double?>? costPrice,
       Value<String?>? category,
-      Value<String?>? barcode,
       Value<bool>? isActive,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt,
@@ -1647,11 +1613,10 @@ class ItemsCompanion extends UpdateCompanion<Item> {
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
+      itemCode: itemCode ?? this.itemCode,
       price: price ?? this.price,
       quantity: quantity ?? this.quantity,
-      costPrice: costPrice ?? this.costPrice,
       category: category ?? this.category,
-      barcode: barcode ?? this.barcode,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -1671,20 +1636,17 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     if (description.present) {
       map['description'] = Variable<String>(description.value);
     }
+    if (itemCode.present) {
+      map['item_code'] = Variable<String>(itemCode.value);
+    }
     if (price.present) {
       map['price'] = Variable<double>(price.value);
     }
     if (quantity.present) {
       map['quantity'] = Variable<int>(quantity.value);
     }
-    if (costPrice.present) {
-      map['cost_price'] = Variable<double>(costPrice.value);
-    }
     if (category.present) {
       map['category'] = Variable<String>(category.value);
-    }
-    if (barcode.present) {
-      map['barcode'] = Variable<String>(barcode.value);
     }
     if (isActive.present) {
       map['is_active'] = Variable<bool>(isActive.value);
@@ -1707,11 +1669,10 @@ class ItemsCompanion extends UpdateCompanion<Item> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('description: $description, ')
+          ..write('itemCode: $itemCode, ')
           ..write('price: $price, ')
           ..write('quantity: $quantity, ')
-          ..write('costPrice: $costPrice, ')
           ..write('category: $category, ')
-          ..write('barcode: $barcode, ')
           ..write('isActive: $isActive, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -6225,11 +6186,10 @@ typedef $$ItemsTableCreateCompanionBuilder = ItemsCompanion Function({
   required String id,
   required String name,
   Value<String?> description,
+  required String itemCode,
   required double price,
-  required int quantity,
-  Value<double?> costPrice,
+  Value<int> quantity,
   Value<String?> category,
-  Value<String?> barcode,
   Value<bool> isActive,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
@@ -6239,11 +6199,10 @@ typedef $$ItemsTableUpdateCompanionBuilder = ItemsCompanion Function({
   Value<String> id,
   Value<String> name,
   Value<String?> description,
+  Value<String> itemCode,
   Value<double> price,
   Value<int> quantity,
-  Value<double?> costPrice,
   Value<String?> category,
-  Value<String?> barcode,
   Value<bool> isActive,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
@@ -6286,20 +6245,17 @@ class $$ItemsTableFilterComposer extends Composer<_$POSDatabase, $ItemsTable> {
   ColumnFilters<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<String> get itemCode => $composableBuilder(
+      column: $table.itemCode, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<double> get price => $composableBuilder(
       column: $table.price, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get quantity => $composableBuilder(
       column: $table.quantity, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get costPrice => $composableBuilder(
-      column: $table.costPrice, builder: (column) => ColumnFilters(column));
-
   ColumnFilters<String> get category => $composableBuilder(
       column: $table.category, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get barcode => $composableBuilder(
-      column: $table.barcode, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<bool> get isActive => $composableBuilder(
       column: $table.isActive, builder: (column) => ColumnFilters(column));
@@ -6350,20 +6306,17 @@ class $$ItemsTableOrderingComposer
   ColumnOrderings<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get itemCode => $composableBuilder(
+      column: $table.itemCode, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<double> get price => $composableBuilder(
       column: $table.price, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<int> get quantity => $composableBuilder(
       column: $table.quantity, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get costPrice => $composableBuilder(
-      column: $table.costPrice, builder: (column) => ColumnOrderings(column));
-
   ColumnOrderings<String> get category => $composableBuilder(
       column: $table.category, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get barcode => $composableBuilder(
-      column: $table.barcode, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<bool> get isActive => $composableBuilder(
       column: $table.isActive, builder: (column) => ColumnOrderings(column));
@@ -6393,20 +6346,17 @@ class $$ItemsTableAnnotationComposer
   GeneratedColumn<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => column);
 
+  GeneratedColumn<String> get itemCode =>
+      $composableBuilder(column: $table.itemCode, builder: (column) => column);
+
   GeneratedColumn<double> get price =>
       $composableBuilder(column: $table.price, builder: (column) => column);
 
   GeneratedColumn<int> get quantity =>
       $composableBuilder(column: $table.quantity, builder: (column) => column);
 
-  GeneratedColumn<double> get costPrice =>
-      $composableBuilder(column: $table.costPrice, builder: (column) => column);
-
   GeneratedColumn<String> get category =>
       $composableBuilder(column: $table.category, builder: (column) => column);
-
-  GeneratedColumn<String> get barcode =>
-      $composableBuilder(column: $table.barcode, builder: (column) => column);
 
   GeneratedColumn<bool> get isActive =>
       $composableBuilder(column: $table.isActive, builder: (column) => column);
@@ -6465,11 +6415,10 @@ class $$ItemsTableTableManager extends RootTableManager<
             Value<String> id = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<String?> description = const Value.absent(),
+            Value<String> itemCode = const Value.absent(),
             Value<double> price = const Value.absent(),
             Value<int> quantity = const Value.absent(),
-            Value<double?> costPrice = const Value.absent(),
             Value<String?> category = const Value.absent(),
-            Value<String?> barcode = const Value.absent(),
             Value<bool> isActive = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
@@ -6479,11 +6428,10 @@ class $$ItemsTableTableManager extends RootTableManager<
             id: id,
             name: name,
             description: description,
+            itemCode: itemCode,
             price: price,
             quantity: quantity,
-            costPrice: costPrice,
             category: category,
-            barcode: barcode,
             isActive: isActive,
             createdAt: createdAt,
             updatedAt: updatedAt,
@@ -6493,11 +6441,10 @@ class $$ItemsTableTableManager extends RootTableManager<
             required String id,
             required String name,
             Value<String?> description = const Value.absent(),
+            required String itemCode,
             required double price,
-            required int quantity,
-            Value<double?> costPrice = const Value.absent(),
+            Value<int> quantity = const Value.absent(),
             Value<String?> category = const Value.absent(),
-            Value<String?> barcode = const Value.absent(),
             Value<bool> isActive = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
@@ -6507,11 +6454,10 @@ class $$ItemsTableTableManager extends RootTableManager<
             id: id,
             name: name,
             description: description,
+            itemCode: itemCode,
             price: price,
             quantity: quantity,
-            costPrice: costPrice,
             category: category,
-            barcode: barcode,
             isActive: isActive,
             createdAt: createdAt,
             updatedAt: updatedAt,
