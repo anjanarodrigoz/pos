@@ -8,7 +8,7 @@ import 'package:pos/utils/result.dart';
 class SupplierRepository {
   final POSDatabase _database;
 
-  SupplierRepository(this _database);
+  SupplierRepository(this._database);
 
   /// Get all suppliers
   Future<Result<List<Supplier>>> getAllSuppliers() async {
@@ -98,7 +98,8 @@ class SupplierRepository {
         id: Value(supplierId),
         name: name != null ? Value(name) : const Value.absent(),
         email: email != null ? Value(email) : const Value.absent(),
-        mobileNumber: mobileNumber != null ? Value(mobileNumber) : const Value.absent(),
+        mobileNumber:
+            mobileNumber != null ? Value(mobileNumber) : const Value.absent(),
         address: address != null ? Value(address) : const Value.absent(),
         updatedAt: Value(DateTime.now()),
       );
@@ -121,11 +122,13 @@ class SupplierRepository {
   Future<Result<void>> deleteSupplier(String supplierId) async {
     try {
       // Check if supplier has invoices
-      final invoiceCount = await (_database.selectOnly(_database.supplierInvoices)
+      final invoiceCount = await (_database
+              .selectOnly(_database.supplierInvoices)
             ..addColumns([_database.supplierInvoices.invoiceId.count()])
             ..where(_database.supplierInvoices.supplierId.equals(supplierId)))
           .getSingle()
-          .then((row) => row.read(_database.supplierInvoices.invoiceId.count()) ?? 0);
+          .then((row) =>
+              row.read(_database.supplierInvoices.invoiceId.count()) ?? 0);
 
       if (invoiceCount > 0) {
         return Result.failure(AppError.validation(
@@ -163,29 +166,35 @@ class SupplierRepository {
   Future<Result<SupplierStats>> getSupplierStats(String supplierId) async {
     try {
       // Total invoices
-      final totalInvoices = await (_database.selectOnly(_database.supplierInvoices)
+      final totalInvoices = await (_database
+              .selectOnly(_database.supplierInvoices)
             ..addColumns([_database.supplierInvoices.invoiceId.count()])
             ..where(_database.supplierInvoices.supplierId.equals(supplierId))
             ..where(_database.supplierInvoices.isDeleted.equals(false)))
           .getSingle()
-          .then((row) => row.read(_database.supplierInvoices.invoiceId.count()) ?? 0);
+          .then((row) =>
+              row.read(_database.supplierInvoices.invoiceId.count()) ?? 0);
 
       // Total amount
-      final totalAmount = await (_database.selectOnly(_database.supplierInvoices)
+      final totalAmount = await (_database
+              .selectOnly(_database.supplierInvoices)
             ..addColumns([_database.supplierInvoices.total.sum()])
             ..where(_database.supplierInvoices.supplierId.equals(supplierId))
             ..where(_database.supplierInvoices.isDeleted.equals(false)))
           .getSingle()
-          .then((row) => row.read(_database.supplierInvoices.total.sum()) ?? 0.0);
+          .then(
+              (row) => row.read(_database.supplierInvoices.total.sum()) ?? 0.0);
 
       // Unpaid amount
-      final unpaidAmount = await (_database.selectOnly(_database.supplierInvoices)
+      final unpaidAmount = await (_database
+              .selectOnly(_database.supplierInvoices)
             ..addColumns([_database.supplierInvoices.total.sum()])
             ..where(_database.supplierInvoices.supplierId.equals(supplierId))
             ..where(_database.supplierInvoices.isPaid.equals(false))
             ..where(_database.supplierInvoices.isDeleted.equals(false)))
           .getSingle()
-          .then((row) => row.read(_database.supplierInvoices.total.sum()) ?? 0.0);
+          .then(
+              (row) => row.read(_database.supplierInvoices.total.sum()) ?? 0.0);
 
       return Result.success(SupplierStats(
         totalInvoices: totalInvoices,
