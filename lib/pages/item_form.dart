@@ -5,7 +5,8 @@ import 'package:pos/repositories/item_repository.dart';
 import 'package:pos/theme/app_theme.dart';
 import 'package:pos/utils/result.dart';
 
-/// Modern item creation/edit form with all pricing fields
+/// Modern item creation form with selling price only
+/// Buying price and quantity are set later via supply invoices
 class ItemFormPage extends StatefulWidget {
   final String? itemId; // If provided, edit mode; else create mode
 
@@ -23,35 +24,19 @@ class _ItemFormPageState extends State<ItemFormPage> {
   // Basic Details
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _commentController = TextEditingController();
   final _categoryController = TextEditingController();
   final _barcodeController = TextEditingController();
 
   // Pricing
   final _priceController = TextEditingController();
-  final _buyingPriceController = TextEditingController(text: '0.00');
-  final _priceTwoController = TextEditingController(text: '0.00');
-  final _priceThreeController = TextEditingController(text: '0.00');
-  final _priceFourController = TextEditingController(text: '0.00');
-  final _priceFiveController = TextEditingController(text: '0.00');
-
-  // Inventory
-  final _quantityController = TextEditingController(text: '0');
 
   @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
-    _commentController.dispose();
     _categoryController.dispose();
     _barcodeController.dispose();
     _priceController.dispose();
-    _buyingPriceController.dispose();
-    _priceTwoController.dispose();
-    _priceThreeController.dispose();
-    _priceFourController.dispose();
-    _priceFiveController.dispose();
-    _quantityController.dispose();
     super.dispose();
   }
 
@@ -67,18 +52,10 @@ class _ItemFormPageState extends State<ItemFormPage> {
     final result = await _repository.createItem(
       name: _nameController.text.trim(),
       price: double.parse(_priceController.text),
-      quantity: int.parse(_quantityController.text),
+      quantity: 0, // Start with 0, updated via supply invoice
       description: _descriptionController.text.trim().isEmpty
           ? null
           : _descriptionController.text.trim(),
-      comment: _commentController.text.trim().isEmpty
-          ? null
-          : _commentController.text.trim(),
-      buyingPrice: double.tryParse(_buyingPriceController.text) ?? 0.0,
-      priceTwo: double.tryParse(_priceTwoController.text) ?? 0.0,
-      priceThree: double.tryParse(_priceThreeController.text) ?? 0.0,
-      priceFour: double.tryParse(_priceFourController.text) ?? 0.0,
-      priceFive: double.tryParse(_priceFiveController.text) ?? 0.0,
       category: _categoryController.text.trim().isEmpty
           ? null
           : _categoryController.text.trim(),
@@ -194,16 +171,6 @@ class _ItemFormPageState extends State<ItemFormPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: AppTheme.spacingMd),
-                TextFormField(
-                  controller: _commentController,
-                  style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-                  decoration: AppTheme.inputDecoration(
-                    labelText: 'Comments',
-                    prefixIcon: const Icon(Icons.notes),
-                  ),
-                  maxLines: 3,
-                ),
               ],
             ),
 
@@ -214,141 +181,35 @@ class _ItemFormPageState extends State<ItemFormPage> {
               title: 'Pricing',
               icon: Icons.payments_outlined,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _priceController,
-                        style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-                        decoration: AppTheme.inputDecoration(
-                          labelText: 'Selling Price *',
-                          prefixIcon: const Icon(Icons.attach_money),
-                        ),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                        ],
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Price is required';
-                          }
-                          if (double.tryParse(value) == null) {
-                            return 'Enter a valid price';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    SizedBox(width: AppTheme.spacingMd),
-                    Expanded(
-                      child: TextFormField(
-                        controller: _buyingPriceController,
-                        style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-                        decoration: AppTheme.inputDecoration(
-                          labelText: 'Buying Price',
-                          prefixIcon: const Icon(Icons.shopping_cart),
-                        ),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: AppTheme.spacingMd),
-                Text(
-                  'Alternative Pricing Tiers',
-                  style: AppTheme.labelMedium.copyWith(
-                    color: AppTheme.textSecondary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(height: AppTheme.spacingSm),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _priceTwoController,
-                        style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-                        decoration: AppTheme.inputDecoration(
-                          labelText: 'Price 2',
-                        ),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: AppTheme.spacingMd),
-                    Expanded(
-                      child: TextFormField(
-                        controller: _priceThreeController,
-                        style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-                        decoration: AppTheme.inputDecoration(
-                          labelText: 'Price 3',
-                        ),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: AppTheme.spacingMd),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _priceFourController,
-                        style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-                        decoration: AppTheme.inputDecoration(
-                          labelText: 'Price 4',
-                        ),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: AppTheme.spacingMd),
-                    Expanded(
-                      child: TextFormField(
-                        controller: _priceFiveController,
-                        style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-                        decoration: AppTheme.inputDecoration(
-                          labelText: 'Price 5',
-                        ),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            SizedBox(height: AppTheme.spacingLg),
-
-            // Inventory Section
-            _buildSectionCard(
-              title: 'Inventory',
-              icon: Icons.inventory_outlined,
-              children: [
                 TextFormField(
-                  controller: _quantityController,
+                  controller: _priceController,
                   style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
                   decoration: AppTheme.inputDecoration(
-                    labelText: 'Initial Quantity',
-                    prefixIcon: const Icon(Icons.warehouse),
+                    labelText: 'Selling Price *',
+                    prefixIcon: const Icon(Icons.attach_money),
+                    hintText: 'Enter the selling price per unit',
                   ),
-                  keyboardType: TextInputType.number,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
                   ],
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Selling price is required';
+                    }
+                    if (double.tryParse(value) == null) {
+                      return 'Enter a valid price';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: AppTheme.spacingSm),
+                Text(
+                  'Note: Buying price and stock quantity will be set when you create a supply invoice.',
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppTheme.textHint,
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
               ],
             ),

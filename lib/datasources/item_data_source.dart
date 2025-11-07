@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pos/models/item.dart';
+import 'package:pos/database/pos_database.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-/// DataSource for Syncfusion DataGrid to display items
+/// DataSource for Syncfusion DataGrid to display items in invoice selection
 class ItemDataSource extends DataGridSource {
   List<Item> itemData;
 
@@ -15,16 +15,14 @@ class ItemDataSource extends DataGridSource {
   void buildDataGridRows() {
     dataGridRows = itemData.map<DataGridRow>((item) {
       return DataGridRow(cells: [
-        DataGridCell<String>(columnName: Item.idKey, value: item.id),
-        DataGridCell<String>(columnName: Item.nameKey, value: item.name),
+        DataGridCell<String>(columnName: 'id', value: item.id),
+        DataGridCell<String>(columnName: 'name', value: item.name),
         DataGridCell<String>(
-            columnName: Item.descriptionKey, value: item.description ?? ''),
-        DataGridCell<double>(columnName: Item.priceKey, value: item.price),
-        DataGridCell<double>(
-            columnName: Item.buyingPriceKey, value: item.buyingPrice),
-        DataGridCell<int>(columnName: Item.qtyKey, value: item.qty),
-        DataGridCell<String>(
-            columnName: Item.commentKey, value: item.comment ?? ''),
+            columnName: 'description', value: item.description ?? ''),
+        DataGridCell<double>(columnName: 'price', value: item.price),
+        DataGridCell<double>(columnName: 'costPrice', value: item.costPrice),
+        DataGridCell<int>(columnName: 'quantity', value: item.quantity),
+        DataGridCell<String>(columnName: 'category', value: item.category ?? ''),
       ]);
     }).toList();
   }
@@ -37,9 +35,9 @@ class ItemDataSource extends DataGridSource {
     return DataGridRowAdapter(
       cells: row.getCells().map<Widget>((dataGridCell) {
         return Container(
-          alignment: dataGridCell.columnName == Item.qtyKey ||
-                  dataGridCell.columnName == Item.priceKey ||
-                  dataGridCell.columnName == Item.buyingPriceKey
+          alignment: dataGridCell.columnName == 'quantity' ||
+                  dataGridCell.columnName == 'price' ||
+                  dataGridCell.columnName == 'costPrice'
               ? Alignment.centerRight
               : Alignment.centerLeft,
           padding: const EdgeInsets.symmetric(horizontal: 8.0),

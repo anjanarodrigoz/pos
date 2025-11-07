@@ -25,30 +25,18 @@ class _ItemViewPageState extends State<ItemViewPage> {
   // Edit controllers
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _commentController = TextEditingController();
   final _categoryController = TextEditingController();
   final _barcodeController = TextEditingController();
   final _priceController = TextEditingController();
-  final _buyingPriceController = TextEditingController();
-  final _priceTwoController = TextEditingController();
-  final _priceThreeController = TextEditingController();
-  final _priceFourController = TextEditingController();
-  final _priceFiveController = TextEditingController();
   final _quantityController = TextEditingController();
 
   @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
-    _commentController.dispose();
     _categoryController.dispose();
     _barcodeController.dispose();
     _priceController.dispose();
-    _buyingPriceController.dispose();
-    _priceTwoController.dispose();
-    _priceThreeController.dispose();
-    _priceFourController.dispose();
-    _priceFiveController.dispose();
     _quantityController.dispose();
     super.dispose();
   }
@@ -56,15 +44,9 @@ class _ItemViewPageState extends State<ItemViewPage> {
   void _populateControllers(Item item) {
     _nameController.text = item.name;
     _descriptionController.text = item.description ?? '';
-    _commentController.text = item.comment ?? '';
     _categoryController.text = item.category ?? '';
     _barcodeController.text = item.barcode ?? '';
     _priceController.text = item.price.toStringAsFixed(2);
-    _buyingPriceController.text = item.buyingPrice.toStringAsFixed(2);
-    _priceTwoController.text = item.priceTwo.toStringAsFixed(2);
-    _priceThreeController.text = item.priceThree.toStringAsFixed(2);
-    _priceFourController.text = item.priceFour.toStringAsFixed(2);
-    _priceFiveController.text = item.priceFive.toStringAsFixed(2);
     _quantityController.text = item.quantity.toString();
   }
 
@@ -73,21 +55,14 @@ class _ItemViewPageState extends State<ItemViewPage> {
       _isLoading = true;
     });
 
+    // Create updated item with only editable fields
     final updatedItem = Item(
       id: originalItem.id,
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim().isEmpty
           ? null
           : _descriptionController.text.trim(),
-      comment: _commentController.text.trim().isEmpty
-          ? null
-          : _commentController.text.trim(),
       price: double.parse(_priceController.text),
-      buyingPrice: double.parse(_buyingPriceController.text),
-      priceTwo: double.parse(_priceTwoController.text),
-      priceThree: double.parse(_priceThreeController.text),
-      priceFour: double.parse(_priceFourController.text),
-      priceFive: double.parse(_priceFiveController.text),
       quantity: int.parse(_quantityController.text),
       category: _categoryController.text.trim().isEmpty
           ? null
@@ -95,9 +70,9 @@ class _ItemViewPageState extends State<ItemViewPage> {
       barcode: _barcodeController.text.trim().isEmpty
           ? null
           : _barcodeController.text.trim(),
+      // Keep original values for these fields
+      costPrice: originalItem.costPrice,
       isActive: originalItem.isActive,
-      lastInDate: originalItem.lastInDate,
-      lastOutDate: originalItem.lastOutDate,
       createdAt: originalItem.createdAt,
       updatedAt: DateTime.now(),
     );
@@ -587,16 +562,12 @@ class _ItemViewPageState extends State<ItemViewPage> {
             ),
             SizedBox(height: AppTheme.spacingMd),
             TextField(
-              controller: _commentController,
-              style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-              decoration: AppTheme.inputDecoration(labelText: 'Comments'),
-              maxLines: 3,
-            ),
-            SizedBox(height: AppTheme.spacingMd),
-            TextField(
               controller: _quantityController,
               style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-              decoration: AppTheme.inputDecoration(labelText: 'Quantity'),
+              decoration: AppTheme.inputDecoration(
+                labelText: 'Quantity',
+                hintText: 'Updated via supply invoices',
+              ),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
@@ -604,7 +575,6 @@ class _ItemViewPageState extends State<ItemViewPage> {
             _buildDetailRow('Description', item.description),
             _buildDetailRow('Category', item.category),
             _buildDetailRow('Barcode', item.barcode),
-            _buildDetailRow('Comments', item.comment),
             _buildDetailRow('Quantity', item.quantity.toString()),
           ],
         ],
@@ -646,100 +616,30 @@ class _ItemViewPageState extends State<ItemViewPage> {
           Divider(color: AppTheme.dividerColor),
           SizedBox(height: AppTheme.spacingMd),
           if (_isEditMode) ...[
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _priceController,
-                    style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-                    decoration: AppTheme.inputDecoration(labelText: 'Selling Price'),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                    ],
-                  ),
-                ),
-                SizedBox(width: AppTheme.spacingMd),
-                Expanded(
-                  child: TextField(
-                    controller: _buyingPriceController,
-                    style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-                    decoration: AppTheme.inputDecoration(labelText: 'Buying Price'),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                    ],
-                  ),
-                ),
+            TextField(
+              controller: _priceController,
+              style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
+              decoration: AppTheme.inputDecoration(
+                labelText: 'Selling Price',
+                hintText: 'Price per unit',
+              ),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
               ],
             ),
-            SizedBox(height: AppTheme.spacingMd),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _priceTwoController,
-                    style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-                    decoration: AppTheme.inputDecoration(labelText: 'Price 2'),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                    ],
-                  ),
-                ),
-                SizedBox(width: AppTheme.spacingMd),
-                Expanded(
-                  child: TextField(
-                    controller: _priceThreeController,
-                    style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-                    decoration: AppTheme.inputDecoration(labelText: 'Price 3'),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: AppTheme.spacingMd),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _priceFourController,
-                    style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-                    decoration: AppTheme.inputDecoration(labelText: 'Price 4'),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                    ],
-                  ),
-                ),
-                SizedBox(width: AppTheme.spacingMd),
-                Expanded(
-                  child: TextField(
-                    controller: _priceFiveController,
-                    style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
-                    decoration: AppTheme.inputDecoration(labelText: 'Price 5'),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                    ],
-                  ),
-                ),
-              ],
+            SizedBox(height: AppTheme.spacingSm),
+            Text(
+              'Note: Buying price and alternative pricing tiers are managed via supply invoices.',
+              style: AppTheme.bodySmall.copyWith(
+                color: AppTheme.textHint,
+                fontStyle: FontStyle.italic,
+              ),
             ),
           ] else ...[
             _buildDetailRow('Selling Price', currencyFormat.format(item.price)),
-            _buildDetailRow('Buying Price', currencyFormat.format(item.buyingPrice)),
-            if (item.priceTwo > 0)
-              _buildDetailRow('Price 2', currencyFormat.format(item.priceTwo)),
-            if (item.priceThree > 0)
-              _buildDetailRow('Price 3', currencyFormat.format(item.priceThree)),
-            if (item.priceFour > 0)
-              _buildDetailRow('Price 4', currencyFormat.format(item.priceFour)),
-            if (item.priceFive > 0)
-              _buildDetailRow('Price 5', currencyFormat.format(item.priceFive)),
+            if (item.costPrice > 0)
+              _buildDetailRow('Cost Price', currencyFormat.format(item.costPrice)),
           ],
         ],
       ),

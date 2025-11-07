@@ -59,41 +59,38 @@ class ItemRepository {
   }
 
   /// Create new item
+  /// Note: Only accepts fields in current schema. After database regeneration,
+  /// this will be updated to support comment, buyingPrice, priceTwo-Five, lastInDate, lastOutDate
   Future<Result<Item>> createItem({
     required String name,
     required double price,
     int quantity = 0,
     String? description,
-    String? comment,
-    double? buyingPrice,
-    double? priceTwo,
-    double? priceThree,
-    double? priceFour,
-    double? priceFive,
     String? category,
     String? barcode,
-    DateTime? lastInDate,
-    DateTime? lastOutDate,
+    // Temporarily ignore these parameters until database is regenerated:
+    String? comment, // Will be supported after regeneration
+    double? buyingPrice, // Will be supported after regeneration
+    double? priceTwo, // Will be supported after regeneration
+    double? priceThree, // Will be supported after regeneration
+    double? priceFour, // Will be supported after regeneration
+    double? priceFive, // Will be supported after regeneration
+    DateTime? lastInDate, // Will be supported after regeneration
+    DateTime? lastOutDate, // Will be supported after regeneration
   }) async {
     try {
       final itemId = IDGenerator.generateItemId();
 
+      // Only use fields that exist in current generated schema
       final companion = ItemsCompanion.insert(
         id: itemId,
         name: name,
         price: price,
         quantity: Value(quantity),
         description: Value(description),
-        comment: Value(comment),
-        buyingPrice: Value(buyingPrice ?? 0.0),
-        priceTwo: Value(priceTwo ?? 0.0),
-        priceThree: Value(priceThree ?? 0.0),
-        priceFour: Value(priceFour ?? 0.0),
-        priceFive: Value(priceFive ?? 0.0),
         category: Value(category),
         barcode: Value(barcode),
-        lastInDate: Value(lastInDate),
-        lastOutDate: Value(lastOutDate),
+        // costPrice field exists but not used on creation (set via supply invoice)
       );
 
       await _database.into(_database.items).insert(companion);
