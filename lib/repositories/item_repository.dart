@@ -62,11 +62,18 @@ class ItemRepository {
   Future<Result<Item>> createItem({
     required String name,
     required double price,
-    required int quantity,
+    int quantity = 0,
     String? description,
-    double? costPrice,
+    String? comment,
+    double? buyingPrice,
+    double? priceTwo,
+    double? priceThree,
+    double? priceFour,
+    double? priceFive,
     String? category,
     String? barcode,
+    DateTime? lastInDate,
+    DateTime? lastOutDate,
   }) async {
     try {
       final itemId = IDGenerator.generateItemId();
@@ -75,11 +82,18 @@ class ItemRepository {
         id: itemId,
         name: name,
         price: price,
-        quantity: quantity,
+        quantity: Value(quantity),
         description: Value(description),
-        costPrice: Value(costPrice),
+        comment: Value(comment),
+        buyingPrice: Value(buyingPrice ?? 0.0),
+        priceTwo: Value(priceTwo ?? 0.0),
+        priceThree: Value(priceThree ?? 0.0),
+        priceFour: Value(priceFour ?? 0.0),
+        priceFive: Value(priceFive ?? 0.0),
         category: Value(category),
         barcode: Value(barcode),
+        lastInDate: Value(lastInDate),
+        lastOutDate: Value(lastOutDate),
       );
 
       await _database.into(_database.items).insert(companion);
@@ -95,40 +109,17 @@ class ItemRepository {
   }
 
   /// Update item
-  Future<Result<Item>> updateItem({
-    required String itemId,
-    String? name,
-    double? price,
-    int? quantity,
-    String? description,
-    double? costPrice,
-    String? category,
-    String? barcode,
-    bool? isActive,
-  }) async {
+  Future<Result<Item>> updateItem(Item item) async {
     try {
-      final updates = ItemsCompanion(
-        id: Value(itemId),
-        name: name != null ? Value(name) : const Value.absent(),
-        price: price != null ? Value(price) : const Value.absent(),
-        quantity: quantity != null ? Value(quantity) : const Value.absent(),
-        description: description != null ? Value(description) : const Value.absent(),
-        costPrice: costPrice != null ? Value(costPrice) : const Value.absent(),
-        category: category != null ? Value(category) : const Value.absent(),
-        barcode: barcode != null ? Value(barcode) : const Value.absent(),
-        isActive: isActive != null ? Value(isActive) : const Value.absent(),
-        updatedAt: Value(DateTime.now()),
-      );
+      await (_database.update(_database.items)..where((i) => i.id.equals(item.id)))
+          .write(item.toCompanion(true));
 
-      await (_database.update(_database.items)..where((i) => i.id.equals(itemId)))
-          .write(updates);
+      final updated = await getItem(item.id);
+      AppLogger.info('Item updated: ${item.id}');
 
-      final item = await getItem(itemId);
-      AppLogger.info('Item updated: $itemId');
-
-      return item;
+      return updated;
     } catch (e, stack) {
-      AppLogger.error('Failed to update item $itemId', e, stack);
+      AppLogger.error('Failed to update item ${item.id}', e, stack);
       return Result.failure(AppError.generic('Failed to update item'));
     }
   }

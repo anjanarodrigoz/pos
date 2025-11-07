@@ -47,12 +47,27 @@ class Items extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
   TextColumn get description => text().nullable()();
-  RealColumn get price => real()();
-  IntColumn get quantity => integer()();
-  RealColumn get costPrice => real().nullable()();
+  TextColumn get comment => text().nullable()();
+
+  // Pricing
+  RealColumn get price => real()(); // Main selling price
+  RealColumn get buyingPrice => real().withDefault(const Constant(0.0))(); // Cost price
+  RealColumn get priceTwo => real().withDefault(const Constant(0.0))();
+  RealColumn get priceThree => real().withDefault(const Constant(0.0))();
+  RealColumn get priceFour => real().withDefault(const Constant(0.0))();
+  RealColumn get priceFive => real().withDefault(const Constant(0.0))();
+
+  // Inventory
+  IntColumn get quantity => integer().withDefault(const Constant(0))();
+  DateTimeColumn get lastInDate => dateTime().nullable()();
+  DateTimeColumn get lastOutDate => dateTime().nullable()();
+
+  // Additional info
   TextColumn get category => text().nullable()();
   TextColumn get barcode => text().nullable()();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+
+  // Timestamps
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 
