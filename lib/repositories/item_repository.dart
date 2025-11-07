@@ -76,7 +76,7 @@ class ItemRepository {
         name: name,
         itemCode: itemCode,
         price: price,
-        quantity: Value(quantity),
+        quantity: quantity,
         description: Value(description),
         category: Value(category),
         // Quantity defaults to 0, updated ONLY via supply invoice
@@ -97,7 +97,8 @@ class ItemRepository {
   /// Update item
   Future<Result<Item>> updateItem(Item item) async {
     try {
-      await (_database.update(_database.items)..where((i) => i.id.equals(item.id)))
+      await (_database.update(_database.items)
+            ..where((i) => i.id.equals(item.id)))
           .write(item.toCompanion(true));
 
       final updated = await getItem(item.id);
@@ -118,7 +119,8 @@ class ItemRepository {
       return Result.success(null);
     } catch (e, stack) {
       AppLogger.error('Failed to update stock for $itemId', e, stack);
-      return Result.failure(AppError.generic('Failed to update stock: ${e.toString()}'));
+      return Result.failure(
+          AppError.generic('Failed to update stock: ${e.toString()}'));
     }
   }
 
@@ -134,7 +136,8 @@ class ItemRepository {
 
       if (usageCount > 0) {
         // Soft delete instead of hard delete
-        await (_database.update(_database.items)..where((i) => i.id.equals(itemId)))
+        await (_database.update(_database.items)
+              ..where((i) => i.id.equals(itemId)))
             .write(const ItemsCompanion(isActive: Value(false)));
 
         AppLogger.info('Item deactivated (used in invoices): $itemId');
@@ -142,7 +145,9 @@ class ItemRepository {
       }
 
       // Hard delete if never used
-      await (_database.delete(_database.items)..where((i) => i.id.equals(itemId))).go();
+      await (_database.delete(_database.items)
+            ..where((i) => i.id.equals(itemId)))
+          .go();
 
       AppLogger.info('Item deleted: $itemId');
       return Result.success(null);
@@ -185,8 +190,7 @@ class ItemRepository {
   /// Get all categories
   Future<Result<List<String>>> getAllCategories() async {
     try {
-      final result = await _database
-          .selectOnly(_database.items, distinct: true)
+      final result = _database.selectOnly(_database.items, distinct: true)
         ..addColumns([_database.items.category]);
 
       final rows = await result.get();
@@ -214,12 +218,13 @@ class ItemRepository {
           .then((row) => row.read(_database.invoiceItems.quantity.sum()) ?? 0);
 
       // Total revenue
-      final revenueExpression = _database.invoiceItems.quantity.cast<double>() * _database.invoiceItems.netPrice;
+      final revenueExpression = _database.invoiceItems.quantity.cast<double>() *
+          _database.invoiceItems.netPrice;
       final totalRevenue = await (_database.selectOnly(_database.invoiceItems)
             ..addColumns([revenueExpression.sum()])
             ..where(_database.invoiceItems.itemId.equals(itemId)))
           .getSingle()
-          .then((row) => (row.read(revenueExpression.sum()) ?? 0.0) as double);
+          .then((row) => (row.read(revenueExpression.sum()) ?? 0.0));
 
       // Get current stock
       final item = await getItem(itemId);
@@ -251,7 +256,8 @@ class ItemRepository {
 
   /// Watch single item
   Stream<Item> watchItem(String itemId) {
-    return (_database.select(_database.items)..where((i) => i.id.equals(itemId)))
+    return (_database.select(_database.items)
+          ..where((i) => i.id.equals(itemId)))
         .watchSingle();
   }
 }

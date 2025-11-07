@@ -143,7 +143,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
 
   Future<void> getItemData() async {
     _item = await _databaseService.getAllItems();
-    itemDataSource = ItemDataSource(itemData: _item);
+    itemDataSource = ItemDataSource(itemData: []);
     setState(() {});
   }
 
