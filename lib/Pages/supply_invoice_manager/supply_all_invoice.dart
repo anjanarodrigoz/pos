@@ -7,6 +7,8 @@ import 'package:pos/utils/my_format.dart';
 import 'package:pos/Pages/supply_invoice_manager/supply_invoice_create_page.dart';
 import 'package:pos/Pages/supply_invoice_manager/supply_invoice_view.dart';
 
+import '../main_window.dart';
+
 /// Modern supplier invoice list page with professional table view
 class SupplyAllInvoice extends StatefulWidget {
   final bool isReturnManager;
@@ -21,7 +23,8 @@ class SupplyAllInvoice extends StatefulWidget {
 }
 
 class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
-  final SupplierInvoiceRepository _repository = Get.find<SupplierInvoiceRepository>();
+  final SupplierInvoiceRepository _repository =
+      Get.find<SupplierInvoiceRepository>();
   String _searchQuery = '';
   String _filterStatus = 'all'; // all, paid, unpaid
 
@@ -82,6 +85,10 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
     return filtered;
   }
 
+  void _navigateToMainMenu() {
+    Get.offAll(() => const MainWindow());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,7 +96,7 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => _navigateToMainMenu(),
         ),
         title: Text(
           widget.isReturnManager ? 'Return Notes' : 'Supplier Invoices',
@@ -97,14 +104,15 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
         ),
         backgroundColor: AppTheme.cardBackground,
         elevation: 0,
-        iconTheme: IconThemeData(color: AppTheme.textPrimary),
+        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
         actions: [
           Padding(
             padding: const EdgeInsets.all(AppTheme.spacingSm),
             child: ElevatedButton.icon(
               onPressed: _navigateToCreateInvoice,
               icon: const Icon(Icons.add, size: 18),
-              label: Text(widget.isReturnManager ? 'New Return Note' : 'New Invoice'),
+              label: Text(
+                  widget.isReturnManager ? 'New Return Note' : 'New Invoice'),
               style: AppTheme.primaryButtonStyle(),
             ),
           ),
@@ -126,8 +134,10 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
                   children: [
                     Expanded(
                       child: TextField(
-                        onChanged: (value) => setState(() => _searchQuery = value),
-                        style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
+                        onChanged: (value) =>
+                            setState(() => _searchQuery = value),
+                        style: AppTheme.bodyMedium
+                            .copyWith(color: AppTheme.textPrimary),
                         decoration: AppTheme.inputDecoration(
                           labelText: 'Search invoices...',
                           prefixIcon: const Icon(Icons.search),
@@ -147,13 +157,16 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
                       ),
                       child: DropdownButton<String>(
                         value: _filterStatus,
-                        onChanged: (value) => setState(() => _filterStatus = value!),
+                        onChanged: (value) =>
+                            setState(() => _filterStatus = value!),
                         underline: const SizedBox(),
                         isDense: true,
                         items: const [
-                          DropdownMenuItem(value: 'all', child: Text('All Invoices')),
+                          DropdownMenuItem(
+                              value: 'all', child: Text('All Invoices')),
                           DropdownMenuItem(value: 'paid', child: Text('Paid')),
-                          DropdownMenuItem(value: 'unpaid', child: Text('Unpaid')),
+                          DropdownMenuItem(
+                              value: 'unpaid', child: Text('Unpaid')),
                         ],
                       ),
                     ),
@@ -178,7 +191,8 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
                   return Center(
                     child: Text(
                       'Error loading invoices: ${snapshot.error}',
-                      style: AppTheme.bodyMedium.copyWith(color: AppTheme.errorColor),
+                      style: AppTheme.bodyMedium
+                          .copyWith(color: AppTheme.errorColor),
                     ),
                   );
                 }
@@ -231,7 +245,7 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
                           horizontal: AppTheme.spacingLg,
                           vertical: AppTheme.spacingMd,
                         ),
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: AppTheme.backgroundGrey,
                           border: Border(
                             bottom: BorderSide(color: AppTheme.borderColor),
@@ -312,7 +326,8 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
                           itemBuilder: (context, index) {
                             final invoice = invoices[index];
                             return InkWell(
-                              onTap: () => _navigateToInvoiceDetail(invoice.invoiceId),
+                              onTap: () =>
+                                  _navigateToInvoiceDetail(invoice.invoiceId),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: AppTheme.spacingLg,
@@ -321,7 +336,8 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
                                 decoration: BoxDecoration(
                                   border: Border(
                                     bottom: BorderSide(
-                                      color: AppTheme.borderColor.withOpacity(0.5),
+                                      color:
+                                          AppTheme.borderColor.withOpacity(0.5),
                                     ),
                                   ),
                                 ),
@@ -360,7 +376,8 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        MyFormat.formatDate(invoice.createdDate),
+                                        MyFormat.formatDate(
+                                            invoice.createdDate),
                                         style: AppTheme.bodySmall.copyWith(
                                           color: AppTheme.textSecondary,
                                         ),
@@ -387,9 +404,12 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
                                           ),
                                           decoration: BoxDecoration(
                                             color: invoice.isPaid
-                                                ? AppTheme.successColor.withOpacity(0.1)
-                                                : AppTheme.warningColor.withOpacity(0.1),
-                                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                                ? AppTheme.successColor
+                                                    .withOpacity(0.1)
+                                                : AppTheme.warningColor
+                                                    .withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(
+                                                AppTheme.radiusSm),
                                           ),
                                           child: Text(
                                             invoice.isPaid ? 'Paid' : 'Unpaid',
