@@ -276,7 +276,7 @@ class _MainWindowState extends State<MainWindow> {
     await windowResizer();
 
     Get.offAll(() => SupplyAllInvoice(
-          isRetunManager: true,
+          isReturnManager: true,
         ));
   }
 

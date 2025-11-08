@@ -47,7 +47,7 @@ class SupplyInvoicePage extends StatelessWidget {
           leading: IconButton(
               onPressed: () {
                 Get.offAll(SupplyAllInvoice(
-                  isRetunManager: isReturnManger,
+                  isReturnManager: isReturnManger,
                 ));
               },
               icon: const Icon(Icons.arrow_back)),
@@ -132,7 +132,7 @@ class SupplyInvoicePage extends StatelessWidget {
               onContinue: () async {
                 await SupplyerInvoiceDB().deleteInvoice(invoice);
                 Get.offAll(SupplyAllInvoice(
-                  isRetunManager: isReturnManger,
+                  isReturnManager: isReturnManger,
                 ));
               },
               continueText: 'Delete',
@@ -151,7 +151,7 @@ class SupplyInvoicePage extends StatelessWidget {
             return Dialog(
               child: SelectSupplyerPage(
                 supplyInvoice: invoice,
-                isRetunManager: isReturnManger,
+                isReturnManager: isReturnManger,
               ),
             );
           });
