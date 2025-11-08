@@ -9,6 +9,7 @@ import 'package:pos/repositories/customer_repository.dart';
 import 'package:pos/repositories/item_repository.dart';
 import 'package:pos/repositories/invoice_repository.dart';
 import 'package:pos/repositories/supplier_repository.dart';
+import 'package:pos/repositories/supplier_invoice_repository.dart';
 import 'package:pos/repositories/payment_repository.dart';
 import 'package:pos/repositories/quotation_repository.dart';
 import 'package:pos/repositories/credit_note_repository.dart';
@@ -72,6 +73,7 @@ void main() async {
     Get.put(ItemRepository(database));
     Get.put(InvoiceRepository(database));
     Get.put(SupplierRepository(database));
+    Get.put(SupplierInvoiceRepository(database));
     Get.put(PaymentRepository(database));
     Get.put(QuotationRepository(database));
     Get.put(CreditNoteRepository(database));

@@ -4,7 +4,7 @@ import 'package:pos/database/pos_database.dart';
 import 'package:pos/repositories/supplier_invoice_repository.dart';
 import 'package:pos/theme/app_theme.dart';
 import 'package:pos/utils/my_format.dart';
-import 'package:pos/Pages/supply_invoice_manager/supply_invoice_page.dart';
+import 'package:pos/Pages/supply_invoice_manager/supply_invoice_create_page.dart';
 import 'package:pos/Pages/supply_invoice_manager/supply_invoice_view.dart';
 
 /// Modern supplier invoice list page with professional table view
@@ -29,8 +29,8 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SupplyInvoicePage(
-          isReturnManager: widget.isReturnManager,
+        builder: (context) => SupplyInvoiceCreatePage(
+          isReturnNote: widget.isReturnManager,
         ),
       ),
     );
