@@ -95,7 +95,7 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
           widget.isReturnManager ? 'Return Notes' : 'Supplier Invoices',
           style: AppTheme.headlineMedium.copyWith(color: AppTheme.textPrimary),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.cardBackground,
         elevation: 0,
         iconTheme: IconThemeData(color: AppTheme.textPrimary),
         actions: [
@@ -119,7 +119,7 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
           // Search and Filters
           Container(
             padding: const EdgeInsets.all(AppTheme.spacingLg),
-            color: Colors.white,
+            color: AppTheme.cardBackground,
             child: Column(
               children: [
                 Row(
@@ -222,7 +222,7 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
                 }
 
                 return Container(
-                  color: Colors.white,
+                  color: AppTheme.cardBackground,
                   child: Column(
                     children: [
                       // Table Header
