@@ -80,7 +80,13 @@ class SupplierRepository {
     String? country,
   }) async {
     try {
-      final supplierId = IDGenerator.generateSupplierId();
+      // Generate auto-incremental supplier ID
+      final count = await (_database.selectOnly(_database.suppliers)
+            ..addColumns([_database.suppliers.id.count()]))
+          .getSingle()
+          .then((row) => row.read(_database.suppliers.id.count()) ?? 0);
+
+      final supplierId = 'SUPP-${(count + 1).toString().padLeft(4, '0')}';
 
       final companion = SuppliersCompanion.insert(
         id: supplierId,

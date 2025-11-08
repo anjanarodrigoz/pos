@@ -160,14 +160,48 @@ class SupplierInvoices extends Table {
   TextColumn get invoiceId => text()();
   TextColumn get supplierId => text().references(Suppliers, #id)();
   DateTimeColumn get createdDate => dateTime()();
+
+  // Pricing details
+  RealColumn get totalNet => real()();
+  RealColumn get totalGst => real()();
   RealColumn get total => real()();
+  RealColumn get gstPercentage => real()();
+
+  // Supplier info (denormalized for quick access)
+  TextColumn get supplierName => text()();
+  TextColumn get supplierMobile => text().nullable()();
+  TextColumn get supplierEmail => text().nullable()();
+
+  // Additional data stored as JSON
+  TextColumn get extraChargesJson => text().nullable()(); // JSON array of extra charges
+  TextColumn get commentsJson => text().nullable()(); // JSON array of comments
+  TextColumn get billingAddressJson => text().nullable()(); // JSON object of billing address
+
+  // Status
   BoolColumn get isPaid => boolean().withDefault(const Constant(false))();
   BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
-  TextColumn get supplierName => text()();
+  BoolColumn get isReturnNote => boolean().withDefault(const Constant(false))();
+
+  // Reference ID (optional external reference)
+  TextColumn get referenceId => text().nullable()();
+
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 
   @override
   Set<Column> get primaryKey => {invoiceId};
+}
+
+class SupplierInvoiceItems extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get invoiceId => text().references(SupplierInvoices, #invoiceId, onDelete: KeyAction.cascade)();
+  TextColumn get itemId => text().references(Items, #id)();
+  TextColumn get itemName => text()();
+  IntColumn get quantity => integer()();
+  RealColumn get buyingPrice => real()(); // Price we bought it for (different from selling price)
+  RealColumn get netPrice => real()(); // Total net price (quantity * buyingPrice)
+  TextColumn get comment => text().nullable()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 
 class Quotations extends Table {
@@ -208,6 +242,7 @@ class CreditNotes extends Table {
   ExtraCharges,
   Suppliers,
   SupplierInvoices,
+  SupplierInvoiceItems,
   Quotations,
   CreditNotes,
 ])
@@ -215,7 +250,7 @@ class POSDatabase extends _$POSDatabase {
   POSDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -232,6 +267,10 @@ class POSDatabase extends _$POSDatabase {
             CREATE INDEX idx_items_name ON items(name);
             CREATE INDEX idx_items_code ON items(item_code);
             CREATE INDEX idx_customers_email ON customers(email);
+            CREATE INDEX idx_supplier_invoices_supplier ON supplier_invoices(supplier_id);
+            CREATE INDEX idx_supplier_invoices_date ON supplier_invoices(created_date);
+            CREATE INDEX idx_supplier_invoices_paid ON supplier_invoices(is_paid);
+            CREATE INDEX idx_supplier_invoice_items_invoice ON supplier_invoice_items(invoice_id);
           ''');
         },
         onUpgrade: (Migrator m, int from, int to) async {
@@ -327,6 +366,78 @@ class POSDatabase extends _$POSDatabase {
             // Create index
             await customStatement('CREATE INDEX idx_suppliers_name ON suppliers(first_name, last_name)');
             await customStatement('CREATE INDEX idx_suppliers_email ON suppliers(email)');
+          }
+
+          // Migration from v3 to v4: Expand supplier invoices table and add supplier invoice items
+          if (from == 3 && to == 4) {
+            // Create new supplier_invoices table with expanded schema
+            await customStatement('''
+              CREATE TABLE supplier_invoices_new (
+                invoice_id TEXT NOT NULL PRIMARY KEY,
+                supplier_id TEXT NOT NULL,
+                created_date INTEGER NOT NULL,
+                total_net REAL NOT NULL,
+                total_gst REAL NOT NULL,
+                total REAL NOT NULL,
+                gst_percentage REAL NOT NULL,
+                supplier_name TEXT NOT NULL,
+                supplier_mobile TEXT,
+                supplier_email TEXT,
+                extra_charges_json TEXT,
+                comments_json TEXT,
+                billing_address_json TEXT,
+                is_paid INTEGER NOT NULL DEFAULT 0,
+                is_deleted INTEGER NOT NULL DEFAULT 0,
+                is_return_note INTEGER NOT NULL DEFAULT 0,
+                reference_id TEXT,
+                created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+                updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+                FOREIGN KEY (supplier_id) REFERENCES suppliers(id)
+              )
+            ''');
+
+            // Copy existing data from old table to new table
+            await customStatement('''
+              INSERT INTO supplier_invoices_new (
+                invoice_id, supplier_id, created_date, total_net, total_gst, total,
+                gst_percentage, supplier_name, is_paid, is_deleted, created_at
+              )
+              SELECT
+                invoice_id, supplier_id, created_date,
+                total as total_net, 0 as total_gst, total,
+                0 as gst_percentage, supplier_name,
+                is_paid, is_deleted, created_at
+              FROM supplier_invoices
+            ''');
+
+            // Drop old table
+            await customStatement('DROP TABLE supplier_invoices');
+
+            // Rename new table
+            await customStatement('ALTER TABLE supplier_invoices_new RENAME TO supplier_invoices');
+
+            // Create new supplier_invoice_items table
+            await customStatement('''
+              CREATE TABLE supplier_invoice_items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                invoice_id TEXT NOT NULL,
+                item_id TEXT NOT NULL,
+                item_name TEXT NOT NULL,
+                quantity INTEGER NOT NULL,
+                buying_price REAL NOT NULL,
+                net_price REAL NOT NULL,
+                comment TEXT,
+                created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+                FOREIGN KEY (invoice_id) REFERENCES supplier_invoices(invoice_id) ON DELETE CASCADE,
+                FOREIGN KEY (item_id) REFERENCES items(id)
+              )
+            ''');
+
+            // Create indexes
+            await customStatement('CREATE INDEX idx_supplier_invoices_supplier ON supplier_invoices(supplier_id)');
+            await customStatement('CREATE INDEX idx_supplier_invoices_date ON supplier_invoices(created_date)');
+            await customStatement('CREATE INDEX idx_supplier_invoices_paid ON supplier_invoices(is_paid)');
+            await customStatement('CREATE INDEX idx_supplier_invoice_items_invoice ON supplier_invoice_items(invoice_id)');
           }
         },
       );

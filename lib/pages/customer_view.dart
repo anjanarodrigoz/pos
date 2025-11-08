@@ -402,16 +402,27 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                   style: AppTheme.headlineLarge.copyWith(color: Colors.white),
                 ),
                 SizedBox(height: AppTheme.spacingXs),
-                if (customer.email != null)
+                Text(
+                  customer.id,
+                  style: AppTheme.bodyMedium.copyWith(
+                    color: Colors.white70,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+                if (customer.email != null) ...[
+                  SizedBox(height: AppTheme.spacingXs),
                   Text(
                     customer.email!,
                     style: AppTheme.bodyMedium.copyWith(color: Colors.white70),
                   ),
-                if (customer.mobileNumber != null)
+                ],
+                if (customer.mobileNumber != null) ...[
+                  SizedBox(height: AppTheme.spacingXs),
                   Text(
                     customer.mobileNumber!,
                     style: AppTheme.bodyMedium.copyWith(color: Colors.white70),
                   ),
+                ],
               ],
             ),
           ),

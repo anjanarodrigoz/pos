@@ -39,7 +39,6 @@ class _SupplyerFormPageState extends State<SupplyerFormPage> {
   final _postalCodeController = TextEditingController();
   final _countryController = TextEditingController();
 
-  final String _supplierId = IDGenerator.generateSupplierId();
   bool _isSaving = false;
 
   @override
@@ -135,7 +134,7 @@ class _SupplyerFormPageState extends State<SupplyerFormPage> {
       backgroundColor: AppTheme.backgroundGrey,
       appBar: AppBar(
         title: Text(
-          'New Supplier - #$_supplierId',
+          'New Supplier',
           style: AppTheme.headlineMedium.copyWith(color: AppTheme.textPrimary),
         ),
         backgroundColor: Colors.white,

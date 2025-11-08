@@ -77,7 +77,13 @@ class CustomerRepository {
     String? postalCountry,
   }) async {
     try {
-      final customerId = IDGenerator.generateCustomerId();
+      // Generate auto-incremental customer ID
+      final count = await (_database.selectOnly(_database.customers)
+            ..addColumns([_database.customers.id.count()]))
+          .getSingle()
+          .then((row) => row.read(_database.customers.id.count()) ?? 0);
+
+      final customerId = 'CUST-${(count + 1).toString().padLeft(4, '0')}';
 
       final companion = CustomersCompanion.insert(
         id: customerId,
