@@ -95,119 +95,135 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
 
   void _showItemQuantityDialog(Item item, {InvoiceItemEntry? existingItem, int? editIndex}) {
     final quantityController = TextEditingController(text: existingItem?.quantity.toString() ?? '1');
-    final priceController = TextEditingController(text: existingItem?.netPrice.toStringAsFixed(2) ?? '');
+    final priceWithoutGstController = TextEditingController(text: existingItem?.netPrice.toStringAsFixed(2) ?? '');
+    final priceWithGstController = TextEditingController();
     final commentController = TextEditingController(text: existingItem?.comment ?? '');
-    bool isPriceWithGST = false;
+
+    // Initialize price with GST if existing item
+    if (existingItem != null) {
+      priceWithGstController.text = existingItem.itemPrice.toStringAsFixed(2);
+    }
+
+    bool _updatingPrice = false;
+
+    void _updatePriceWithGst() {
+      if (_updatingPrice) return;
+      _updatingPrice = true;
+
+      final priceWithoutGst = double.tryParse(priceWithoutGstController.text) ?? 0.0;
+      if (priceWithoutGst > 0) {
+        final priceWithGst = priceWithoutGst * (1 + Val.gstPrecentage);
+        priceWithGstController.text = priceWithGst.toStringAsFixed(2);
+      }
+
+      _updatingPrice = false;
+    }
+
+    void _updatePriceWithoutGst() {
+      if (_updatingPrice) return;
+      _updatingPrice = true;
+
+      final priceWithGst = double.tryParse(priceWithGstController.text) ?? 0.0;
+      if (priceWithGst > 0) {
+        final priceWithoutGst = priceWithGst / (1 + Val.gstPrecentage);
+        priceWithoutGstController.text = priceWithoutGst.toStringAsFixed(2);
+      }
+
+      _updatingPrice = false;
+    }
 
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(item.name),
-          content: SizedBox(
-            width: 500,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: quantityController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                        decoration: AppTheme.inputDecoration(labelText: 'Quantity'),
+      builder: (context) => AlertDialog(
+        title: Text(item.name),
+        content: SizedBox(
+          width: 500,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: quantityController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: AppTheme.inputDecoration(labelText: 'Quantity'),
+              ),
+              const SizedBox(height: AppTheme.spacingMd),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: priceWithoutGstController,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                      ],
+                      onChanged: (_) => _updatePriceWithGst(),
+                      decoration: AppTheme.inputDecoration(
+                        labelText: 'Price (without GST)',
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: AppTheme.spacingMd),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: priceController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
-                        ],
-                        decoration: AppTheme.inputDecoration(
-                          labelText: isPriceWithGST ? 'Price (with GST)' : 'Price (without GST)',
-                        ),
+                  ),
+                  const SizedBox(width: AppTheme.spacingMd),
+                  Expanded(
+                    child: TextField(
+                      controller: priceWithGstController,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                      ],
+                      onChanged: (_) => _updatePriceWithoutGst(),
+                      decoration: AppTheme.inputDecoration(
+                        labelText: 'Price (with GST)',
                       ),
                     ),
-                    const SizedBox(width: AppTheme.spacingSm),
-                    SizedBox(
-                      width: 150,
-                      child: CheckboxListTile(
-                        title: const Text('With GST', style: TextStyle(fontSize: 12)),
-                        value: isPriceWithGST,
-                        dense: true,
-                        contentPadding: EdgeInsets.zero,
-                        onChanged: (value) {
-                          setDialogState(() {
-                            isPriceWithGST = value ?? false;
-                          });
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppTheme.spacingMd),
-                TextField(
-                  controller: commentController,
-                  maxLines: 3,
-                  decoration: AppTheme.inputDecoration(labelText: 'Comment (optional)'),
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppTheme.spacingMd),
+              TextField(
+                controller: commentController,
+                maxLines: 2,
+                decoration: AppTheme.inputDecoration(labelText: 'Comment (optional)'),
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                final quantity = int.tryParse(quantityController.text) ?? 0;
-                final price = double.tryParse(priceController.text) ?? 0.0;
-
-                if (quantity > 0 && price > 0) {
-                  double netPrice;
-                  if (isPriceWithGST) {
-                    // User entered price with GST, calculate net price
-                    netPrice = price / (1 + Val.gstPrecentage);
-                  } else {
-                    // User entered net price
-                    netPrice = price;
-                  }
-
-                  final newItem = InvoiceItemEntry(
-                    itemId: item.id,
-                    itemCode: item.itemCode,
-                    itemName: item.name,
-                    quantity: quantity,
-                    netPrice: netPrice,
-                    comment: commentController.text.isEmpty ? null : commentController.text,
-                  );
-
-                  setState(() {
-                    if (editIndex != null) {
-                      _items[editIndex] = newItem;
-                    } else {
-                      _items.add(newItem);
-                    }
-                  });
-                  _calculateTotals();
-                  Navigator.pop(context);
-                } else {
-                  AlertMessage.snakMessage('Please enter valid quantity and price', context);
-                }
-              },
-              child: Text(editIndex != null ? 'Update' : 'Add'),
-            ),
-          ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              final quantity = int.tryParse(quantityController.text) ?? 0;
+              final netPrice = double.tryParse(priceWithoutGstController.text) ?? 0.0;
+
+              if (quantity > 0 && netPrice > 0) {
+                final newItem = InvoiceItemEntry(
+                  itemId: item.id,
+                  itemCode: item.itemCode,
+                  itemName: item.name,
+                  quantity: quantity,
+                  netPrice: netPrice,
+                  comment: commentController.text.isEmpty ? null : commentController.text,
+                );
+
+                setState(() {
+                  if (editIndex != null) {
+                    _items[editIndex] = newItem;
+                  } else {
+                    _items.add(newItem);
+                  }
+                });
+                _calculateTotals();
+                Navigator.pop(context);
+              } else {
+                AlertMessage.snakMessage('Please enter valid quantity and price', context);
+              }
+            },
+            child: Text(editIndex != null ? 'Update' : 'Add'),
+          ),
+        ],
       ),
     );
   }
@@ -411,7 +427,7 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
           widget.isReturnNote ? 'New Return Note' : 'New Supplier Invoice',
           style: AppTheme.headlineMedium.copyWith(color: AppTheme.textPrimary),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.cardBackground,
         elevation: 0,
         iconTheme: IconThemeData(color: AppTheme.textPrimary),
         bottom: PreferredSize(
@@ -436,7 +452,7 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
   Widget _buildLeftSidebar() {
     return Container(
       width: 250,
-      color: Colors.white,
+      color: AppTheme.cardBackground,
       padding: const EdgeInsets.all(AppTheme.spacingLg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -621,7 +637,7 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
 
   Widget _buildInvoiceDisplay() {
     return Container(
-      color: Colors.white,
+      color: AppTheme.cardBackground,
       padding: const EdgeInsets.all(AppTheme.spacingLg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -631,22 +647,10 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
 
           const SizedBox(height: AppTheme.spacingLg),
 
-          // Items table
+          // Unified invoice table
           Expanded(
             child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  _buildItemsTable(),
-                  if (_extraCharges.isNotEmpty) ...[
-                    const SizedBox(height: AppTheme.spacingLg),
-                    _buildExtraChargesTable(),
-                  ],
-                  if (_comments.isNotEmpty) ...[
-                    const SizedBox(height: AppTheme.spacingLg),
-                    _buildCommentsSection(),
-                  ],
-                ],
-              ),
+              child: _buildUnifiedInvoiceTable(),
             ),
           ),
         ],
@@ -707,7 +711,7 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
     );
   }
 
-  Widget _buildItemsTable() {
+  Widget _buildUnifiedInvoiceTable() {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: AppTheme.borderColor),
@@ -763,8 +767,8 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
             ),
           ),
 
-          // Table rows
-          if (_items.isEmpty)
+          // Table rows - Items, Extra Charges, Comments in one unified table
+          if (_items.isEmpty && _extraCharges.isEmpty && _comments.isEmpty)
             Padding(
               padding: const EdgeInsets.all(AppTheme.spacingXl),
               child: Text(
@@ -776,275 +780,257 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
               ),
             )
           else
-            ..._items.asMap().entries.map((entry) {
-              final index = entry.key;
-              final item = entry.value;
-              return Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppTheme.spacingMd,
-                      vertical: AppTheme.spacingMd,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        top: BorderSide(color: AppTheme.borderColor),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            item.itemCode,
-                            style: _tableCellStyle().copyWith(fontFamily: 'monospace'),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 3,
-                          child: Text(item.itemName, style: _tableCellStyle()),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Text(
-                            item.quantity.toString(),
-                            style: _tableCellStyle(),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            MyFormat.formatCurrency(item.netPrice),
-                            style: _tableCellStyle(),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            MyFormat.formatCurrency(item.gstPrice),
-                            style: _tableCellStyle(),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            MyFormat.formatCurrency(item.itemPrice),
-                            style: _tableCellStyle(),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            MyFormat.formatCurrency(item.totalPrice),
-                            style: _tableCellStyle().copyWith(fontWeight: FontWeight.w600),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 80,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.edit, size: 18, color: AppTheme.primaryColor),
-                                onPressed: () => _editItem(index),
-                                tooltip: 'Edit',
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.delete, size: 18, color: AppTheme.errorColor),
-                                onPressed: () => _removeItem(index),
-                                tooltip: 'Delete',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (item.comment != null)
+            ...[
+              // Items section
+              ..._items.asMap().entries.map((entry) {
+                final index = entry.key;
+                final item = entry.value;
+                return Column(
+                  children: [
                     Container(
-                      width: double.infinity,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: AppTheme.spacingLg,
+                        horizontal: AppTheme.spacingMd,
                         vertical: AppTheme.spacingSm,
                       ),
                       decoration: BoxDecoration(
-                        color: AppTheme.backgroundGrey.withOpacity(0.5),
                         border: Border(
-                          top: BorderSide(color: AppTheme.borderColor.withOpacity(0.5)),
+                          top: BorderSide(color: AppTheme.borderColor),
                         ),
                       ),
-                      child: Text(
-                        'Comment: ${item.comment}',
-                        style: AppTheme.bodyXSmall.copyWith(
-                          color: AppTheme.textSecondary,
-                          fontStyle: FontStyle.italic,
-                        ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              item.itemCode,
+                              style: _tableCellStyle().copyWith(fontFamily: 'monospace'),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: Text(item.itemName, style: _tableCellStyle()),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              item.quantity.toString(),
+                              style: _tableCellStyle(),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              MyFormat.formatCurrency(item.netPrice),
+                              style: _tableCellStyle(),
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              MyFormat.formatCurrency(item.gstPrice),
+                              style: _tableCellStyle(),
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              MyFormat.formatCurrency(item.itemPrice),
+                              style: _tableCellStyle(),
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              MyFormat.formatCurrency(item.totalPrice),
+                              style: _tableCellStyle().copyWith(fontWeight: FontWeight.w600),
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 80,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.edit, size: 18, color: AppTheme.primaryColor),
+                                  onPressed: () => _editItem(index),
+                                  tooltip: 'Edit',
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                                const SizedBox(width: 4),
+                                IconButton(
+                                  icon: Icon(Icons.delete, size: 18, color: AppTheme.errorColor),
+                                  onPressed: () => _removeItem(index),
+                                  tooltip: 'Delete',
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                ],
-              );
-            }).toList(),
-        ],
-      ),
-    );
-  }
+                    if (item.comment != null)
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppTheme.spacingLg,
+                          vertical: AppTheme.spacingSm,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.backgroundGrey.withOpacity(0.3),
+                          border: Border(
+                            top: BorderSide(color: AppTheme.borderColor.withOpacity(0.5)),
+                          ),
+                        ),
+                        child: Text(
+                          'Comment: ${item.comment}',
+                          style: AppTheme.bodyXSmall.copyWith(
+                            color: AppTheme.textSecondary,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              }).toList(),
 
-  Widget _buildExtraChargesTable() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: AppTheme.borderColor),
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(AppTheme.spacingMd),
-            decoration: BoxDecoration(
-              color: AppTheme.warningColor.withOpacity(0.1),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(AppTheme.radiusMd),
-                topRight: Radius.circular(AppTheme.radiusMd),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.add_circle_outline, color: AppTheme.warningColor, size: 20),
-                const SizedBox(width: AppTheme.spacingSm),
-                Text(
-                  'Extra Charges',
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w600,
+              // Extra charges section
+              ..._extraCharges.asMap().entries.map((entry) {
+                final index = entry.key;
+                final charge = entry.value;
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppTheme.spacingMd,
+                    vertical: AppTheme.spacingSm,
                   ),
-                ),
-              ],
-            ),
-          ),
-          ..._extraCharges.asMap().entries.map((entry) {
-            final index = entry.key;
-            final charge = entry.value;
-            return Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppTheme.spacingMd,
-                vertical: AppTheme.spacingMd,
-              ),
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: AppTheme.borderColor),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(charge.description, style: _tableCellStyle()),
-                  ),
-                  Text(
-                    MyFormat.formatCurrency(charge.amount),
-                    style: _tableCellStyle().copyWith(fontWeight: FontWeight.w600),
-                  ),
-                  SizedBox(
-                    width: 80,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.edit, size: 18, color: AppTheme.primaryColor),
-                          onPressed: () => _addExtraCharge(existingCharge: charge, editIndex: index),
-                          tooltip: 'Edit',
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.delete, size: 18, color: AppTheme.errorColor),
-                          onPressed: () => _removeExtraCharge(index),
-                          tooltip: 'Delete',
-                        ),
-                      ],
+                  decoration: BoxDecoration(
+                    color: AppTheme.warningColor.withOpacity(0.05),
+                    border: Border(
+                      top: BorderSide(color: AppTheme.borderColor),
                     ),
                   ),
-                ],
-              ),
-            );
-          }).toList(),
-        ],
-      ),
-    );
-  }
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Row(
+                          children: [
+                            Icon(Icons.add_circle_outline, color: AppTheme.warningColor, size: 16),
+                            const SizedBox(width: 4),
+                            Text('Extra Charge', style: _tableCellStyle().copyWith(color: AppTheme.warningColor)),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: Text(charge.description, style: _tableCellStyle()),
+                      ),
+                      Expanded(flex: 1, child: const SizedBox()),
+                      Expanded(flex: 2, child: const SizedBox()),
+                      Expanded(flex: 2, child: const SizedBox()),
+                      Expanded(flex: 2, child: const SizedBox()),
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          MyFormat.formatCurrency(charge.amount),
+                          style: _tableCellStyle().copyWith(fontWeight: FontWeight.w600),
+                          textAlign: TextAlign.right,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 80,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.edit, size: 18, color: AppTheme.primaryColor),
+                              onPressed: () => _addExtraCharge(existingCharge: charge, editIndex: index),
+                              tooltip: 'Edit',
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                            const SizedBox(width: 4),
+                            IconButton(
+                              icon: Icon(Icons.delete, size: 18, color: AppTheme.errorColor),
+                              onPressed: () => _removeExtraCharge(index),
+                              tooltip: 'Delete',
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
 
-  Widget _buildCommentsSection() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: AppTheme.borderColor),
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(AppTheme.spacingMd),
-            decoration: BoxDecoration(
-              color: AppTheme.infoColor.withOpacity(0.1),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(AppTheme.radiusMd),
-                topRight: Radius.circular(AppTheme.radiusMd),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.comment_outlined, color: AppTheme.infoColor, size: 20),
-                const SizedBox(width: AppTheme.spacingSm),
-                Text(
-                  'Comments',
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w600,
+              // Comments section
+              ..._comments.asMap().entries.map((entry) {
+                final index = entry.key;
+                final comment = entry.value;
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppTheme.spacingMd,
+                    vertical: AppTheme.spacingSm,
                   ),
-                ),
-              ],
-            ),
-          ),
-          ..._comments.asMap().entries.map((entry) {
-            final index = entry.key;
-            final comment = entry.value;
-            return Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppTheme.spacingMd,
-                vertical: AppTheme.spacingMd,
-              ),
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: AppTheme.borderColor),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(comment, style: _tableCellStyle()),
-                  ),
-                  SizedBox(
-                    width: 80,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.edit, size: 18, color: AppTheme.primaryColor),
-                          onPressed: () => _addComment(existingComment: comment, editIndex: index),
-                          tooltip: 'Edit',
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.delete, size: 18, color: AppTheme.errorColor),
-                          onPressed: () => _removeComment(index),
-                          tooltip: 'Delete',
-                        ),
-                      ],
+                  decoration: BoxDecoration(
+                    color: AppTheme.infoColor.withOpacity(0.05),
+                    border: Border(
+                      top: BorderSide(color: AppTheme.borderColor),
                     ),
                   ),
-                ],
-              ),
-            );
-          }).toList(),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Row(
+                          children: [
+                            Icon(Icons.comment_outlined, color: AppTheme.infoColor, size: 16),
+                            const SizedBox(width: 4),
+                            Text('Comment', style: _tableCellStyle().copyWith(color: AppTheme.infoColor)),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        flex: 12,
+                        child: Text(comment, style: _tableCellStyle()),
+                      ),
+                      SizedBox(
+                        width: 80,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.edit, size: 18, color: AppTheme.primaryColor),
+                              onPressed: () => _addComment(existingComment: comment, editIndex: index),
+                              tooltip: 'Edit',
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                            const SizedBox(width: 4),
+                            IconButton(
+                              icon: Icon(Icons.delete, size: 18, color: AppTheme.errorColor),
+                              onPressed: () => _removeComment(index),
+                              tooltip: 'Delete',
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ],
         ],
       ),
     );
@@ -1095,6 +1081,7 @@ class _SupplierSelectionDialogState extends State<_SupplierSelectionDialog> {
         width: 700,
         height: 500,
         padding: const EdgeInsets.all(AppTheme.spacingLg),
+        color: AppTheme.cardBackground,
         child: Column(
           children: [
             Row(
@@ -1211,6 +1198,7 @@ class _ItemSelectionDialogState extends State<_ItemSelectionDialog> {
         width: 700,
         height: 500,
         padding: const EdgeInsets.all(AppTheme.spacingLg),
+        color: AppTheme.cardBackground,
         child: Column(
           children: [
             Row(
