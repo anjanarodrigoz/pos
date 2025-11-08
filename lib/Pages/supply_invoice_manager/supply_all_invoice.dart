@@ -1,199 +1,420 @@
 import 'package:flutter/material.dart';
-import 'package:get/route_manager.dart';
-
-import 'package:pos/Pages/supply_invoice_manager/supply_invoice_page.dart';
-import 'package:pos/database/supplyer_invoice_db_service.dart';
-import 'package:pos/models/invoice.dart';
-import 'package:pos/utils/constant.dart';
-
+import 'package:get/get.dart';
+import 'package:pos/database/pos_database.dart';
+import 'package:pos/repositories/supplier_invoice_repository.dart';
+import 'package:pos/theme/app_theme.dart';
 import 'package:pos/utils/my_format.dart';
-import 'package:pos/widgets/pos_appbar.dart';
-import 'package:pos/widgets/pos_button.dart';
-import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import '../../models/supply_invoice.dart';
-import 'select_supplyer_page.dart';
+import 'package:pos/Pages/supply_invoice_manager/supply_invoice_page.dart';
+import 'package:pos/Pages/supply_invoice_manager/supply_invoice_view.dart';
 
-class SupplyAllInvoice extends StatelessWidget {
-  bool isRetunManager;
-  SupplyAllInvoice({super.key, this.isRetunManager = false});
+/// Modern supplier invoice list page with professional table view
+class SupplyAllInvoice extends StatefulWidget {
+  final bool isReturnManager;
 
-  List<SupplyInvoice> supplyInvoice = [];
-  SupplyInvoiceDataSource invoiceDataSource =
-      SupplyInvoiceDataSource(invoiceData: [], isRetunManager: false);
+  const SupplyAllInvoice({
+    Key? key,
+    this.isReturnManager = false,
+  }) : super(key: key);
+
+  @override
+  State<SupplyAllInvoice> createState() => _SupplyAllInvoiceState();
+}
+
+class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
+  final SupplierInvoiceRepository _repository = Get.find<SupplierInvoiceRepository>();
+  String _searchQuery = '';
+  String _filterStatus = 'all'; // all, paid, unpaid
+
+  void _navigateToCreateInvoice() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SupplyInvoicePage(
+          isReturnManager: widget.isReturnManager,
+        ),
+      ),
+    );
+
+    if (result == true) {
+      // Refresh handled by StreamBuilder
+    }
+  }
+
+  void _navigateToInvoiceDetail(String invoiceId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SupplyInvoiceView(
+          invoiceId: invoiceId,
+          isReturnNote: widget.isReturnManager,
+        ),
+      ),
+    );
+  }
+
+  List<SupplierInvoice> _filterInvoices(List<SupplierInvoice> invoices) {
+    var filtered = invoices;
+
+    // Filter by search query
+    if (_searchQuery.isNotEmpty) {
+      filtered = filtered.where((invoice) {
+        final query = _searchQuery.toLowerCase();
+        return invoice.invoiceId.toLowerCase().contains(query) ||
+            invoice.supplierName.toLowerCase().contains(query) ||
+            (invoice.referenceId?.toLowerCase().contains(query) ?? false);
+      }).toList();
+    }
+
+    // Filter by payment status
+    if (_filterStatus == 'paid') {
+      filtered = filtered.where((i) => i.isPaid).toList();
+    } else if (_filterStatus == 'unpaid') {
+      filtered = filtered.where((i) => !i.isPaid).toList();
+    }
+
+    // Filter by return note status
+    if (widget.isReturnManager) {
+      filtered = filtered.where((i) => i.isReturnNote).toList();
+    } else {
+      filtered = filtered.where((i) => !i.isReturnNote).toList();
+    }
+
+    return filtered;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const PosAppBar(title: 'Supply Invoice'),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const SizedBox(
-            height: 10.0,
+      backgroundColor: AppTheme.backgroundGrey,
+      appBar: AppBar(
+        title: Text(
+          widget.isReturnManager ? 'Return Notes' : 'Supplier Invoices',
+          style: AppTheme.headlineMedium.copyWith(color: AppTheme.textPrimary),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: IconThemeData(color: AppTheme.textPrimary),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(AppTheme.spacingSm),
+            child: ElevatedButton.icon(
+              onPressed: _navigateToCreateInvoice,
+              icon: const Icon(Icons.add, size: 18),
+              label: Text(widget.isReturnManager ? 'New Return Note' : 'New Invoice'),
+              style: AppTheme.primaryButtonStyle(),
+            ),
           ),
-          PosButton(
-            text:
-                isRetunManager ? '+ Add Return Note' : ' + Add Supply Invoice',
-            onPressed: () {
-              Get.to(SelectSupplyerPage(isRetunManager: isRetunManager));
-            },
-            width: 200.0,
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(height: 1, color: AppTheme.borderColor),
+        ),
+      ),
+      body: Column(
+        children: [
+          // Search and Filters
+          Container(
+            padding: const EdgeInsets.all(AppTheme.spacingLg),
+            color: Colors.white,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        onChanged: (value) => setState(() => _searchQuery = value),
+                        style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
+                        decoration: AppTheme.inputDecoration(
+                          labelText: 'Search invoices...',
+                          prefixIcon: const Icon(Icons.search),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppTheme.spacingMd),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppTheme.spacingMd,
+                        vertical: AppTheme.spacingSm,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.backgroundGrey,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                        border: Border.all(color: AppTheme.borderColor),
+                      ),
+                      child: DropdownButton<String>(
+                        value: _filterStatus,
+                        onChanged: (value) => setState(() => _filterStatus = value!),
+                        underline: const SizedBox(),
+                        isDense: true,
+                        items: const [
+                          DropdownMenuItem(value: 'all', child: Text('All Invoices')),
+                          DropdownMenuItem(value: 'paid', child: Text('Paid')),
+                          DropdownMenuItem(value: 'unpaid', child: Text('Unpaid')),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
+
+          const SizedBox(height: 1),
+
+          // Invoice List
           Expanded(
-            child: FutureBuilder(
-                future: isRetunManager
-                    ? SupplyerInvoiceDB().getReturnNotes()
-                    : SupplyerInvoiceDB().getNormalInvoice(),
-                builder: (context, snapshot) {
-                  supplyInvoice = snapshot.data ?? [];
-                  invoiceDataSource = SupplyInvoiceDataSource(
-                      isRetunManager: isRetunManager,
-                      invoiceData: supplyInvoice.reversed.toList());
+            child: StreamBuilder<List<SupplierInvoice>>(
+              stream: _repository.watchAllInvoices(activeOnly: true),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                  if (supplyInvoice.isEmpty) {
-                    return Center(
-                      child: Text(isRetunManager
-                          ? '+ Add Return Note'
-                          : '+ Add Supply invoices'),
-                    );
-                  }
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      'Error loading invoices: ${snapshot.error}',
+                      style: AppTheme.bodyMedium.copyWith(color: AppTheme.errorColor),
+                    ),
+                  );
+                }
 
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    child: SfDataGrid(
-                      gridLinesVisibility: GridLinesVisibility.both,
-                      headerGridLinesVisibility: GridLinesVisibility.both,
-                      allowFiltering: true,
-                      rowHeight: Const.tableRowHeight,
-                      allowColumnsResizing: true,
-                      showFilterIconOnHover: true,
-                      columnWidthMode: ColumnWidthMode.auto,
-                      source: invoiceDataSource,
-                      onCellTap: ((details) {
-                        if (details.rowColumnIndex.rowIndex != 0) {
-                          int selectedRowIndex =
-                              details.rowColumnIndex.rowIndex - 1;
-                          var row = invoiceDataSource.effectiveRows
-                              .elementAt(selectedRowIndex);
-                          String invoiceId = row.getCells()[0].value;
+                final allInvoices = snapshot.data ?? [];
+                final invoices = _filterInvoices(allInvoices);
 
-                          Get.to(SupplyInvoicePage(
-                            invoiceId: invoiceId,
-                            isReturnManger: isRetunManager,
-                          ));
-                        }
-                      }),
-                      columns: [
-                        GridColumn(
-                            width: 100.0,
-                            columnName: Invoice.invoiceIdKey,
-                            label: const Center(child: Text('Invoice ID'))),
-                        if (!isRetunManager)
-                          GridColumn(
-                              width: 80.0,
-                              columnName: Invoice.invoiceIdKey,
-                              label: const Center(child: Text('Ref. ID'))),
-                        GridColumn(
-                            columnName: Invoice.customerNameKey,
-                            label: const Center(child: Text('Sup. Name'))),
-                        GridColumn(
-                            width: 80.0,
-                            columnName: Invoice.customerIdKey,
-                            label: const Center(child: Text('Sup. ID'))),
-                        GridColumn(
-                            columnName: Invoice.createdDateKey,
-                            label: const Center(child: Text('Date'))),
-                        GridColumn(
-                            columnName: Invoice.netKey,
-                            label: const Center(child: Text('Net Total'))),
-                        GridColumn(
-                            columnName: Invoice.gstKey,
-                            label: const Center(child: Text('GST Total'))),
-                        GridColumn(
-                            columnName: Invoice.totalKey,
-                            label: const Center(child: Text('Total'))),
-
-                        // Add more columns as needed
+                if (invoices.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          widget.isReturnManager
+                              ? Icons.assignment_return_outlined
+                              : Icons.receipt_long_outlined,
+                          size: 64,
+                          color: AppTheme.textSecondary.withOpacity(0.3),
+                        ),
+                        const SizedBox(height: AppTheme.spacingMd),
+                        Text(
+                          _searchQuery.isEmpty
+                              ? (widget.isReturnManager
+                                  ? 'No return notes yet'
+                                  : 'No supplier invoices yet')
+                              : 'No invoices match your search',
+                          style: AppTheme.bodyLarge.copyWith(
+                            color: AppTheme.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: AppTheme.spacingSm),
+                        Text(
+                          'Click the button above to create one',
+                          style: AppTheme.bodyMedium.copyWith(
+                            color: AppTheme.textSecondary.withOpacity(0.7),
+                          ),
+                        ),
                       ],
                     ),
                   );
-                }),
-          )
-        ]),
+                }
+
+                return Container(
+                  color: Colors.white,
+                  child: Column(
+                    children: [
+                      // Table Header
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppTheme.spacingLg,
+                          vertical: AppTheme.spacingMd,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.backgroundGrey,
+                          border: Border(
+                            bottom: BorderSide(color: AppTheme.borderColor),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'Invoice ID',
+                                style: AppTheme.bodySmall.copyWith(
+                                  color: AppTheme.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            if (!widget.isReturnManager)
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  'Ref. ID',
+                                  style: AppTheme.bodySmall.copyWith(
+                                    color: AppTheme.textSecondary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            Expanded(
+                              flex: 3,
+                              child: Text(
+                                'Supplier',
+                                style: AppTheme.bodySmall.copyWith(
+                                  color: AppTheme.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'Date',
+                                style: AppTheme.bodySmall.copyWith(
+                                  color: AppTheme.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'Total',
+                                textAlign: TextAlign.right,
+                                style: AppTheme.bodySmall.copyWith(
+                                  color: AppTheme.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Text(
+                                'Status',
+                                textAlign: TextAlign.center,
+                                style: AppTheme.bodySmall.copyWith(
+                                  color: AppTheme.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Table Rows
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: invoices.length,
+                          itemBuilder: (context, index) {
+                            final invoice = invoices[index];
+                            return InkWell(
+                              onTap: () => _navigateToInvoiceDetail(invoice.invoiceId),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppTheme.spacingLg,
+                                  vertical: AppTheme.spacingMd,
+                                ),
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: AppTheme.borderColor.withOpacity(0.5),
+                                    ),
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        invoice.invoiceId,
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: AppTheme.primaryColor,
+                                          fontWeight: FontWeight.w500,
+                                          fontFamily: 'monospace',
+                                        ),
+                                      ),
+                                    ),
+                                    if (!widget.isReturnManager)
+                                      Expanded(
+                                        flex: 2,
+                                        child: Text(
+                                          invoice.referenceId ?? '-',
+                                          style: AppTheme.bodySmall.copyWith(
+                                            color: AppTheme.textSecondary,
+                                          ),
+                                        ),
+                                      ),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        invoice.supplierName,
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: AppTheme.textPrimary,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        MyFormat.formatDate(invoice.createdDate),
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: AppTheme.textSecondary,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        MyFormat.formatCurrency(invoice.total),
+                                        textAlign: TextAlign.right,
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: AppTheme.textPrimary,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Center(
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: AppTheme.spacingSm,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: invoice.isPaid
+                                                ? AppTheme.successColor.withOpacity(0.1)
+                                                : AppTheme.warningColor.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                          ),
+                                          child: Text(
+                                            invoice.isPaid ? 'Paid' : 'Unpaid',
+                                            style: AppTheme.bodyXSmall.copyWith(
+                                              color: invoice.isPaid
+                                                  ? AppTheme.successColor
+                                                  : AppTheme.warningColor,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
-  }
-}
-
-class SupplyInvoiceDataSource extends DataGridSource {
-  List<DataGridRow> _customersData = [];
-
-  SupplyInvoiceDataSource(
-      {required List<SupplyInvoice> invoiceData, required isRetunManager}) {
-    _customersData = invoiceData
-        .map<DataGridRow>((e) => DataGridRow(cells: [
-              DataGridCell(
-                  columnName: Invoice.invoiceIdKey, value: e.invoiceId),
-              if (!isRetunManager)
-                DataGridCell(
-                    columnName: Invoice.invoiceIdKey, value: e.referenceId),
-              DataGridCell(
-                  columnName: Invoice.customerNameKey, value: e.supplyerName),
-              DataGridCell(
-                  columnName: Invoice.customerIdKey, value: e.supplyerId),
-              DataGridCell(
-                  columnName: Invoice.createdDateKey, value: e.createdDate),
-              DataGridCell(columnName: Invoice.netKey, value: e.totalNetPrice),
-              DataGridCell(columnName: Invoice.gstKey, value: e.totalGstPrice),
-              DataGridCell(columnName: Invoice.totalKey, value: e.total),
-            ]))
-        .toList();
-  }
-
-  @override
-  List<DataGridRow> get rows => _customersData;
-
-  @override
-  DataGridRowAdapter? buildRow(DataGridRow row) {
-    // TODO: implement buildRow
-    return DataGridRowAdapter(
-        cells: row.getCells().map<Widget>((e) {
-      if (e.columnName == Invoice.createdDateKey) {
-        return Container(
-          alignment: Alignment.center,
-          padding: Const.tableValuesPadding,
-          child: Text(
-            MyFormat.formatDate(e.value),
-            style: Const.tableValuesTextStyle,
-          ),
-        );
-      }
-
-      if (e.columnName == Invoice.netKey ||
-          e.columnName == Invoice.gstKey ||
-          e.columnName == Invoice.totalKey ||
-          e.columnName == Invoice.paykey) {
-        return Container(
-          alignment: Alignment.centerRight,
-          padding: Const.tableValuesPadding,
-          child: Text(
-            MyFormat.formatCurrency(e.value),
-            style: Const.tableValuesTextStyle,
-          ),
-        );
-      }
-
-      return Container(
-        alignment: Alignment.center,
-        padding: Const.tableValuesPadding,
-        child: Text(e.value.toString(), style: Const.tableValuesTextStyle),
-      );
-    }).toList());
   }
 }
