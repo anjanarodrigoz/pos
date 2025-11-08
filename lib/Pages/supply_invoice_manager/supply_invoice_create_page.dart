@@ -20,12 +20,14 @@ class SupplyInvoiceCreatePage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<SupplyInvoiceCreatePage> createState() => _SupplyInvoiceCreatePageState();
+  State<SupplyInvoiceCreatePage> createState() =>
+      _SupplyInvoiceCreatePageState();
 }
 
 class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
   final SupplierRepository _supplierRepository = Get.find<SupplierRepository>();
-  final SupplierInvoiceRepository _invoiceRepository = Get.find<SupplierInvoiceRepository>();
+  final SupplierInvoiceRepository _invoiceRepository =
+      Get.find<SupplierInvoiceRepository>();
   final ItemRepository _itemRepository = Get.find<ItemRepository>();
 
   Supplier? _selectedSupplier;
@@ -44,8 +46,10 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
   void _calculateTotals() {
     setState(() {
       _itemsTotal = _items.fold(0.0, (sum, item) => sum + item.totalPrice);
-      _extraChargesTotal = _extraCharges.fold(0.0, (sum, charge) => sum + charge.amount);
-      _netTotal = _items.fold(0.0, (sum, item) => sum + item.netTotal) + _extraChargesTotal;
+      _extraChargesTotal =
+          _extraCharges.fold(0.0, (sum, charge) => sum + charge.amount);
+      _netTotal = _items.fold(0.0, (sum, item) => sum + item.netTotal) +
+          _extraChargesTotal;
       _gstTotal = _items.fold(0.0, (sum, item) => sum + item.gstTotal);
       _grandTotal = _itemsTotal + _extraChargesTotal;
     });
@@ -93,35 +97,40 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
     }
   }
 
-  void _showItemQuantityDialog(Item item, {InvoiceItemEntry? existingItem, int? editIndex}) {
-    final quantityController = TextEditingController(text: existingItem?.quantity.toString() ?? '1');
-    final priceWithoutGstController = TextEditingController(text: existingItem?.netPrice.toStringAsFixed(2) ?? '');
+  void _showItemQuantityDialog(Item item,
+      {InvoiceItemEntry? existingItem, int? editIndex}) {
+    final quantityController =
+        TextEditingController(text: existingItem?.quantity.toString() ?? '1');
+    final priceWithoutGstController = TextEditingController(
+        text: existingItem?.netPrice.toStringAsFixed(2) ?? '');
     final priceWithGstController = TextEditingController();
-    final commentController = TextEditingController(text: existingItem?.comment ?? '');
+    final commentController =
+        TextEditingController(text: existingItem?.comment ?? '');
 
     // Initialize price with GST if existing item
     if (existingItem != null) {
       priceWithGstController.text = existingItem.itemPrice.toStringAsFixed(2);
     }
 
-    bool _updatingPrice = false;
+    bool updatingPrice = false;
 
-    void _updatePriceWithGst() {
-      if (_updatingPrice) return;
-      _updatingPrice = true;
+    void updatePriceWithGst() {
+      if (updatingPrice) return;
+      updatingPrice = true;
 
-      final priceWithoutGst = double.tryParse(priceWithoutGstController.text) ?? 0.0;
+      final priceWithoutGst =
+          double.tryParse(priceWithoutGstController.text) ?? 0.0;
       if (priceWithoutGst > 0) {
         final priceWithGst = priceWithoutGst * (1 + Val.gstPrecentage);
         priceWithGstController.text = priceWithGst.toStringAsFixed(2);
       }
 
-      _updatingPrice = false;
+      updatingPrice = false;
     }
 
-    void _updatePriceWithoutGst() {
-      if (_updatingPrice) return;
-      _updatingPrice = true;
+    void updatePriceWithoutGst() {
+      if (updatingPrice) return;
+      updatingPrice = true;
 
       final priceWithGst = double.tryParse(priceWithGstController.text) ?? 0.0;
       if (priceWithGst > 0) {
@@ -129,7 +138,7 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
         priceWithoutGstController.text = priceWithoutGst.toStringAsFixed(2);
       }
 
-      _updatingPrice = false;
+      updatingPrice = false;
     }
 
     showDialog(
@@ -153,11 +162,13 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
                   Expanded(
                     child: TextField(
                       controller: priceWithoutGstController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
                       inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'^\d*\.?\d*')),
                       ],
-                      onChanged: (_) => _updatePriceWithGst(),
+                      onChanged: (_) => updatePriceWithGst(),
                       decoration: AppTheme.inputDecoration(
                         labelText: 'Price (without GST)',
                       ),
@@ -167,11 +178,13 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
                   Expanded(
                     child: TextField(
                       controller: priceWithGstController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
                       inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'^\d*\.?\d*')),
                       ],
-                      onChanged: (_) => _updatePriceWithoutGst(),
+                      onChanged: (_) => updatePriceWithoutGst(),
                       decoration: AppTheme.inputDecoration(
                         labelText: 'Price (with GST)',
                       ),
@@ -183,7 +196,8 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
               TextField(
                 controller: commentController,
                 maxLines: 2,
-                decoration: AppTheme.inputDecoration(labelText: 'Comment (optional)'),
+                decoration:
+                    AppTheme.inputDecoration(labelText: 'Comment (optional)'),
               ),
             ],
           ),
@@ -196,7 +210,8 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
           TextButton(
             onPressed: () {
               final quantity = int.tryParse(quantityController.text) ?? 0;
-              final netPrice = double.tryParse(priceWithoutGstController.text) ?? 0.0;
+              final netPrice =
+                  double.tryParse(priceWithoutGstController.text) ?? 0.0;
 
               if (quantity > 0 && netPrice > 0) {
                 final newItem = InvoiceItemEntry(
@@ -205,7 +220,9 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
                   itemName: item.name,
                   quantity: quantity,
                   netPrice: netPrice,
-                  comment: commentController.text.isEmpty ? null : commentController.text,
+                  comment: commentController.text.isEmpty
+                      ? null
+                      : commentController.text,
                 );
 
                 setState(() {
@@ -218,7 +235,8 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
                 _calculateTotals();
                 Navigator.pop(context);
               } else {
-                AlertMessage.snakMessage('Please enter valid quantity and price', context);
+                AlertMessage.snakMessage(
+                    'Please enter valid quantity and price', context);
               }
             },
             child: Text(editIndex != null ? 'Update' : 'Add'),
@@ -232,7 +250,8 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
     final item = _items[index];
     _itemRepository.getItem(item.itemId).then((result) {
       if (result.isSuccess && mounted) {
-        _showItemQuantityDialog(result.data!, existingItem: item, editIndex: index);
+        _showItemQuantityDialog(result.data!,
+            existingItem: item, editIndex: index);
       }
     });
   }
@@ -245,13 +264,16 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
   }
 
   void _addExtraCharge({ExtraChargeEntry? existingCharge, int? editIndex}) {
-    final descriptionController = TextEditingController(text: existingCharge?.description ?? '');
-    final amountController = TextEditingController(text: existingCharge?.amount.toStringAsFixed(2) ?? '');
+    final descriptionController =
+        TextEditingController(text: existingCharge?.description ?? '');
+    final amountController = TextEditingController(
+        text: existingCharge?.amount.toStringAsFixed(2) ?? '');
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(editIndex != null ? 'Edit Extra Charge' : 'Add Extra Charge'),
+        title:
+            Text(editIndex != null ? 'Edit Extra Charge' : 'Add Extra Charge'),
         content: SizedBox(
           width: 400,
           child: Column(
@@ -264,7 +286,8 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
               const SizedBox(height: AppTheme.spacingMd),
               TextField(
                 controller: amountController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
                 ],
@@ -300,7 +323,8 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
                 _calculateTotals();
                 Navigator.pop(context);
               } else {
-                AlertMessage.snakMessage('Please enter valid description and amount', context);
+                AlertMessage.snakMessage(
+                    'Please enter valid description and amount', context);
               }
             },
             child: Text(editIndex != null ? 'Update' : 'Add'),
@@ -318,7 +342,8 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
   }
 
   void _addComment({String? existingComment, int? editIndex}) {
-    final commentController = TextEditingController(text: existingComment ?? '');
+    final commentController =
+        TextEditingController(text: existingComment ?? '');
 
     showDialog(
       context: context,
@@ -376,21 +401,28 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
 
     final result = await _invoiceRepository.createInvoice(
       supplierId: _selectedSupplier!.id,
-      supplierName: '${_selectedSupplier!.firstName} ${_selectedSupplier!.lastName}',
+      supplierName:
+          '${_selectedSupplier!.firstName} ${_selectedSupplier!.lastName}',
       supplierMobile: _selectedSupplier!.mobileNumber,
       supplierEmail: _selectedSupplier!.email,
-      items: _items.map((item) => InvoiceItemData(
-        itemId: item.itemId,
-        itemName: item.itemName,
-        quantity: item.quantity,
-        buyingPrice: item.netPrice,
-        comment: item.comment,
-      )).toList(),
+      items: _items
+          .map((item) => InvoiceItemData(
+                itemId: item.itemId,
+                itemName: item.itemName,
+                quantity: item.quantity,
+                buyingPrice: item.netPrice,
+                comment: item.comment,
+              ))
+          .toList(),
       gstPercentage: Val.gstPrecentage,
-      extraCharges: _extraCharges.isEmpty ? null : _extraCharges.map((e) => ExtraChargeData(
-        description: e.description,
-        amount: e.amount,
-      )).toList(),
+      extraCharges: _extraCharges.isEmpty
+          ? null
+          : _extraCharges
+              .map((e) => ExtraChargeData(
+                    description: e.description,
+                    amount: e.amount,
+                  ))
+              .toList(),
       comments: _comments.isEmpty ? null : _comments,
       isReturnNote: widget.isReturnNote,
     );
@@ -405,7 +437,9 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
     if (mounted) {
       if (result.isSuccess) {
         AlertMessage.snakMessage(
-          widget.isReturnNote ? 'Return note created successfully' : 'Invoice created and marked as paid',
+          widget.isReturnNote
+              ? 'Return note created successfully'
+              : 'Invoice created and marked as paid',
           context,
         );
         Navigator.pop(context, true);
@@ -429,7 +463,7 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
         ),
         backgroundColor: AppTheme.cardBackground,
         elevation: 0,
-        iconTheme: IconThemeData(color: AppTheme.textPrimary),
+        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(height: 1, color: AppTheme.borderColor),
@@ -517,9 +551,10 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
           ElevatedButton.icon(
             onPressed: _selectSupplier,
             icon: const Icon(Icons.person_add, size: 18),
-            label: Text(_selectedSupplier == null ? 'Add Supplier' : 'Change Supplier'),
+            label: Text(
+                _selectedSupplier == null ? 'Add Supplier' : 'Change Supplier'),
             style: AppTheme.primaryButtonStyle().copyWith(
-              padding: const MaterialStatePropertyAll(
+              padding: const WidgetStatePropertyAll(
                 EdgeInsets.symmetric(vertical: AppTheme.spacingMd),
               ),
             ),
@@ -532,7 +567,7 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
             icon: const Icon(Icons.add_shopping_cart, size: 18),
             label: const Text('Add Item'),
             style: AppTheme.secondaryButtonStyle().copyWith(
-              padding: const MaterialStatePropertyAll(
+              padding: const WidgetStatePropertyAll(
                 EdgeInsets.symmetric(vertical: AppTheme.spacingMd),
               ),
             ),
@@ -545,7 +580,7 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
             icon: const Icon(Icons.attach_money, size: 18),
             label: const Text('Extra Charges'),
             style: AppTheme.secondaryButtonStyle().copyWith(
-              padding: const MaterialStatePropertyAll(
+              padding: const WidgetStatePropertyAll(
                 EdgeInsets.symmetric(vertical: AppTheme.spacingMd),
               ),
             ),
@@ -558,7 +593,7 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
             icon: const Icon(Icons.comment, size: 18),
             label: const Text('Comment'),
             style: AppTheme.secondaryButtonStyle().copyWith(
-              padding: const MaterialStatePropertyAll(
+              padding: const WidgetStatePropertyAll(
                 EdgeInsets.symmetric(vertical: AppTheme.spacingMd),
               ),
             ),
@@ -600,7 +635,7 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
                 : const Icon(Icons.save, size: 18),
             label: Text(_isSaving ? 'Saving...' : 'Save Invoice'),
             style: AppTheme.primaryButtonStyle().copyWith(
-              padding: const MaterialStatePropertyAll(
+              padding: const WidgetStatePropertyAll(
                 EdgeInsets.symmetric(vertical: AppTheme.spacingMd),
               ),
             ),
@@ -610,7 +645,8 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
     );
   }
 
-  Widget _buildSidebarTotal(String label, double amount, {bool isTotal = false}) {
+  Widget _buildSidebarTotal(String label, double amount,
+      {bool isTotal = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -625,7 +661,8 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
           ),
           Text(
             MyFormat.formatCurrency(amount),
-            style: (isTotal ? AppTheme.bodyMedium : AppTheme.bodySmall).copyWith(
+            style:
+                (isTotal ? AppTheme.bodyMedium : AppTheme.bodySmall).copyWith(
               color: AppTheme.textPrimary,
               fontWeight: FontWeight.w600,
             ),
@@ -643,7 +680,7 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Invoice header
-          _buildInvoiceHeader(),
+          //_buildInvoiceHeader(),
 
           const SizedBox(height: AppTheme.spacingLg),
 
@@ -744,23 +781,28 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
                 ),
                 Expanded(
                   flex: 1,
-                  child: Text('Qty', style: _tableHeaderStyle(), textAlign: TextAlign.center),
+                  child: Text('Qty',
+                      style: _tableHeaderStyle(), textAlign: TextAlign.center),
                 ),
                 Expanded(
                   flex: 2,
-                  child: Text('Net Price', style: _tableHeaderStyle(), textAlign: TextAlign.right),
+                  child: Text('Net Price',
+                      style: _tableHeaderStyle(), textAlign: TextAlign.right),
                 ),
                 Expanded(
                   flex: 2,
-                  child: Text('GST Price', style: _tableHeaderStyle(), textAlign: TextAlign.right),
+                  child: Text('GST Price',
+                      style: _tableHeaderStyle(), textAlign: TextAlign.right),
                 ),
                 Expanded(
                   flex: 2,
-                  child: Text('Item Price', style: _tableHeaderStyle(), textAlign: TextAlign.right),
+                  child: Text('Item Price',
+                      style: _tableHeaderStyle(), textAlign: TextAlign.right),
                 ),
                 Expanded(
                   flex: 2,
-                  child: Text('Total Price', style: _tableHeaderStyle(), textAlign: TextAlign.right),
+                  child: Text('Total Price',
+                      style: _tableHeaderStyle(), textAlign: TextAlign.right),
                 ),
                 const SizedBox(width: 80), // Actions column
               ],
@@ -779,258 +821,275 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
                 ),
               ),
             )
-          else
-            ...[
-              // Items section
-              ..._items.asMap().entries.map((entry) {
-                final index = entry.key;
-                final item = entry.value;
-                return Column(
-                  children: [
+          else ...[
+            // Items section
+            ..._items.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item = entry.value;
+              return Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppTheme.spacingMd,
+                      vertical: AppTheme.spacingSm,
+                    ),
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        top: BorderSide(color: AppTheme.borderColor),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            item.itemCode,
+                            style: _tableCellStyle()
+                                .copyWith(fontFamily: 'monospace'),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: Text(item.itemName, style: _tableCellStyle()),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            item.quantity.toString(),
+                            style: _tableCellStyle(),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            MyFormat.formatCurrency(item.netPrice),
+                            style: _tableCellStyle(),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            MyFormat.formatCurrency(item.gstPrice),
+                            style: _tableCellStyle(),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            MyFormat.formatCurrency(item.itemPrice),
+                            style: _tableCellStyle(),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            MyFormat.formatCurrency(item.totalPrice),
+                            style: _tableCellStyle()
+                                .copyWith(fontWeight: FontWeight.w600),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 80,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit,
+                                    size: 18, color: AppTheme.primaryColor),
+                                onPressed: () => _editItem(index),
+                                tooltip: 'Edit',
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
+                              const SizedBox(width: 4),
+                              IconButton(
+                                icon: const Icon(Icons.delete,
+                                    size: 18, color: AppTheme.errorColor),
+                                onPressed: () => _removeItem(index),
+                                tooltip: 'Delete',
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (item.comment != null)
                     Container(
+                      width: double.infinity,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: AppTheme.spacingMd,
+                        horizontal: AppTheme.spacingLg,
                         vertical: AppTheme.spacingSm,
                       ),
                       decoration: BoxDecoration(
+                        color: AppTheme.backgroundGrey.withOpacity(0.3),
                         border: Border(
-                          top: BorderSide(color: AppTheme.borderColor),
+                          top: BorderSide(
+                              color: AppTheme.borderColor.withOpacity(0.5)),
                         ),
                       ),
+                      child: Text(
+                        'Comment: ${item.comment}',
+                        style: AppTheme.bodyXSmall.copyWith(
+                          color: AppTheme.textSecondary,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            }).toList(),
+
+            // Extra charges section
+            ..._extraCharges.asMap().entries.map((entry) {
+              final index = entry.key;
+              final charge = entry.value;
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.spacingMd,
+                  vertical: AppTheme.spacingSm,
+                ),
+                decoration: BoxDecoration(
+                  color: AppTheme.warningColor.withOpacity(0.05),
+                  border: const Border(
+                    top: BorderSide(color: AppTheme.borderColor),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
                       child: Row(
                         children: [
-                          Expanded(
-                            flex: 2,
-                            child: Text(
-                              item.itemCode,
-                              style: _tableCellStyle().copyWith(fontFamily: 'monospace'),
-                            ),
+                          const Icon(Icons.add_circle_outline,
+                              color: AppTheme.warningColor, size: 16),
+                          const SizedBox(width: 4),
+                          Text('Extra Charge',
+                              style: _tableCellStyle()
+                                  .copyWith(color: AppTheme.warningColor)),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: Text(charge.description, style: _tableCellStyle()),
+                    ),
+                    const Expanded(flex: 1, child: SizedBox()),
+                    const Expanded(flex: 2, child: SizedBox()),
+                    const Expanded(flex: 2, child: SizedBox()),
+                    const Expanded(flex: 2, child: SizedBox()),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        MyFormat.formatCurrency(charge.amount),
+                        style: _tableCellStyle()
+                            .copyWith(fontWeight: FontWeight.w600),
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 80,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit,
+                                size: 18, color: AppTheme.primaryColor),
+                            onPressed: () => _addExtraCharge(
+                                existingCharge: charge, editIndex: index),
+                            tooltip: 'Edit',
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
                           ),
-                          Expanded(
-                            flex: 3,
-                            child: Text(item.itemName, style: _tableCellStyle()),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Text(
-                              item.quantity.toString(),
-                              style: _tableCellStyle(),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: Text(
-                              MyFormat.formatCurrency(item.netPrice),
-                              style: _tableCellStyle(),
-                              textAlign: TextAlign.right,
-                            ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: Text(
-                              MyFormat.formatCurrency(item.gstPrice),
-                              style: _tableCellStyle(),
-                              textAlign: TextAlign.right,
-                            ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: Text(
-                              MyFormat.formatCurrency(item.itemPrice),
-                              style: _tableCellStyle(),
-                              textAlign: TextAlign.right,
-                            ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: Text(
-                              MyFormat.formatCurrency(item.totalPrice),
-                              style: _tableCellStyle().copyWith(fontWeight: FontWeight.w600),
-                              textAlign: TextAlign.right,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 80,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                IconButton(
-                                  icon: Icon(Icons.edit, size: 18, color: AppTheme.primaryColor),
-                                  onPressed: () => _editItem(index),
-                                  tooltip: 'Edit',
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                ),
-                                const SizedBox(width: 4),
-                                IconButton(
-                                  icon: Icon(Icons.delete, size: 18, color: AppTheme.errorColor),
-                                  onPressed: () => _removeItem(index),
-                                  tooltip: 'Delete',
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                ),
-                              ],
-                            ),
+                          const SizedBox(width: 4),
+                          IconButton(
+                            icon: const Icon(Icons.delete,
+                                size: 18, color: AppTheme.errorColor),
+                            onPressed: () => _removeExtraCharge(index),
+                            tooltip: 'Delete',
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
                           ),
                         ],
                       ),
                     ),
-                    if (item.comment != null)
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppTheme.spacingLg,
-                          vertical: AppTheme.spacingSm,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppTheme.backgroundGrey.withOpacity(0.3),
-                          border: Border(
-                            top: BorderSide(color: AppTheme.borderColor.withOpacity(0.5)),
-                          ),
-                        ),
-                        child: Text(
-                          'Comment: ${item.comment}',
-                          style: AppTheme.bodyXSmall.copyWith(
-                            color: AppTheme.textSecondary,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                      ),
                   ],
-                );
-              }).toList(),
+                ),
+              );
+            }).toList(),
 
-              // Extra charges section
-              ..._extraCharges.asMap().entries.map((entry) {
-                final index = entry.key;
-                final charge = entry.value;
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppTheme.spacingMd,
-                    vertical: AppTheme.spacingSm,
+            // Comments section
+            ..._comments.asMap().entries.map((entry) {
+              final index = entry.key;
+              final comment = entry.value;
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.spacingMd,
+                  vertical: AppTheme.spacingSm,
+                ),
+                decoration: BoxDecoration(
+                  color: AppTheme.infoColor.withOpacity(0.05),
+                  border: const Border(
+                    top: BorderSide(color: AppTheme.borderColor),
                   ),
-                  decoration: BoxDecoration(
-                    color: AppTheme.warningColor.withOpacity(0.05),
-                    border: Border(
-                      top: BorderSide(color: AppTheme.borderColor),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Row(
+                        children: [
+                          const Icon(Icons.comment_outlined,
+                              color: AppTheme.infoColor, size: 16),
+                          const SizedBox(width: 4),
+                          Text('Comment',
+                              style: _tableCellStyle()
+                                  .copyWith(color: AppTheme.infoColor)),
+                        ],
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Row(
-                          children: [
-                            Icon(Icons.add_circle_outline, color: AppTheme.warningColor, size: 16),
-                            const SizedBox(width: 4),
-                            Text('Extra Charge', style: _tableCellStyle().copyWith(color: AppTheme.warningColor)),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Text(charge.description, style: _tableCellStyle()),
-                      ),
-                      Expanded(flex: 1, child: const SizedBox()),
-                      Expanded(flex: 2, child: const SizedBox()),
-                      Expanded(flex: 2, child: const SizedBox()),
-                      Expanded(flex: 2, child: const SizedBox()),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          MyFormat.formatCurrency(charge.amount),
-                          style: _tableCellStyle().copyWith(fontWeight: FontWeight.w600),
-                          textAlign: TextAlign.right,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 80,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.edit, size: 18, color: AppTheme.primaryColor),
-                              onPressed: () => _addExtraCharge(existingCharge: charge, editIndex: index),
-                              tooltip: 'Edit',
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                            const SizedBox(width: 4),
-                            IconButton(
-                              icon: Icon(Icons.delete, size: 18, color: AppTheme.errorColor),
-                              onPressed: () => _removeExtraCharge(index),
-                              tooltip: 'Delete',
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-
-              // Comments section
-              ..._comments.asMap().entries.map((entry) {
-                final index = entry.key;
-                final comment = entry.value;
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppTheme.spacingMd,
-                    vertical: AppTheme.spacingSm,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppTheme.infoColor.withOpacity(0.05),
-                    border: Border(
-                      top: BorderSide(color: AppTheme.borderColor),
+                    Expanded(
+                      flex: 12,
+                      child: Text(comment, style: _tableCellStyle()),
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Row(
-                          children: [
-                            Icon(Icons.comment_outlined, color: AppTheme.infoColor, size: 16),
-                            const SizedBox(width: 4),
-                            Text('Comment', style: _tableCellStyle().copyWith(color: AppTheme.infoColor)),
-                          ],
-                        ),
+                    SizedBox(
+                      width: 80,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit,
+                                size: 18, color: AppTheme.primaryColor),
+                            onPressed: () => _addComment(
+                                existingComment: comment, editIndex: index),
+                            tooltip: 'Edit',
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                          const SizedBox(width: 4),
+                          IconButton(
+                            icon: const Icon(Icons.delete,
+                                size: 18, color: AppTheme.errorColor),
+                            onPressed: () => _removeComment(index),
+                            tooltip: 'Delete',
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        flex: 12,
-                        child: Text(comment, style: _tableCellStyle()),
-                      ),
-                      SizedBox(
-                        width: 80,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.edit, size: 18, color: AppTheme.primaryColor),
-                              onPressed: () => _addComment(existingComment: comment, editIndex: index),
-                              tooltip: 'Edit',
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                            const SizedBox(width: 4),
-                            IconButton(
-                              icon: Icon(Icons.delete, size: 18, color: AppTheme.errorColor),
-                              onPressed: () => _removeComment(index),
-                              tooltip: 'Delete',
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ],
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ],
         ],
       ),
     );
@@ -1057,7 +1116,8 @@ class _SupplierSelectionDialog extends StatefulWidget {
   const _SupplierSelectionDialog({required this.suppliers});
 
   @override
-  State<_SupplierSelectionDialog> createState() => _SupplierSelectionDialogState();
+  State<_SupplierSelectionDialog> createState() =>
+      _SupplierSelectionDialogState();
 }
 
 class _SupplierSelectionDialogState extends State<_SupplierSelectionDialog> {
@@ -1119,7 +1179,7 @@ class _SupplierSelectionDialogState extends State<_SupplierSelectionDialog> {
                     onTap: () => Navigator.pop(context, supplier),
                     child: Container(
                       padding: const EdgeInsets.all(AppTheme.spacingMd),
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         border: Border(
                           bottom: BorderSide(color: AppTheme.borderColor),
                         ),
@@ -1236,7 +1296,7 @@ class _ItemSelectionDialogState extends State<_ItemSelectionDialog> {
                     onTap: () => Navigator.pop(context, item),
                     child: Container(
                       padding: const EdgeInsets.all(AppTheme.spacingMd),
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         border: Border(
                           bottom: BorderSide(color: AppTheme.borderColor),
                         ),
