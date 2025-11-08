@@ -115,6 +115,12 @@ class AppTheme {
         color: textHint,
       );
 
+  static TextStyle get bodyXSmall => GoogleFonts.roboto(
+        fontSize: 9,
+        fontWeight: FontWeight.w500,
+        color: textHint,
+      );
+
   // ============ COMPONENT STYLES ============
 
   // Card decoration
