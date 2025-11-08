@@ -20,7 +20,7 @@ class SupplyInvoiceDraftController extends GetxController {
   RxList<String> comments = <String>[].obs;
   RxList<Cart> cartList = <Cart>[].obs;
   SupplyInvoice? copyInvoice;
-  final bool isRetunManager;
+  final bool isReturnManager;
 
   var netTotal = 0.0.obs;
   var gstTotal = 0.0.obs;
@@ -37,7 +37,7 @@ class SupplyInvoiceDraftController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    invoiceId.value = isRetunManager
+    invoiceId.value = isReturnManager
         ? SupplyerInvoiceDB().generateReturnNoteId()
         : SupplyerInvoiceDB().generateInvoiceId();
     if (copyInvoice != null) {
@@ -51,7 +51,9 @@ class SupplyInvoiceDraftController extends GetxController {
   }
 
   SupplyInvoiceDraftController(
-      {required this.supplyer, this.copyInvoice, required this.isRetunManager});
+      {required this.supplyer,
+      this.copyInvoice,
+      required this.isReturnManager});
 
   void addExtraCharges(ExtraCharges extraCharges) {
     extraList.add(extraCharges);
@@ -101,7 +103,7 @@ class SupplyInvoiceDraftController extends GetxController {
     SupplyInvoice invoice = SupplyInvoice(
         email: supplyer.email ?? '',
         referenceId: referenceId.value,
-        isReturnNote: isRetunManager,
+        isReturnNote: isReturnManager,
         supplyerMobile: supplyer.mobileNumber,
         invoiceId: invoiceId.value,
         createdDate: DateTime.now(),
@@ -113,7 +115,7 @@ class SupplyInvoiceDraftController extends GetxController {
         extraCharges: extraList,
         itemList: itemList);
 
-    isRetunManager
+    isReturnManager
         ? await db.saveReturnNoteId(invoiceId.value)
         : await db.saveLastId(invoiceId.value);
     await db.addInvoice(invoice);

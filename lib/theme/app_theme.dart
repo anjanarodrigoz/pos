@@ -7,9 +7,9 @@ class AppTheme {
   AppTheme._();
 
   // ============ COLOR PALETTE ============
-  static const Color primaryColor = Color(0xFF2196F3); // Blue
-  static const Color primaryDark = Color(0xFF1976D2);
-  static const Color primaryLight = Color(0xFF64B5F6);
+  static const Color primaryColor = Color(0xFF0065c1); // Blue
+  static const Color primaryDark = Color(0xFFF5F5F5); //Color(0xFF094fa4);
+  static const Color primaryLight = Color(0xFF1676fe);
 
   static const Color accentColor = Color(0xFF4CAF50); // Green
   static const Color accentDark = Color(0xFF388E3C);
@@ -21,17 +21,21 @@ class AppTheme {
   static const Color infoColor = Color(0xFF2196F3);
 
   static const Color backgroundColor = Color(0xFFF5F5F5);
-  static const Color backgroundGrey = Color(0xFFF9FAFB); // Light grey background (shadcn style)
+  static const Color backgroundGrey =
+      Color(0xFFF9FAFB); // Light grey background (shadcn style)
   static const Color surfaceColor = Color(0xFFFFFFFF);
   static const Color cardColor = Color(0xFFFFFFFF);
+  static const cardBackground = Color(0xFFF5F5F5);
 
-  static const Color textPrimary = Color(0xFF0F172A); // Slate-900 (shadcn style)
+  static const Color textPrimary =
+      Color(0xFF0F172A); // Slate-900 (shadcn style)
   static const Color textSecondary = Color(0xFF64748B); // Slate-500
   static const Color textHint = Color(0xFF94A3B8); // Slate-400
   static const Color textDisabled = Color(0xFFCBD5E1); // Slate-300
 
   static const Color dividerColor = Color(0xFFE2E8F0); // Slate-200
-  static const Color borderColor = Color(0xFFE2E8F0); // Slate-200 (shadcn style)
+  static const Color borderColor =
+      Color(0xFFE2E8F0); // Slate-200 (shadcn style)
 
   // Status Colors
   static const Color statusPending = Color(0xFFFF9800);
@@ -108,6 +112,12 @@ class AppTheme {
 
   static TextStyle get labelSmall => GoogleFonts.roboto(
         fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: textHint,
+      );
+
+  static TextStyle get bodyXSmall => GoogleFonts.roboto(
+        fontSize: 9,
         fontWeight: FontWeight.w500,
         color: textHint,
       );
@@ -201,6 +211,59 @@ class AppTheme {
       foregroundColor: primaryColor,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       textStyle: labelLarge.copyWith(color: primaryColor),
+    );
+  }
+
+  static ButtonStyle outlinedButtonStyle() {
+    return ButtonStyle(
+      backgroundColor: WidgetStateProperty.all(Colors.transparent),
+      foregroundColor: WidgetStateProperty.resolveWith<Color>(
+        (states) {
+          if (states.contains(WidgetState.disabled)) {
+            return Colors.grey.shade400;
+          }
+          return Colors.blue; // Or your primary color
+        },
+      ),
+      side: WidgetStateProperty.resolveWith<BorderSide>(
+        (states) {
+          if (states.contains(WidgetState.disabled)) {
+            return BorderSide(
+              color: Colors.grey.shade300,
+              width: 2,
+            );
+          }
+          return const BorderSide(
+            color: Colors.blue, // Or your primary color
+            width: 2,
+          );
+        },
+      ),
+      padding: WidgetStateProperty.all(
+        const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      ),
+      shape: WidgetStateProperty.all(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      textStyle: WidgetStateProperty.all(
+        const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      overlayColor: WidgetStateProperty.resolveWith<Color?>(
+        (states) {
+          if (states.contains(WidgetState.pressed)) {
+            return Colors.blue.withOpacity(0.1);
+          }
+          if (states.contains(WidgetState.hovered)) {
+            return Colors.blue.withOpacity(0.05);
+          }
+          return null;
+        },
+      ),
     );
   }
 

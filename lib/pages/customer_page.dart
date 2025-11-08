@@ -320,6 +320,16 @@ class _CustomerPageState extends State<CustomerPage> {
                             Expanded(
                               flex: 2,
                               child: Text(
+                                'Customer ID',
+                                style: AppTheme.labelLarge.copyWith(
+                                  color: AppTheme.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
                                 'Email',
                                 style: AppTheme.labelLarge.copyWith(
                                   color: AppTheme.textPrimary,
@@ -409,6 +419,20 @@ class _CustomerPageState extends State<CustomerPage> {
                                             ),
                                           ),
                                         ],
+                                      ),
+                                    ),
+
+                                    // Customer ID
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        customer.id,
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: AppTheme.textSecondary,
+                                          fontFamily: 'monospace',
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
 

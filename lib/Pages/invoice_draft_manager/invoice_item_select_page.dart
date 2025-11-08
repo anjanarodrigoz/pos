@@ -14,7 +14,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../database/item_db_service.dart';
 import '../../models/cart.dart';
 import '../../models/item.dart';
-import '../stock_manager.dart/stock_page.dart';
+import 'package:pos/datasources/item_data_source.dart';
 
 class InvoiceItemSelectPage extends StatefulWidget {
   final InvoiceDraftController? invoiceController;
@@ -143,7 +143,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
 
   Future<void> getItemData() async {
     _item = await _databaseService.getAllItems();
-    itemDataSource = ItemDataSource(itemData: _item);
+    itemDataSource = ItemDataSource(itemData: []);
     setState(() {});
   }
 

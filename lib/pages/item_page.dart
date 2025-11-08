@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pos/Pages/supplyer_manager/supplyer_form.dart';
-import 'package:pos/Pages/supplyer_manager/supplyer_view.dart';
-import 'package:pos/Pages/main_window.dart';
+import 'package:intl/intl.dart';
 import 'package:pos/database/pos_database.dart';
-import 'package:pos/repositories/supplier_repository.dart';
+import 'package:pos/repositories/item_repository.dart';
+import 'package:pos/pages/item_form.dart';
+import 'package:pos/pages/item_view.dart';
+import 'package:pos/Pages/main_window.dart';
 import 'package:pos/theme/app_theme.dart';
 
-/// Modern supplier management page with professional table view
-class SupplyerPage extends StatefulWidget {
-  const SupplyerPage({Key? key}) : super(key: key);
+/// Modern item/stock management page with professional table view
+class ItemPage extends StatefulWidget {
+  const ItemPage({Key? key}) : super(key: key);
 
   @override
-  State<SupplyerPage> createState() => _SupplyerPageState();
+  State<ItemPage> createState() => _ItemPageState();
 }
 
-class _SupplyerPageState extends State<SupplyerPage> {
-  final SupplierRepository _repository = Get.find<SupplierRepository>();
+class _ItemPageState extends State<ItemPage> {
+  final ItemRepository _repository = Get.find<ItemRepository>();
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  bool _showInactiveSuppliers = false;
+  bool _showInactiveItems = false;
 
   @override
   void dispose() {
@@ -31,17 +32,17 @@ class _SupplyerPageState extends State<SupplyerPage> {
     Get.offAll(() => const MainWindow());
   }
 
-  void _navigateToAddSupplier() async {
+  void _navigateToAddItem() async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const SupplyerFormPage()),
+      MaterialPageRoute(builder: (context) => const ItemFormPage()),
     );
 
     if (result == true && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Supplier created successfully',
+            'Item created successfully',
             style: AppTheme.bodyMedium.copyWith(color: Colors.white),
           ),
           backgroundColor: AppTheme.successColor,
@@ -54,11 +55,11 @@ class _SupplyerPageState extends State<SupplyerPage> {
     }
   }
 
-  void _navigateToViewSupplier(Supplier supplier) async {
+  void _navigateToViewItem(Item item) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SupplyerViewPage(supplierId: supplier.id),
+        builder: (context) => ItemViewPage(itemId: item.id),
       ),
     );
 
@@ -66,7 +67,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Supplier deleted successfully',
+            'Item deleted successfully',
             style: AppTheme.bodyMedium.copyWith(color: Colors.white),
           ),
           backgroundColor: AppTheme.successColor,
@@ -81,14 +82,16 @@ class _SupplyerPageState extends State<SupplyerPage> {
 
   @override
   Widget build(BuildContext context) {
+    final currencyFormat = NumberFormat.currency(symbol: '\$');
+
     return Scaffold(
       backgroundColor: AppTheme.backgroundGrey,
       appBar: AppBar(
         title: Text(
-          'Supplier Management',
+          'Stock Management',
           style: AppTheme.headlineMedium.copyWith(color: AppTheme.textPrimary),
         ),
-        backgroundColor: AppTheme.cardBackground,
+        backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: AppTheme.textPrimary),
@@ -102,9 +105,9 @@ class _SupplyerPageState extends State<SupplyerPage> {
               vertical: 8,
             ),
             child: ElevatedButton.icon(
-              onPressed: _navigateToAddSupplier,
+              onPressed: _navigateToAddItem,
               icon: const Icon(Icons.add, size: 18),
-              label: const Text('New Supplier'),
+              label: const Text('New Item'),
               style: AppTheme.primaryButtonStyle(),
             ),
           ),
@@ -122,7 +125,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
           // Search Bar and Filters
           Container(
             padding: const EdgeInsets.all(AppTheme.spacingLg),
-            color: AppTheme.cardBackground,
+            color: Colors.white,
             child: Column(
               children: [
                 Row(
@@ -140,7 +143,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
                             color: AppTheme.textPrimary,
                           ),
                           decoration: InputDecoration(
-                            hintText: 'Search suppliers by name, email, or mobile...',
+                            hintText: 'Search items by name, description, or item code...',
                             hintStyle: AppTheme.bodyMedium.copyWith(
                               color: AppTheme.textHint,
                             ),
@@ -157,8 +160,8 @@ class _SupplyerPageState extends State<SupplyerPage> {
                                       size: 20,
                                     ),
                                     onPressed: () {
+                                      _searchController.clear();
                                       setState(() {
-                                        _searchController.clear();
                                         _searchQuery = '';
                                       });
                                     },
@@ -167,7 +170,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: AppTheme.spacingMd,
-                              vertical: AppTheme.spacingSm,
+                              vertical: AppTheme.spacingMd,
                             ),
                           ),
                           onChanged: (value) {
@@ -178,31 +181,25 @@ class _SupplyerPageState extends State<SupplyerPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: AppTheme.spacingMd),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppTheme.cardBackground,
-                        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                        border: Border.all(color: AppTheme.borderColor),
-                      ),
-                      child: Row(
-                        children: [
-                          Checkbox(
-                            value: _showInactiveSuppliers,
-                            onChanged: (value) {
-                              setState(() {
-                                _showInactiveSuppliers = value ?? false;
-                              });
-                            },
-                          ),
-                          Text(
-                            'Show Inactive',
-                            style: AppTheme.bodySmall.copyWith(
-                              color: AppTheme.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(width: AppTheme.spacingSm),
-                        ],
+                  ],
+                ),
+                SizedBox(height: AppTheme.spacingSm),
+                // Show Inactive Items Checkbox
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _showInactiveItems,
+                      onChanged: (value) {
+                        setState(() {
+                          _showInactiveItems = value ?? false;
+                        });
+                      },
+                      activeColor: AppTheme.primaryColor,
+                    ),
+                    Text(
+                      'Show inactive items',
+                      style: AppTheme.bodySmall.copyWith(
+                        color: AppTheme.textSecondary,
                       ),
                     ),
                   ],
@@ -211,13 +208,19 @@ class _SupplyerPageState extends State<SupplyerPage> {
             ),
           ),
 
-          // Supplier List
+          // Item Table
           Expanded(
-            child: StreamBuilder<List<Supplier>>(
-              stream: _repository.watchAllSuppliers(activeOnly: !_showInactiveSuppliers),
+            child: StreamBuilder<List<Item>>(
+              stream: _repository.watchAllItems(activeOnly: !_showInactiveItems),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppTheme.primaryColor,
+                      ),
+                    ),
+                  );
                 }
 
                 if (snapshot.hasError) {
@@ -227,42 +230,49 @@ class _SupplyerPageState extends State<SupplyerPage> {
                       children: [
                         Icon(
                           Icons.error_outline,
-                          size: 64,
+                          size: 48,
                           color: AppTheme.errorColor,
                         ),
                         SizedBox(height: AppTheme.spacingMd),
                         Text(
-                          'Error loading suppliers',
+                          'Failed to load items',
                           style: AppTheme.headlineSmall.copyWith(
                             color: AppTheme.textPrimary,
                           ),
+                        ),
+                        SizedBox(height: AppTheme.spacingSm),
+                        Text(
+                          snapshot.error.toString(),
+                          style: AppTheme.bodySmall.copyWith(
+                            color: AppTheme.textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
                   );
                 }
 
-                var suppliers = snapshot.data ?? [];
+                var items = snapshot.data ?? [];
 
                 // Apply search filter
                 if (_searchQuery.isNotEmpty) {
                   final query = _searchQuery.toLowerCase();
-                  suppliers = suppliers.where((s) {
-                    return s.firstName.toLowerCase().contains(query) ||
-                        s.lastName.toLowerCase().contains(query) ||
-                        (s.email?.toLowerCase().contains(query) ?? false) ||
-                        (s.mobileNumber?.toLowerCase().contains(query) ?? false);
+                  items = items.where((i) {
+                    return i.name.toLowerCase().contains(query) ||
+                        (i.description?.toLowerCase().contains(query) ?? false) ||
+                        i.itemCode.toLowerCase().contains(query);
                   }).toList();
                 }
 
-                if (suppliers.isEmpty) {
+                if (items.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
                           _searchQuery.isEmpty
-                              ? Icons.local_shipping_outlined
+                              ? Icons.inventory_2_outlined
                               : Icons.search_off,
                           size: 64,
                           color: AppTheme.textHint,
@@ -270,8 +280,8 @@ class _SupplyerPageState extends State<SupplyerPage> {
                         SizedBox(height: AppTheme.spacingMd),
                         Text(
                           _searchQuery.isEmpty
-                              ? 'No suppliers yet'
-                              : 'No suppliers found',
+                              ? 'No items yet'
+                              : 'No items found',
                           style: AppTheme.headlineSmall.copyWith(
                             color: AppTheme.textSecondary,
                           ),
@@ -279,7 +289,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
                         SizedBox(height: AppTheme.spacingSm),
                         Text(
                           _searchQuery.isEmpty
-                              ? 'Click "New Supplier" to add your first supplier'
+                              ? 'Click "New Item" to add your first item'
                               : 'Try a different search term',
                           style: AppTheme.bodySmall.copyWith(
                             color: AppTheme.textHint,
@@ -293,7 +303,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
                 return Container(
                   margin: const EdgeInsets.all(AppTheme.spacingLg),
                   decoration: BoxDecoration(
-                    color: AppTheme.cardBackground,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(AppTheme.radiusLg),
                     border: Border.all(color: AppTheme.borderColor),
                     boxShadow: [
@@ -325,9 +335,9 @@ class _SupplyerPageState extends State<SupplyerPage> {
                         child: Row(
                           children: [
                             Expanded(
-                              flex: 2,
+                              flex: 3,
                               child: Text(
-                                'Name',
+                                'Item Name',
                                 style: AppTheme.labelLarge.copyWith(
                                   color: AppTheme.textPrimary,
                                   fontWeight: FontWeight.w600,
@@ -337,7 +347,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
                             Expanded(
                               flex: 2,
                               child: Text(
-                                'Supplier ID',
+                                'Item Code',
                                 style: AppTheme.labelLarge.copyWith(
                                   color: AppTheme.textPrimary,
                                   fontWeight: FontWeight.w600,
@@ -347,7 +357,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
                             Expanded(
                               flex: 2,
                               child: Text(
-                                'Email',
+                                'Category',
                                 style: AppTheme.labelLarge.copyWith(
                                   color: AppTheme.textPrimary,
                                   fontWeight: FontWeight.w600,
@@ -357,21 +367,34 @@ class _SupplyerPageState extends State<SupplyerPage> {
                             Expanded(
                               flex: 1,
                               child: Text(
-                                'Mobile',
+                                'Price',
                                 style: AppTheme.labelLarge.copyWith(
                                   color: AppTheme.textPrimary,
                                   fontWeight: FontWeight.w600,
                                 ),
+                                textAlign: TextAlign.right,
                               ),
                             ),
                             Expanded(
-                              flex: 2,
+                              flex: 1,
                               child: Text(
-                                'City',
+                                'Stock',
                                 style: AppTheme.labelLarge.copyWith(
                                   color: AppTheme.textPrimary,
                                   fontWeight: FontWeight.w600,
                                 ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Text(
+                                'Value',
+                                style: AppTheme.labelLarge.copyWith(
+                                  color: AppTheme.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                textAlign: TextAlign.right,
                               ),
                             ),
                             SizedBox(width: 60),
@@ -382,13 +405,15 @@ class _SupplyerPageState extends State<SupplyerPage> {
                       // Table Body
                       Expanded(
                         child: ListView.builder(
-                          itemCount: suppliers.length,
+                          itemCount: items.length,
                           itemBuilder: (context, index) {
-                            final supplier = suppliers[index];
-                            final isLast = index == suppliers.length - 1;
+                            final item = items[index];
+                            final isLast = index == items.length - 1;
+                            final stockValue = item.price * item.quantity;
+                            final isLowStock = item.quantity < 10;
 
                             return InkWell(
-                              onTap: () => _navigateToViewSupplier(supplier),
+                              onTap: () => _navigateToViewItem(item),
                               hoverColor: AppTheme.backgroundGrey.withOpacity(0.5),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
@@ -406,46 +431,41 @@ class _SupplyerPageState extends State<SupplyerPage> {
                                 ),
                                 child: Row(
                                   children: [
-                                    // Name with Avatar
+                                    // Item Name
                                     Expanded(
-                                      flex: 2,
-                                      child: Row(
+                                      flex: 3,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          CircleAvatar(
-                                            radius: 16,
-                                            backgroundColor: AppTheme.primaryLight,
-                                            child: Text(
-                                              '${supplier.firstName[0]}${supplier.lastName[0]}'
-                                                  .toUpperCase(),
-                                              style: AppTheme.labelSmall.copyWith(
-                                                color: AppTheme.primaryDark,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                          Text(
+                                            item.name,
+                                            style: AppTheme.bodyMedium.copyWith(
+                                              color: item.isActive
+                                                  ? AppTheme.textPrimary
+                                                  : AppTheme.textHint,
+                                              fontWeight: FontWeight.w500,
                                             ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                          SizedBox(width: AppTheme.spacingSm),
-                                          Expanded(
-                                            child: Text(
-                                              '${supplier.firstName} ${supplier.lastName}',
-                                              style: AppTheme.bodyMedium.copyWith(
-                                                color: supplier.isActive
-                                                    ? AppTheme.textPrimary
-                                                    : AppTheme.textHint,
-                                                fontWeight: FontWeight.w500,
+                                          if (item.description != null)
+                                            Text(
+                                              item.description!,
+                                              style: AppTheme.bodySmall.copyWith(
+                                                color: AppTheme.textHint,
                                               ),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                             ),
-                                          ),
                                         ],
                                       ),
                                     ),
 
-                                    // Supplier ID
+                                    // Item Code
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        supplier.id,
+                                        item.itemCode,
                                         style: AppTheme.bodySmall.copyWith(
                                           color: AppTheme.textSecondary,
                                           fontFamily: 'monospace',
@@ -455,13 +475,13 @@ class _SupplyerPageState extends State<SupplyerPage> {
                                       ),
                                     ),
 
-                                    // Email
+                                    // Category
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        supplier.email ?? '—',
+                                        item.category ?? '—',
                                         style: AppTheme.bodySmall.copyWith(
-                                          color: supplier.email != null
+                                          color: item.category != null
                                               ? AppTheme.textSecondary
                                               : AppTheme.textHint,
                                         ),
@@ -470,41 +490,69 @@ class _SupplyerPageState extends State<SupplyerPage> {
                                       ),
                                     ),
 
-                                    // Mobile
+                                    // Price
                                     Expanded(
                                       flex: 1,
                                       child: Text(
-                                        supplier.mobileNumber ?? '—',
+                                        currencyFormat.format(item.price),
                                         style: AppTheme.bodySmall.copyWith(
-                                          color: supplier.mobileNumber != null
-                                              ? AppTheme.textSecondary
-                                              : AppTheme.textHint,
+                                          color: AppTheme.textSecondary,
                                         ),
+                                        textAlign: TextAlign.right,
                                       ),
                                     ),
 
-                                    // City
+                                    // Stock
                                     Expanded(
-                                      flex: 2,
-                                      child: Text(
-                                        supplier.city ?? '—',
-                                        style: AppTheme.bodySmall.copyWith(
-                                          color: supplier.city != null
-                                              ? AppTheme.textSecondary
-                                              : AppTheme.textHint,
+                                      flex: 1,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
                                         ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                                        decoration: BoxDecoration(
+                                          color: isLowStock
+                                              ? AppTheme.warningColor.withOpacity(0.1)
+                                              : AppTheme.successColor.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          item.quantity.toString(),
+                                          style: AppTheme.labelSmall.copyWith(
+                                            color: isLowStock
+                                                ? AppTheme.warningColor
+                                                : AppTheme.successColor,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
                                     ),
 
-                                    // Status Icon
+                                    // Stock Value
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        currencyFormat.format(stockValue),
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: AppTheme.textSecondary,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        textAlign: TextAlign.right,
+                                      ),
+                                    ),
+
+                                    // Actions
                                     SizedBox(
                                       width: 60,
-                                      child: Icon(
-                                        Icons.chevron_right,
-                                        color: AppTheme.textHint,
-                                        size: 20,
+                                      child: IconButton(
+                                        icon: Icon(
+                                          Icons.arrow_forward_ios,
+                                          size: 16,
+                                          color: AppTheme.textSecondary,
+                                        ),
+                                        onPressed: () => _navigateToViewItem(item),
+                                        tooltip: 'View Details',
                                       ),
                                     ),
                                   ],

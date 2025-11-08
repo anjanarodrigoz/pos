@@ -41,14 +41,14 @@ class ItemRepository {
     }
   }
 
-  /// Search items by name
+  /// Search items by name, description, or item code
   Future<Result<List<Item>>> searchItems(String query) async {
     try {
       final items = await (_database.select(_database.items)
             ..where((i) =>
                 i.name.like('%$query%') |
                 i.description.like('%$query%') |
-                i.barcode.like('%$query%')))
+                i.itemCode.like('%$query%')))
           .get();
 
       return Result.success(items);
@@ -58,15 +58,15 @@ class ItemRepository {
     }
   }
 
-  /// Create new item
+  /// Create new item with selling price only
+  /// Note: Quantity defaults to 0 and is updated ONLY via supply invoices
   Future<Result<Item>> createItem({
     required String name,
+    required String itemCode,
     required double price,
-    required int quantity,
+    int quantity = 0,
     String? description,
-    double? costPrice,
     String? category,
-    String? barcode,
   }) async {
     try {
       final itemId = IDGenerator.generateItemId();
@@ -74,12 +74,12 @@ class ItemRepository {
       final companion = ItemsCompanion.insert(
         id: itemId,
         name: name,
+        itemCode: itemCode,
         price: price,
-        quantity: quantity,
+        quantity: Value(quantity),
         description: Value(description),
-        costPrice: Value(costPrice),
         category: Value(category),
-        barcode: Value(barcode),
+        // Quantity defaults to 0, updated ONLY via supply invoice
       );
 
       await _database.into(_database.items).insert(companion);
@@ -95,40 +95,18 @@ class ItemRepository {
   }
 
   /// Update item
-  Future<Result<Item>> updateItem({
-    required String itemId,
-    String? name,
-    double? price,
-    int? quantity,
-    String? description,
-    double? costPrice,
-    String? category,
-    String? barcode,
-    bool? isActive,
-  }) async {
+  Future<Result<Item>> updateItem(Item item) async {
     try {
-      final updates = ItemsCompanion(
-        id: Value(itemId),
-        name: name != null ? Value(name) : const Value.absent(),
-        price: price != null ? Value(price) : const Value.absent(),
-        quantity: quantity != null ? Value(quantity) : const Value.absent(),
-        description: description != null ? Value(description) : const Value.absent(),
-        costPrice: costPrice != null ? Value(costPrice) : const Value.absent(),
-        category: category != null ? Value(category) : const Value.absent(),
-        barcode: barcode != null ? Value(barcode) : const Value.absent(),
-        isActive: isActive != null ? Value(isActive) : const Value.absent(),
-        updatedAt: Value(DateTime.now()),
-      );
+      await (_database.update(_database.items)
+            ..where((i) => i.id.equals(item.id)))
+          .write(item.toCompanion(true));
 
-      await (_database.update(_database.items)..where((i) => i.id.equals(itemId)))
-          .write(updates);
+      final updated = await getItem(item.id);
+      AppLogger.info('Item updated: ${item.id}');
 
-      final item = await getItem(itemId);
-      AppLogger.info('Item updated: $itemId');
-
-      return item;
+      return updated;
     } catch (e, stack) {
-      AppLogger.error('Failed to update item $itemId', e, stack);
+      AppLogger.error('Failed to update item ${item.id}', e, stack);
       return Result.failure(AppError.generic('Failed to update item'));
     }
   }
@@ -141,7 +119,8 @@ class ItemRepository {
       return Result.success(null);
     } catch (e, stack) {
       AppLogger.error('Failed to update stock for $itemId', e, stack);
-      return Result.failure(AppError.generic('Failed to update stock: ${e.toString()}'));
+      return Result.failure(
+          AppError.generic('Failed to update stock: ${e.toString()}'));
     }
   }
 
@@ -157,7 +136,8 @@ class ItemRepository {
 
       if (usageCount > 0) {
         // Soft delete instead of hard delete
-        await (_database.update(_database.items)..where((i) => i.id.equals(itemId)))
+        await (_database.update(_database.items)
+              ..where((i) => i.id.equals(itemId)))
             .write(const ItemsCompanion(isActive: Value(false)));
 
         AppLogger.info('Item deactivated (used in invoices): $itemId');
@@ -165,7 +145,9 @@ class ItemRepository {
       }
 
       // Hard delete if never used
-      await (_database.delete(_database.items)..where((i) => i.id.equals(itemId))).go();
+      await (_database.delete(_database.items)
+            ..where((i) => i.id.equals(itemId)))
+          .go();
 
       AppLogger.info('Item deleted: $itemId');
       return Result.success(null);
@@ -208,8 +190,7 @@ class ItemRepository {
   /// Get all categories
   Future<Result<List<String>>> getAllCategories() async {
     try {
-      final result = await _database
-          .selectOnly(_database.items, distinct: true)
+      final result = _database.selectOnly(_database.items, distinct: true)
         ..addColumns([_database.items.category]);
 
       final rows = await result.get();
@@ -237,12 +218,13 @@ class ItemRepository {
           .then((row) => row.read(_database.invoiceItems.quantity.sum()) ?? 0);
 
       // Total revenue
-      final revenueExpression = _database.invoiceItems.quantity.cast<double>() * _database.invoiceItems.netPrice;
+      final revenueExpression = _database.invoiceItems.quantity.cast<double>() *
+          _database.invoiceItems.netPrice;
       final totalRevenue = await (_database.selectOnly(_database.invoiceItems)
             ..addColumns([revenueExpression.sum()])
             ..where(_database.invoiceItems.itemId.equals(itemId)))
           .getSingle()
-          .then((row) => (row.read(revenueExpression.sum()) ?? 0.0) as double);
+          .then((row) => (row.read(revenueExpression.sum()) ?? 0.0));
 
       // Get current stock
       final item = await getItem(itemId);
@@ -274,7 +256,8 @@ class ItemRepository {
 
   /// Watch single item
   Stream<Item> watchItem(String itemId) {
-    return (_database.select(_database.items)..where((i) => i.id.equals(itemId)))
+    return (_database.select(_database.items)
+          ..where((i) => i.id.equals(itemId)))
         .watchSingle();
   }
 }
