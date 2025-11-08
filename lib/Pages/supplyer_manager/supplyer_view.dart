@@ -261,7 +261,7 @@ class _SupplyerViewPageState extends State<SupplyerViewPage> {
             );
           },
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.cardBackground,
         elevation: 0,
         iconTheme: IconThemeData(color: AppTheme.textPrimary),
         actions: [
@@ -327,7 +327,7 @@ class _SupplyerViewPageState extends State<SupplyerViewPage> {
                         Container(
                           padding: const EdgeInsets.all(AppTheme.spacingLg),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppTheme.cardBackground,
                             border: Border(
                               top: BorderSide(color: AppTheme.borderColor),
                             ),
@@ -381,7 +381,7 @@ class _SupplyerViewPageState extends State<SupplyerViewPage> {
   Widget _buildDetailsCard(Supplier supplier) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.cardBackground,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         border: Border.all(color: AppTheme.borderColor),
         boxShadow: [
@@ -511,7 +511,7 @@ class _SupplyerViewPageState extends State<SupplyerViewPage> {
   Widget _buildBusinessCard(Supplier supplier) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.cardBackground,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         border: Border.all(color: AppTheme.borderColor),
         boxShadow: [
@@ -613,7 +613,7 @@ class _SupplyerViewPageState extends State<SupplyerViewPage> {
   Widget _buildAddressCard(Supplier supplier) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.cardBackground,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         border: Border.all(color: AppTheme.borderColor),
         boxShadow: [

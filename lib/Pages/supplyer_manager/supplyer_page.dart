@@ -88,7 +88,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
           'Supplier Management',
           style: AppTheme.headlineMedium.copyWith(color: AppTheme.textPrimary),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.cardBackground,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: AppTheme.textPrimary),
@@ -122,7 +122,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
           // Search Bar and Filters
           Container(
             padding: const EdgeInsets.all(AppTheme.spacingLg),
-            color: Colors.white,
+            color: AppTheme.cardBackground,
             child: Column(
               children: [
                 Row(
@@ -181,7 +181,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
                     const SizedBox(width: AppTheme.spacingMd),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppTheme.cardBackground,
                         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                         border: Border.all(color: AppTheme.borderColor),
                       ),
@@ -293,7 +293,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
                 return Container(
                   margin: const EdgeInsets.all(AppTheme.spacingLg),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.cardBackground,
                     borderRadius: BorderRadius.circular(AppTheme.radiusLg),
                     border: Border.all(color: AppTheme.borderColor),
                     boxShadow: [

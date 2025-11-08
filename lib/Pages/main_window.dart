@@ -52,7 +52,7 @@ class _MainWindowState extends State<MainWindow> {
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.cardBackground,
                 border: Border(
                   bottom: BorderSide(color: AppTheme.borderColor),
                 ),
@@ -181,7 +181,7 @@ class _MainWindowState extends State<MainWindow> {
       borderRadius: BorderRadius.circular(AppTheme.radiusLg),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.cardBackground,
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           border: Border.all(color: AppTheme.borderColor),
           boxShadow: [

@@ -137,7 +137,7 @@ class _SupplyerFormPageState extends State<SupplyerFormPage> {
           'New Supplier',
           style: AppTheme.headlineMedium.copyWith(color: AppTheme.textPrimary),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.cardBackground,
         elevation: 0,
         iconTheme: IconThemeData(color: AppTheme.textPrimary),
         bottom: PreferredSize(
@@ -420,7 +420,7 @@ class _SupplyerFormPageState extends State<SupplyerFormPage> {
             Container(
               padding: const EdgeInsets.all(AppTheme.spacingLg),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.cardBackground,
                 border: Border(
                   top: BorderSide(color: AppTheme.borderColor),
                 ),
@@ -468,7 +468,7 @@ class _SupplyerFormPageState extends State<SupplyerFormPage> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.cardBackground,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         border: Border.all(color: AppTheme.borderColor),
         boxShadow: [

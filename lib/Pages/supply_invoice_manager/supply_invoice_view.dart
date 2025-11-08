@@ -99,7 +99,7 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
             );
           },
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.cardBackground,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppTheme.textPrimary),
         actions: [
@@ -191,7 +191,7 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
   Widget _buildInvoiceHeaderCard(SupplierInvoice invoice) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.cardBackground,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         border: Border.all(color: AppTheme.borderColor),
         boxShadow: [
@@ -276,7 +276,7 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
   Widget _buildInvoiceItemsCard(SupplierInvoice invoice) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.cardBackground,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         border: Border.all(color: AppTheme.borderColor),
         boxShadow: [
@@ -491,7 +491,7 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
 
       return Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.cardBackground,
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           border: Border.all(color: AppTheme.borderColor),
           boxShadow: [
@@ -563,7 +563,7 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
 
       return Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.cardBackground,
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           border: Border.all(color: AppTheme.borderColor),
           boxShadow: [
