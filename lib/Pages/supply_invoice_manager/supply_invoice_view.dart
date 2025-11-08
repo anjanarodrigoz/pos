@@ -23,10 +23,12 @@ class SupplyInvoiceView extends StatefulWidget {
 }
 
 class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
-  final SupplierInvoiceRepository _repository = Get.find<SupplierInvoiceRepository>();
+  final SupplierInvoiceRepository _repository =
+      Get.find<SupplierInvoiceRepository>();
 
   Future<void> _togglePaidStatus(SupplierInvoice invoice) async {
-    final result = await _repository.markAsPaid(invoice.invoiceId, !invoice.isPaid);
+    final result =
+        await _repository.markAsPaid(invoice.invoiceId, !invoice.isPaid);
 
     if (mounted) {
       if (result.isSuccess) {
@@ -48,7 +50,8 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Invoice'),
-        content: const Text('Are you sure you want to delete this invoice? This action cannot be undone.'),
+        content: const Text(
+            'Are you sure you want to delete this invoice? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -91,13 +94,14 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
               widget.isReturnNote
                   ? 'Return Note ${invoice?.invoiceId ?? ""}'
                   : 'Invoice ${invoice?.invoiceId ?? ""}',
-              style: AppTheme.headlineMedium.copyWith(color: AppTheme.textPrimary),
+              style:
+                  AppTheme.headlineMedium.copyWith(color: AppTheme.textPrimary),
             );
           },
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: IconThemeData(color: AppTheme.textPrimary),
+        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
         actions: [
           StreamBuilder<SupplierInvoice>(
             stream: _repository.watchInvoice(widget.invoiceId),
@@ -109,8 +113,12 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
                 children: [
                   IconButton(
                     icon: Icon(
-                      invoice.isPaid ? Icons.check_circle : Icons.circle_outlined,
-                      color: invoice.isPaid ? AppTheme.successColor : AppTheme.textSecondary,
+                      invoice.isPaid
+                          ? Icons.check_circle
+                          : Icons.circle_outlined,
+                      color: invoice.isPaid
+                          ? AppTheme.successColor
+                          : AppTheme.textSecondary,
                     ),
                     onPressed: () => _togglePaidStatus(invoice),
                     tooltip: invoice.isPaid ? 'Mark as unpaid' : 'Mark as paid',
@@ -171,8 +179,7 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
                 const SizedBox(height: AppTheme.spacingLg),
 
                 // Comments (if any)
-                if (invoice.commentsJson != null)
-                  _buildCommentsCard(invoice),
+                if (invoice.commentsJson != null) _buildCommentsCard(invoice),
               ],
             ),
           );
@@ -221,7 +228,8 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
                       _buildDetailRow('Email', invoice.supplierEmail!),
                     if (invoice.referenceId != null)
                       _buildDetailRow('Reference ID', invoice.referenceId!),
-                    _buildDetailRow('Date', MyFormat.formatDate(invoice.createdDate)),
+                    _buildDetailRow(
+                        'Date', MyFormat.formatDate(invoice.createdDate)),
                   ],
                 ),
               ),
@@ -251,7 +259,9 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
                   ),
                   const SizedBox(height: AppTheme.spacingMd),
                   _buildTotalRow('Net Total', invoice.totalNet),
-                  _buildTotalRow('GST (${(invoice.gstPercentage * 100).toStringAsFixed(1)}%)', invoice.totalGst),
+                  _buildTotalRow(
+                      'GST (${(invoice.gstPercentage * 100).toStringAsFixed(1)}%)',
+                      invoice.totalGst),
                   const Divider(),
                   _buildTotalRow('Total', invoice.total, isTotal: true),
                 ],
@@ -284,7 +294,8 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
             padding: const EdgeInsets.all(AppTheme.spacingLg),
             child: Row(
               children: [
-                Icon(Icons.inventory_2_outlined, color: AppTheme.primaryColor),
+                const Icon(Icons.inventory_2_outlined,
+                    color: AppTheme.primaryColor),
                 const SizedBox(width: AppTheme.spacingSm),
                 Text(
                   'Invoice Items',
@@ -313,7 +324,8 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
                   padding: const EdgeInsets.all(AppTheme.spacingLg),
                   child: Text(
                     'No items in this invoice',
-                    style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
+                    style: AppTheme.bodyMedium
+                        .copyWith(color: AppTheme.textSecondary),
                   ),
                 );
               }
@@ -326,7 +338,7 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
                       horizontal: AppTheme.spacingLg,
                       vertical: AppTheme.spacingMd,
                     ),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: AppTheme.backgroundGrey,
                       border: Border(
                         top: BorderSide(color: AppTheme.borderColor),
@@ -383,80 +395,85 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
                   ),
 
                   // Table Rows
-                  ...items.map((item) => Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppTheme.spacingLg,
-                      vertical: AppTheme.spacingMd,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: AppTheme.borderColor.withOpacity(0.5),
-                        ),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              flex: 3,
-                              child: Text(
-                                item.itemName,
-                                style: AppTheme.bodySmall.copyWith(
-                                  color: AppTheme.textPrimary,
-                                  fontWeight: FontWeight.w500,
+                  ...items
+                      .map((item) => Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppTheme.spacingLg,
+                              vertical: AppTheme.spacingMd,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: AppTheme.borderColor.withOpacity(0.5),
                                 ),
                               ),
                             ),
-                            Expanded(
-                              flex: 1,
-                              child: Text(
-                                item.quantity.toString(),
-                                textAlign: TextAlign.center,
-                                style: AppTheme.bodySmall.copyWith(
-                                  color: AppTheme.textPrimary,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        item.itemName,
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: AppTheme.textPrimary,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        item.quantity.toString(),
+                                        textAlign: TextAlign.center,
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: AppTheme.textPrimary,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        MyFormat.formatCurrency(
+                                            item.buyingPrice),
+                                        textAlign: TextAlign.right,
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: AppTheme.textSecondary,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        MyFormat.formatCurrency(item.netPrice),
+                                        textAlign: TextAlign.right,
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: AppTheme.textPrimary,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
+                                if (item.comment != null &&
+                                    item.comment!.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: AppTheme.spacingSm),
+                                    child: Text(
+                                      item.comment!,
+                                      style: AppTheme.bodySmall.copyWith(
+                                        color: AppTheme.textSecondary,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                MyFormat.formatCurrency(item.buyingPrice),
-                                textAlign: TextAlign.right,
-                                style: AppTheme.bodySmall.copyWith(
-                                  color: AppTheme.textSecondary,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                MyFormat.formatCurrency(item.netPrice),
-                                textAlign: TextAlign.right,
-                                style: AppTheme.bodySmall.copyWith(
-                                  color: AppTheme.textPrimary,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        if (item.comment != null && item.comment!.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: AppTheme.spacingSm),
-                            child: Text(
-                              item.comment!,
-                              style: AppTheme.bodyXSmall.copyWith(
-                                color: AppTheme.textSecondary,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  )).toList(),
+                          ))
+                      .toList(),
                 ],
               );
             },
@@ -491,7 +508,8 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
           children: [
             Row(
               children: [
-                Icon(Icons.add_circle_outline, color: AppTheme.primaryColor),
+                const Icon(Icons.add_circle_outline,
+                    color: AppTheme.primaryColor),
                 const SizedBox(width: AppTheme.spacingSm),
                 Text(
                   'Extra Charges',
@@ -562,7 +580,8 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
           children: [
             Row(
               children: [
-                Icon(Icons.comment_outlined, color: AppTheme.primaryColor),
+                const Icon(Icons.comment_outlined,
+                    color: AppTheme.primaryColor),
                 const SizedBox(width: AppTheme.spacingSm),
                 Text(
                   'Comments',
@@ -624,7 +643,8 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
         children: [
           Text(
             '$label:',
-            style: (isTotal ? AppTheme.bodyMedium : AppTheme.bodySmall).copyWith(
+            style:
+                (isTotal ? AppTheme.bodyMedium : AppTheme.bodySmall).copyWith(
               color: AppTheme.textSecondary,
               fontWeight: isTotal ? FontWeight.w600 : FontWeight.normal,
             ),
@@ -632,7 +652,8 @@ class _SupplyInvoiceViewState extends State<SupplyInvoiceView> {
           const SizedBox(width: AppTheme.spacingMd),
           Text(
             MyFormat.formatCurrency(amount),
-            style: (isTotal ? AppTheme.bodyLarge : AppTheme.bodyMedium).copyWith(
+            style:
+                (isTotal ? AppTheme.bodyLarge : AppTheme.bodyMedium).copyWith(
               color: AppTheme.textPrimary,
               fontWeight: FontWeight.w600,
             ),
