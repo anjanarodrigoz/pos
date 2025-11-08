@@ -87,6 +87,10 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundGrey,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Text(
           widget.isReturnManager ? 'Return Notes' : 'Supplier Invoices',
           style: AppTheme.headlineMedium.copyWith(color: AppTheme.textPrimary),
@@ -245,17 +249,16 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
                                 ),
                               ),
                             ),
-                            if (!widget.isReturnManager)
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  'Ref. ID',
-                                  style: AppTheme.bodySmall.copyWith(
-                                    color: AppTheme.textSecondary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'Supplier ID',
+                                style: AppTheme.bodySmall.copyWith(
+                                  color: AppTheme.textSecondary,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
+                            ),
                             Expanded(
                               flex: 3,
                               child: Text(
@@ -335,16 +338,16 @@ class _SupplyAllInvoiceState extends State<SupplyAllInvoice> {
                                         ),
                                       ),
                                     ),
-                                    if (!widget.isReturnManager)
-                                      Expanded(
-                                        flex: 2,
-                                        child: Text(
-                                          invoice.referenceId ?? '-',
-                                          style: AppTheme.bodySmall.copyWith(
-                                            color: AppTheme.textSecondary,
-                                          ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        invoice.supplierId,
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: AppTheme.textSecondary,
+                                          fontFamily: 'monospace',
                                         ),
                                       ),
+                                    ),
                                     Expanded(
                                       flex: 3,
                                       child: Text(

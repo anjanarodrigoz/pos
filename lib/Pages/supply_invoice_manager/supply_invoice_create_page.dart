@@ -8,6 +8,7 @@ import 'package:pos/repositories/item_repository.dart';
 import 'package:pos/theme/app_theme.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/utils/alert_message.dart';
+import 'package:pos/utils/val.dart';
 
 /// Modern supplier invoice creation page
 class SupplyInvoiceCreatePage extends StatefulWidget {
@@ -39,10 +40,6 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
   // Comments
   final List<String> _comments = [];
 
-  // Controllers
-  final TextEditingController _gstController = TextEditingController(text: '10.0');
-  final TextEditingController _referenceIdController = TextEditingController();
-
   // Totals
   double _itemsTotal = 0.0;
   double _extraChargesTotal = 0.0;
@@ -52,21 +49,13 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
 
   bool _isSaving = false;
 
-  @override
-  void dispose() {
-    _gstController.dispose();
-    _referenceIdController.dispose();
-    super.dispose();
-  }
-
   void _calculateTotals() {
     setState(() {
       _itemsTotal = _items.fold(0.0, (sum, item) => sum + (item.quantity * item.buyingPrice));
       _extraChargesTotal = _extraCharges.fold(0.0, (sum, charge) => sum + charge.amount);
       _netTotal = _itemsTotal + _extraChargesTotal;
 
-      final gstPercentage = double.tryParse(_gstController.text) ?? 0.0;
-      _gstTotal = (_netTotal * gstPercentage / 100 * 100).round() / 100;
+      _gstTotal = (_netTotal * Val.gstPrecentage * 100).round() / 100;
       _grandTotal = ((_netTotal + _gstTotal) * 100).round() / 100;
     });
   }
@@ -87,85 +76,7 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
 
     final selected = await showDialog<Supplier>(
       context: context,
-      builder: (context) => Dialog(
-        child: Container(
-          width: 800,
-          height: 600,
-          padding: const EdgeInsets.all(AppTheme.spacingLg),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Select Supplier',
-                    style: AppTheme.headlineMedium.copyWith(
-                      color: AppTheme.textPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppTheme.spacingMd),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: suppliers.length,
-                  itemBuilder: (context, index) {
-                    final supplier = suppliers[index];
-                    return InkWell(
-                      onTap: () => Navigator.pop(context, supplier),
-                      child: Container(
-                        padding: const EdgeInsets.all(AppTheme.spacingMd),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(color: AppTheme.borderColor),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${supplier.firstName} ${supplier.lastName}',
-                                    style: AppTheme.bodyMedium.copyWith(
-                                      color: AppTheme.textPrimary,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Text(
-                                    supplier.id,
-                                    style: AppTheme.bodySmall.copyWith(
-                                      color: AppTheme.textSecondary,
-                                      fontFamily: 'monospace',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            if (supplier.mobileNumber != null)
-                              Text(
-                                supplier.mobileNumber!,
-                                style: AppTheme.bodySmall.copyWith(
-                                  color: AppTheme.textSecondary,
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      builder: (context) => _SupplierSelectionDialog(suppliers: suppliers),
     );
 
     if (selected != null) {
@@ -191,84 +102,7 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
 
     final selected = await showDialog<Item>(
       context: context,
-      builder: (context) => Dialog(
-        child: Container(
-          width: 800,
-          height: 600,
-          padding: const EdgeInsets.all(AppTheme.spacingLg),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Select Item',
-                    style: AppTheme.headlineMedium.copyWith(
-                      color: AppTheme.textPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppTheme.spacingMd),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    return InkWell(
-                      onTap: () => Navigator.pop(context, item),
-                      child: Container(
-                        padding: const EdgeInsets.all(AppTheme.spacingMd),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(color: AppTheme.borderColor),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item.name,
-                                    style: AppTheme.bodyMedium.copyWith(
-                                      color: AppTheme.textPrimary,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Text(
-                                    item.itemCode,
-                                    style: AppTheme.bodySmall.copyWith(
-                                      color: AppTheme.textSecondary,
-                                      fontFamily: 'monospace',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Text(
-                              'Stock: ${item.quantity}',
-                              style: AppTheme.bodySmall.copyWith(
-                                color: AppTheme.textSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      builder: (context) => _ItemSelectionDialog(items: items),
     );
 
     if (selected != null) {
@@ -473,8 +307,6 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
 
     setState(() => _isSaving = true);
 
-    final gstPercentage = double.tryParse(_gstController.text) ?? 0.0;
-
     final result = await _invoiceRepository.createInvoice(
       supplierId: _selectedSupplier!.id,
       supplierName: '${_selectedSupplier!.firstName} ${_selectedSupplier!.lastName}',
@@ -487,8 +319,7 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
         buyingPrice: item.buyingPrice,
         comment: item.comment,
       )).toList(),
-      gstPercentage: gstPercentage / 100,
-      referenceId: _referenceIdController.text.isEmpty ? null : _referenceIdController.text,
+      gstPercentage: Val.gstPrecentage,
       extraCharges: _extraCharges.isEmpty ? null : _extraCharges.map((e) => ExtraChargeData(
         description: e.description,
         amount: e.amount,
@@ -497,12 +328,18 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
       isReturnNote: widget.isReturnNote,
     );
 
+    if (result.isSuccess) {
+      // Automatically mark as paid
+      final invoice = result.data!;
+      await _invoiceRepository.markAsPaid(invoice.invoiceId, true);
+    }
+
     setState(() => _isSaving = false);
 
     if (mounted) {
       if (result.isSuccess) {
         AlertMessage.snakMessage(
-          widget.isReturnNote ? 'Return note created successfully' : 'Invoice created successfully',
+          widget.isReturnNote ? 'Return note created successfully' : 'Invoice created and marked as paid',
           context,
         );
         Navigator.pop(context, true);
@@ -563,11 +400,6 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
 
                   const SizedBox(height: AppTheme.spacingLg),
 
-                  // Invoice Details
-                  _buildInvoiceDetailsCard(),
-
-                  const SizedBox(height: AppTheme.spacingLg),
-
                   // Items
                   _buildItemsCard(),
 
@@ -585,8 +417,8 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
             ),
           ),
 
-          // Totals sidebar
-          _buildTotalsSidebar(),
+          // Invoice summary sidebar
+          _buildInvoiceSummarySidebar(),
         ],
       ),
     );
@@ -661,64 +493,6 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
                 ),
               ),
             ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInvoiceDetailsCard() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        border: Border.all(color: AppTheme.borderColor),
-      ),
-      padding: const EdgeInsets.all(AppTheme.spacingLg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.receipt_outlined, color: AppTheme.primaryColor),
-              const SizedBox(width: AppTheme.spacingSm),
-              Text(
-                'Invoice Details',
-                style: AppTheme.headlineSmall.copyWith(
-                  color: AppTheme.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppTheme.spacingMd),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _gstController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
-                  ],
-                  onChanged: (_) => _calculateTotals(),
-                  decoration: AppTheme.inputDecoration(
-                    labelText: 'GST Percentage (%)',
-                  ),
-                ),
-              ),
-              if (!widget.isReturnNote) ...[
-                const SizedBox(width: AppTheme.spacingMd),
-                Expanded(
-                  child: TextField(
-                    controller: _referenceIdController,
-                    decoration: AppTheme.inputDecoration(
-                      labelText: 'Reference ID (optional)',
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
         ],
       ),
     );
@@ -1010,34 +784,155 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
     );
   }
 
-  Widget _buildTotalsSidebar() {
+  Widget _buildInvoiceSummarySidebar() {
     return Container(
-      width: 300,
+      width: 350,
       color: Colors.white,
       padding: const EdgeInsets.all(AppTheme.spacingLg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Summary',
+            'Invoice Summary',
             style: AppTheme.headlineSmall.copyWith(
               color: AppTheme.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: AppTheme.spacingLg),
-          _buildTotalRow('Items Total', _itemsTotal),
-          if (_extraCharges.isNotEmpty)
-            _buildTotalRow('Extra Charges', _extraChargesTotal),
-          const Divider(),
-          _buildTotalRow('Net Total', _netTotal),
+
+          // Items section
+          if (_items.isNotEmpty) ...[
+            Text(
+              'Items',
+              style: AppTheme.bodyMedium.copyWith(
+                color: AppTheme.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppTheme.spacingSm),
+            ..._items.map((item) => Padding(
+              padding: const EdgeInsets.only(bottom: AppTheme.spacingXs),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${item.itemName} (${item.quantity})',
+                      style: AppTheme.bodySmall.copyWith(
+                        color: AppTheme.textSecondary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Text(
+                    MyFormat.formatCurrency(item.quantity * item.buyingPrice),
+                    style: AppTheme.bodySmall.copyWith(
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            )).toList(),
+            const Divider(),
+          ],
+
+          // Extra charges section
+          if (_extraCharges.isNotEmpty) ...[
+            Text(
+              'Extra Charges',
+              style: AppTheme.bodyMedium.copyWith(
+                color: AppTheme.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppTheme.spacingSm),
+            ..._extraCharges.map((charge) => Padding(
+              padding: const EdgeInsets.only(bottom: AppTheme.spacingXs),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      charge.description,
+                      style: AppTheme.bodySmall.copyWith(
+                        color: AppTheme.textSecondary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Text(
+                    MyFormat.formatCurrency(charge.amount),
+                    style: AppTheme.bodySmall.copyWith(
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            )).toList(),
+            const Divider(),
+          ],
+
+          // Comments section
+          if (_comments.isNotEmpty) ...[
+            Text(
+              'Comments',
+              style: AppTheme.bodyMedium.copyWith(
+                color: AppTheme.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppTheme.spacingSm),
+            ..._comments.map((comment) => Padding(
+              padding: const EdgeInsets.only(bottom: AppTheme.spacingXs),
+              child: Text(
+                '• $comment',
+                style: AppTheme.bodyXSmall.copyWith(
+                  color: AppTheme.textSecondary,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            )).toList(),
+            const Divider(),
+          ],
+
+          // Totals
+          _buildTotalRow('Subtotal', _itemsTotal + _extraChargesTotal),
           _buildTotalRow(
-            'GST (${_gstController.text}%)',
+            'GST (${(Val.gstPrecentage * 100).toStringAsFixed(1)}%)',
             _gstTotal,
           ),
           const Divider(),
-          _buildTotalRow('Grand Total', _grandTotal, isTotal: true),
+          _buildTotalRow('Total', _grandTotal, isTotal: true),
+
           const Spacer(),
+
+          Container(
+            padding: const EdgeInsets.all(AppTheme.spacingSm),
+            decoration: BoxDecoration(
+              color: AppTheme.successColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              border: Border.all(color: AppTheme.successColor.withOpacity(0.3)),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.check_circle, color: AppTheme.successColor, size: 16),
+                const SizedBox(width: AppTheme.spacingSm),
+                Expanded(
+                  child: Text(
+                    'Invoice will be marked as paid',
+                    style: AppTheme.bodyXSmall.copyWith(
+                      color: AppTheme.successColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: AppTheme.spacingMd),
+
           ElevatedButton.icon(
             onPressed: _isSaving ? null : _saveInvoice,
             icon: _isSaving
@@ -1083,6 +978,238 @@ class _SupplyInvoiceCreatePageState extends State<SupplyInvoiceCreatePage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// Supplier selection dialog with search
+class _SupplierSelectionDialog extends StatefulWidget {
+  final List<Supplier> suppliers;
+
+  const _SupplierSelectionDialog({required this.suppliers});
+
+  @override
+  State<_SupplierSelectionDialog> createState() => _SupplierSelectionDialogState();
+}
+
+class _SupplierSelectionDialogState extends State<_SupplierSelectionDialog> {
+  String _searchQuery = '';
+
+  List<Supplier> get _filteredSuppliers {
+    if (_searchQuery.isEmpty) return widget.suppliers;
+
+    final query = _searchQuery.toLowerCase();
+    return widget.suppliers.where((s) {
+      return s.firstName.toLowerCase().contains(query) ||
+          s.lastName.toLowerCase().contains(query) ||
+          s.id.toLowerCase().contains(query) ||
+          (s.mobileNumber?.toLowerCase().contains(query) ?? false);
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        width: 800,
+        height: 600,
+        padding: const EdgeInsets.all(AppTheme.spacingLg),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Select Supplier',
+                  style: AppTheme.headlineMedium.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTheme.spacingMd),
+            TextField(
+              onChanged: (value) => setState(() => _searchQuery = value),
+              decoration: AppTheme.inputDecoration(
+                labelText: 'Search suppliers...',
+                prefixIcon: const Icon(Icons.search),
+              ),
+            ),
+            const SizedBox(height: AppTheme.spacingMd),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _filteredSuppliers.length,
+                itemBuilder: (context, index) {
+                  final supplier = _filteredSuppliers[index];
+                  return InkWell(
+                    onTap: () => Navigator.pop(context, supplier),
+                    child: Container(
+                      padding: const EdgeInsets.all(AppTheme.spacingMd),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: AppTheme.borderColor),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${supplier.firstName} ${supplier.lastName}',
+                                  style: AppTheme.bodyMedium.copyWith(
+                                    color: AppTheme.textPrimary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Text(
+                                  supplier.id,
+                                  style: AppTheme.bodySmall.copyWith(
+                                    color: AppTheme.textSecondary,
+                                    fontFamily: 'monospace',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (supplier.mobileNumber != null)
+                            Text(
+                              supplier.mobileNumber!,
+                              style: AppTheme.bodySmall.copyWith(
+                                color: AppTheme.textSecondary,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Item selection dialog with search
+class _ItemSelectionDialog extends StatefulWidget {
+  final List<Item> items;
+
+  const _ItemSelectionDialog({required this.items});
+
+  @override
+  State<_ItemSelectionDialog> createState() => _ItemSelectionDialogState();
+}
+
+class _ItemSelectionDialogState extends State<_ItemSelectionDialog> {
+  String _searchQuery = '';
+
+  List<Item> get _filteredItems {
+    if (_searchQuery.isEmpty) return widget.items;
+
+    final query = _searchQuery.toLowerCase();
+    return widget.items.where((i) {
+      return i.name.toLowerCase().contains(query) ||
+          i.itemCode.toLowerCase().contains(query) ||
+          (i.category?.toLowerCase().contains(query) ?? false);
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        width: 800,
+        height: 600,
+        padding: const EdgeInsets.all(AppTheme.spacingLg),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Select Item',
+                  style: AppTheme.headlineMedium.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTheme.spacingMd),
+            TextField(
+              onChanged: (value) => setState(() => _searchQuery = value),
+              decoration: AppTheme.inputDecoration(
+                labelText: 'Search items...',
+                prefixIcon: const Icon(Icons.search),
+              ),
+            ),
+            const SizedBox(height: AppTheme.spacingMd),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _filteredItems.length,
+                itemBuilder: (context, index) {
+                  final item = _filteredItems[index];
+                  return InkWell(
+                    onTap: () => Navigator.pop(context, item),
+                    child: Container(
+                      padding: const EdgeInsets.all(AppTheme.spacingMd),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: AppTheme.borderColor),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.name,
+                                  style: AppTheme.bodyMedium.copyWith(
+                                    color: AppTheme.textPrimary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Text(
+                                  item.itemCode,
+                                  style: AppTheme.bodySmall.copyWith(
+                                    color: AppTheme.textSecondary,
+                                    fontFamily: 'monospace',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            'Stock: ${item.quantity}',
+                            style: AppTheme.bodySmall.copyWith(
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
