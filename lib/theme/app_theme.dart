@@ -7,9 +7,9 @@ class AppTheme {
   AppTheme._();
 
   // ============ COLOR PALETTE ============
-  static const Color primaryColor = Color(0xFF2196F3); // Blue
-  static const Color primaryDark = Color(0xFF1976D2);
-  static const Color primaryLight = Color(0xFF64B5F6);
+  static const Color primaryColor = Color(0xFF0065c1); // Blue
+  static const Color primaryDark = Color(0xFFF5F5F5); //Color(0xFF094fa4);
+  static const Color primaryLight = Color(0xFF1676fe);
 
   static const Color accentColor = Color(0xFF4CAF50); // Green
   static const Color accentDark = Color(0xFF388E3C);
@@ -25,6 +25,7 @@ class AppTheme {
       Color(0xFFF9FAFB); // Light grey background (shadcn style)
   static const Color surfaceColor = Color(0xFFFFFFFF);
   static const Color cardColor = Color(0xFFFFFFFF);
+  static const cardBackground = Color(0xFFF5F5F5);
 
   static const Color textPrimary =
       Color(0xFF0F172A); // Slate-900 (shadcn style)
