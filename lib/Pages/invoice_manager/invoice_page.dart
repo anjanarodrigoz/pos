@@ -8,14 +8,14 @@ import 'package:pos/Pages/invoice_manager/search_invoice_page.dart';
 import 'package:pos/api/email_sender.dart';
 import 'package:pos/api/pdf_api.dart';
 import 'package:pos/api/printer_manager.dart';
-import 'package:pos/database/invoice_db_service.dart';
+import 'package:pos/repositories/invoice_repository.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/payment.dart';
 import 'package:pos/utils/alert_message.dart';
+import 'package:pos/utils/invoice_converter.dart';
 import 'package:pos/widgets/pos_appbar.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/pos_text_form_field.dart';
-import 'package:pos/widgets/print_verify.dart';
 import 'package:pos/widgets/verify_dialog.dart';
 import 'package:printing/printing.dart';
 
@@ -34,6 +34,7 @@ class InvoicePage extends StatefulWidget {
 }
 
 class _InvoicePageState extends State<InvoicePage> {
+  final InvoiceRepository _invoiceRepo = Get.find<InvoiceRepository>();
   List<Invoice> invoiceList = [];
   late Invoice invoice;
   final RxInt index = 0.obs;
@@ -42,9 +43,29 @@ class _InvoicePageState extends State<InvoicePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     searchInvoiceId = widget.searchInvoiceId;
     super.initState();
+  }
+
+  // Helper method to load full invoice data from Drift
+  Future<List<Invoice>> _loadFullInvoices(List<dynamic> driftInvoices) async {
+    List<Invoice> domainInvoices = [];
+
+    for (var driftInvoice in driftInvoices) {
+      try {
+        final fullDataResult = await _invoiceRepo.getFullInvoiceData(driftInvoice.invoiceId);
+
+        if (fullDataResult.isSuccess) {
+          final domainInvoice = InvoiceConverter.fromFullInvoiceData(fullDataResult.data!);
+          domainInvoices.add(domainInvoice);
+        }
+      } catch (e) {
+        // Skip invoices that fail to load
+        continue;
+      }
+    }
+
+    return domainInvoices;
   }
 
   @override
@@ -109,8 +130,10 @@ class _InvoicePageState extends State<InvoicePage> {
                                 Icons.keyboard_double_arrow_left_rounded),
                             onPressed: () {
                               searchInvoiceId = null;
-                              index.value = invoiceList.length - 1;
-                              invoice = invoiceList[index.value];
+                              if (invoiceList.isNotEmpty) {
+                                index.value = invoiceList.length - 1;
+                                invoice = invoiceList[index.value];
+                              }
                             },
                           ),
                           IconButton(
@@ -142,8 +165,10 @@ class _InvoicePageState extends State<InvoicePage> {
                                 Icons.keyboard_double_arrow_right_rounded),
                             onPressed: () {
                               searchInvoiceId = null;
-                              index.value = 0;
-                              invoice = invoiceList[index.value];
+                              if (invoiceList.isNotEmpty) {
+                                index.value = 0;
+                                invoice = invoiceList[index.value];
+                              }
                             },
                           ),
                         ],
@@ -155,23 +180,47 @@ class _InvoicePageState extends State<InvoicePage> {
             ),
           ),
           StreamBuilder(
-            stream: InvoiceDB().getStreamInvoice(),
+            stream: _invoiceRepo.watchInvoices(activeOnly: false),
             builder: (context, snapshot) {
-              final list = snapshot.data ?? [];
-              invoiceList = list.reversed.toList();
-              if (searchInvoiceId != null) {
-                (index.value = invoiceList.indexOf(invoiceList
-                    .where((element) => element.invoiceId == searchInvoiceId)
-                    .first));
+              if (!snapshot.hasData) {
+                return const Expanded(
+                  child: Center(child: CircularProgressIndicator()),
+                );
               }
-              return invoiceList.isNotEmpty
-                  ? Obx(() {
-                      invoice = invoiceList[index.value];
 
-                      return SaveInvoiceViewPage(invoice: invoice);
-                    })
-                  : const Expanded(
-                      child: Center(child: Text('No invoices found')));
+              final driftInvoices = snapshot.data ?? [];
+
+              // Load full data for each invoice (items, payments, charges)
+              return FutureBuilder(
+                future: _loadFullInvoices(driftInvoices),
+                builder: (context, AsyncSnapshot<List<Invoice>> fullSnapshot) {
+                  if (!fullSnapshot.hasData) {
+                    return const Expanded(
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+
+                  invoiceList = fullSnapshot.data!.reversed.toList();
+
+                  if (searchInvoiceId != null && invoiceList.isNotEmpty) {
+                    try {
+                      index.value = invoiceList.indexOf(invoiceList
+                          .where((element) => element.invoiceId == searchInvoiceId)
+                          .first);
+                    } catch (e) {
+                      index.value = 0;
+                    }
+                  }
+
+                  return invoiceList.isNotEmpty
+                      ? Obx(() {
+                          invoice = invoiceList[index.value];
+                          return SaveInvoiceViewPage(invoice: invoice);
+                        })
+                      : const Expanded(
+                          child: Center(child: Text('No invoices found')));
+                },
+              );
             },
           ),
         ],
@@ -194,7 +243,7 @@ class _InvoicePageState extends State<InvoicePage> {
   void openOldInvoice() async {
     if (invoice.isDeleted) {
       AlertMessage.snakMessage(
-          'This invoice has been deleted and Can nott open be edited.',
+          'This invoice has been deleted and Can not be edited.',
           context);
       return;
     }
@@ -216,11 +265,11 @@ class _InvoicePageState extends State<InvoicePage> {
           'Invoice has been paid and cannot be deleted.', context);
     } else if ((invoice.payments ?? []).isNotEmpty) {
       AlertMessage.snakMessage(
-          'This invoive has some payments.please remove the payments.',
+          'This invoice has some payments. Please remove the payments first.',
           context);
     } else if (invoice.isDeleted) {
       AlertMessage.snakMessage(
-          'This invoive has been deleted already.', context);
+          'This invoice has been deleted already.', context);
     } else {
       showDialog(
           context: context,
@@ -228,7 +277,16 @@ class _InvoicePageState extends State<InvoicePage> {
                 title: 'Delete Invoice #${invoice.invoiceId}',
                 content: 'Do you want to delete this invoice?',
                 onContinue: () async {
-                  await InvoiceDB().deleteInvoice(invoice);
+                  final result = await _invoiceRepo.deleteInvoice(invoice.invoiceId);
+
+                  if (result.isSuccess) {
+                    AlertMessage.snakMessage('Invoice deleted successfully', context);
+                  } else {
+                    AlertMessage.snakMessage(
+                      'Failed to delete invoice: ${result.error?.message}',
+                      context
+                    );
+                  }
                   Get.back();
                 },
                 continueText: 'Delete',
@@ -308,14 +366,25 @@ class _InvoicePageState extends State<InvoicePage> {
                     double paymentAmount =
                         double.tryParse(paymentAmountController.text) ?? 0.0;
                     if (paymentAmount > 0.0 && paymentAmount <= invoice.toPay) {
-                      Payment payment = Payment(
-                          date: DateTime.now(),
-                          amount: paymentAmount,
-                          comment: commentController.text,
-                          paymethod: payMethod.value);
+                      final result = await _invoiceRepo.addPayment(
+                        invoiceId: invoice.invoiceId,
+                        amount: paymentAmount,
+                        paymentMethod: InvoiceConverter.paymethodToString(payMethod.value),
+                        comment: commentController.text.isNotEmpty
+                            ? commentController.text
+                            : null,
+                        date: DateTime.now(),
+                      );
 
-                      await InvoiceDB().addInvoicePayment(payment, invoice);
-                      Navigator.of(context).pop();
+                      if (result.isSuccess) {
+                        Navigator.of(context).pop();
+                        AlertMessage.snakMessage('Payment added successfully', context);
+                      } else {
+                        AlertMessage.snakMessage(
+                          'Failed to add payment: ${result.error?.message}',
+                          context
+                        );
+                      }
                     } else {
                       AlertMessage.snakMessage('Enter valid amount', context);
                     }
@@ -332,7 +401,7 @@ class _InvoicePageState extends State<InvoicePage> {
 
   Future<void> openCopyInvoice() async {
     if (invoice.isDeleted) {
-      AlertMessage.snakMessage('This invoice can not be copy', context);
+      AlertMessage.snakMessage('This invoice can not be copied', context);
     } else {
       showDialog(
           context: context,
