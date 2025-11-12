@@ -24,6 +24,7 @@ import '../../controllers/invoice_edit_controller.dart';
 
 import '../../models/invoice.dart';
 import '../../theme/t_colors.dart';
+import '../../widgets/print_verify.dart';
 
 class InvoicePage extends StatefulWidget {
   String? searchInvoiceId;
@@ -53,10 +54,12 @@ class _InvoicePageState extends State<InvoicePage> {
 
     for (var driftInvoice in driftInvoices) {
       try {
-        final fullDataResult = await _invoiceRepo.getFullInvoiceData(driftInvoice.invoiceId);
+        final fullDataResult =
+            await _invoiceRepo.getFullInvoiceData(driftInvoice.invoiceId);
 
         if (fullDataResult.isSuccess) {
-          final domainInvoice = InvoiceConverter.fromFullInvoiceData(fullDataResult.data!);
+          final domainInvoice =
+              InvoiceConverter.fromFullInvoiceData(fullDataResult.data!);
           domainInvoices.add(domainInvoice);
         }
       } catch (e) {
@@ -205,7 +208,8 @@ class _InvoicePageState extends State<InvoicePage> {
                   if (searchInvoiceId != null && invoiceList.isNotEmpty) {
                     try {
                       index.value = invoiceList.indexOf(invoiceList
-                          .where((element) => element.invoiceId == searchInvoiceId)
+                          .where(
+                              (element) => element.invoiceId == searchInvoiceId)
                           .first);
                     } catch (e) {
                       index.value = 0;
@@ -243,8 +247,7 @@ class _InvoicePageState extends State<InvoicePage> {
   void openOldInvoice() async {
     if (invoice.isDeleted) {
       AlertMessage.snakMessage(
-          'This invoice has been deleted and Can not be edited.',
-          context);
+          'This invoice has been deleted and Can not be edited.', context);
       return;
     }
     if (invoice.isPaid) {
@@ -277,15 +280,16 @@ class _InvoicePageState extends State<InvoicePage> {
                 title: 'Delete Invoice #${invoice.invoiceId}',
                 content: 'Do you want to delete this invoice?',
                 onContinue: () async {
-                  final result = await _invoiceRepo.deleteInvoice(invoice.invoiceId);
+                  final result =
+                      await _invoiceRepo.deleteInvoice(invoice.invoiceId);
 
                   if (result.isSuccess) {
-                    AlertMessage.snakMessage('Invoice deleted successfully', context);
+                    AlertMessage.snakMessage(
+                        'Invoice deleted successfully', context);
                   } else {
                     AlertMessage.snakMessage(
-                      'Failed to delete invoice: ${result.error?.message}',
-                      context
-                    );
+                        'Failed to delete invoice: ${result.error?.message}',
+                        context);
                   }
                   Get.back();
                 },
@@ -369,7 +373,8 @@ class _InvoicePageState extends State<InvoicePage> {
                       final result = await _invoiceRepo.addPayment(
                         invoiceId: invoice.invoiceId,
                         amount: paymentAmount,
-                        paymentMethod: InvoiceConverter.paymethodToString(payMethod.value),
+                        paymentMethod:
+                            InvoiceConverter.paymethodToString(payMethod.value),
                         comment: commentController.text.isNotEmpty
                             ? commentController.text
                             : null,
@@ -378,12 +383,12 @@ class _InvoicePageState extends State<InvoicePage> {
 
                       if (result.isSuccess) {
                         Navigator.of(context).pop();
-                        AlertMessage.snakMessage('Payment added successfully', context);
+                        AlertMessage.snakMessage(
+                            'Payment added successfully', context);
                       } else {
                         AlertMessage.snakMessage(
-                          'Failed to add payment: ${result.error?.message}',
-                          context
-                        );
+                            'Failed to add payment: ${result.error?.message}',
+                            context);
                       }
                     } else {
                       AlertMessage.snakMessage('Enter valid amount', context);
