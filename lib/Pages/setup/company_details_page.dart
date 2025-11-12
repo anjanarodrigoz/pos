@@ -25,7 +25,6 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
       mobileNumber1: '',
       email: '',
       email2: '',
-      password: '',
       smtpServer: '');
 
   @override

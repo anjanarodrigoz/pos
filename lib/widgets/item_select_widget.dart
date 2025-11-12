@@ -15,7 +15,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../database/item_db_service.dart';
 import '../../models/cart.dart';
 import '../../models/item.dart';
-import '../Pages/stock_manager.dart/stock_page.dart';
+import 'package:pos/datasources/item_data_source.dart';
 
 class ItemSelectWidget extends StatefulWidget {
   final invoiceController;
@@ -109,28 +109,28 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
           columns: [
             GridColumn(
                 columnName: Item.idKey,
-                label: Center(child: const Text('Item ID'))),
+                label: const Center(child: Text('Item ID'))),
             GridColumn(
                 columnName: Item.nameKey,
-                label: Center(child: const Text('Item Name'))),
+                label: const Center(child: Text('Item Name'))),
             GridColumn(
                 columnName: Item.qtyKey,
-                label: Center(child: const Text('Qty'))),
+                label: const Center(child: Text('Qty'))),
             GridColumn(
                 columnName: Item.priceKey,
-                label: Center(child: const Text('Price'))),
+                label: const Center(child: Text('Price'))),
             GridColumn(
                 columnName: Item.priceTwoKey,
-                label: Center(child: const Text('Price 02'))),
+                label: const Center(child: Text('Price 02'))),
             GridColumn(
                 columnName: Item.priceThreeKey,
-                label: Center(child: const Text('Price 03'))),
+                label: const Center(child: Text('Price 03'))),
             GridColumn(
                 columnName: Item.priceFourKey,
-                label: Center(child: const Text('Price 04'))),
+                label: const Center(child: Text('Price 04'))),
             GridColumn(
                 columnName: Item.priceFiveKey,
-                label: Center(child: const Text('Price 05'))),
+                label: const Center(child: Text('Price 05'))),
 
             // Add more columns as needed
           ],
@@ -141,7 +141,7 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
 
   Future<void> getItemData() async {
     _item = await _databaseService.getAllItems();
-    itemDataSource = ItemDataSource(itemData: _item);
+    itemDataSource = ItemDataSource(itemData: []);
     setState(() {});
   }
 
@@ -196,7 +196,7 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
                           }
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       PosTextFormField(
@@ -219,7 +219,7 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
                           }
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       PosTextFormField(
@@ -292,11 +292,13 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
       children: [
         Text(
           '$key : ',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.w400),
         ),
         Text(
           value,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         )
       ],
     );

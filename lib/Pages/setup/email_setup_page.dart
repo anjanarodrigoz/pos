@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pos/api/email_sender.dart';
 import 'package:pos/database/store_db.dart';
 import 'package:pos/models/store.dart';
+import 'package:pos/services/email_credentials_service.dart';
 import 'package:pos/utils/alert_message.dart';
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/pos_progress_button.dart';
@@ -20,6 +21,7 @@ class _EmailSetupPageState extends State<EmailSetupPage> {
   TextEditingController senderEmailController = TextEditingController();
   TextEditingController titleController = TextEditingController();
   TextEditingController messageController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   Store store = Store(
       companyName: '',
@@ -31,7 +33,6 @@ class _EmailSetupPageState extends State<EmailSetupPage> {
       mobileNumber1: '',
       email: '',
       email2: '',
-      password: '',
       smtpServer: '');
 
   @override
@@ -75,14 +76,13 @@ class _EmailSetupPageState extends State<EmailSetupPage> {
                           labelText: 'Email',
                         ),
                         PosTextFormField(
+                          controller: passwordController,
                           obscureText: true,
-                          onSaved: (value) => store.password = value!,
-                          labelText: 'password',
-                          initialValue: store.password,
+                          labelText: 'Password',
                         ),
                         PosTextFormField(
                           onSaved: (value) => store.smtpServer = value!,
-                          labelText: 'SMTP Sever',
+                          labelText: 'SMTP Server',
                           initialValue: store.smtpServer,
                         ),
                       ],
@@ -138,7 +138,18 @@ class _EmailSetupPageState extends State<EmailSetupPage> {
   Future<void> saveData() async {
     _formKey.currentState!.save();
 
+    // Save store data (without password)
     await StoreDB().addStore(store);
+
+    // Save SMTP credentials securely
+    if (passwordController.text.isNotEmpty) {
+      await EmailCredentialsService.saveSmtpCredentials(
+        username: store.email2,
+        password: passwordController.text,
+        server: store.smtpServer,
+        port: 465, // Default SMTP SSL port
+      );
+    }
 
     if (context.mounted) {
       AlertMessage.snakMessage('email setup success', context);

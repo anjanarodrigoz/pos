@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
@@ -7,6 +6,8 @@ import 'package:mailer/smtp_server.dart';
 import 'package:pdf/widgets.dart';
 import 'package:pos/database/store_db.dart';
 import 'package:pos/enums/enums.dart';
+import 'package:pos/services/email_credentials_service.dart';
+import 'package:pos/services/logger_service.dart';
 import 'package:pos/utils/alert_message.dart';
 import 'package:pos/utils/my_format.dart';
 import 'dart:developer' as dev;
@@ -21,13 +22,27 @@ class EmailSender {
   static sendEmail(String recipients, BuildContext context,
       {String? title, String? body, List<FileAttachment>? attachment}) async {
     Store store = StoreDB().getStore();
+
+    // Get credentials from secure storage
+    String? password = await EmailCredentialsService.getSmtpPassword();
+    if (password == null) {
+      AppLogger.error('SMTP credentials not configured');
+      if (context.mounted) {
+        AlertMessage.snakMessage(
+            'Email not configured. Please set up email credentials in settings.',
+            context);
+      }
+      return;
+    }
+
     // Note that using a username and password for gmail only works if
     // you have two-factor authentication enabled and created an App password.
     // Search for "gmail app password 2fa"
     // The alternative is to use oauth.
     String username = store.email2.toLowerCase();
-    String password = store.password;
     String smtp = store.smtpServer.toLowerCase();
+
+    AppLogger.info('Sending email to $recipients');
 
     SmtpServer smtpServer;
 
