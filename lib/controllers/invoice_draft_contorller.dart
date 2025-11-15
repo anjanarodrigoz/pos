@@ -87,46 +87,39 @@ class InvoiceDraftController extends GetxController {
 
   /// Save invoice to Drift database using InvoiceRepository
   Future<void> saveInvoice() async {
-    // Convert cart items to invoiced items
-    List<InvoicedItem> itemList = cartList
-        .map((cart) => InvoicedItem(
+    // Convert cart items to InvoiceItemData for repository
+    final items = cartList
+        .map((cart) => InvoiceItemData(
               itemId: cart.itemId,
-              name: cart.name,
+              itemName: cart.name,
+              quantity: cart.qty,
               netPrice: cart.price,
-              qty: cart.qty,
               comment: cart.comment,
               isPostedItem: cart.isPostedItem,
             ))
         .toList();
 
-    // Create invoice model
-    Invoice invoice = Invoice(
-      email: customer.email ?? '',
-      customerMobile: customer.mobileNumber,
-      invoiceId: invoiceId.value,
-      createdDate: DateTime.now(),
-      customerId: customer.id,
-      gstPrecentage: Val.gstPrecentage,
-      customerName: '${customer.firstName} ${customer.lastName}',
-      billingAddress: customer.deliveryAddress,
-      shippingAddress: customer.postalAddress,
-      comments: comments,
-      extraCharges: extraList,
-      itemList: itemList,
-    );
+    // Convert extra charges to ExtraChargeData for repository
+    final charges = extraList
+        .map((extra) => ExtraChargeData(
+              description: extra.name,
+              amount: extra.netTotal,
+            ))
+        .toList();
 
     // Save invoice using InvoiceRepository (Drift database)
     final result = await _invoiceRepo.createInvoice(
-      customerId: invoice.customerId,
-      customerName: invoice.customerName,
-      customerMobile: invoice.customerMobile,
-      email: invoice.email,
-      gstPercentage: invoice.gstPrecentage,
-      billingAddress: invoice.billingAddress,
-      shippingAddress: invoice.shippingAddress,
-      items: itemList,
-      extraCharges: extraList.toList()?? [],
-      comments: comments,
+      invoiceId: invoiceId.value,
+      customerId: customer.id,
+      customerName: '${customer.firstName} ${customer.lastName}',
+      customerMobile: customer.mobileNumber,
+      email: customer.email,
+      gstPercentage: Val.gstPrecentage,
+      billingAddress: customer.deliveryAddress?.toJson(),
+      shippingAddress: customer.postalAddress?.toJson(),
+      items: items,
+      extraCharges: charges,
+      comments: comments.isNotEmpty ? comments : null,
     );
 
     if (result.isFailure) {

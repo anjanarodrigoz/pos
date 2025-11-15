@@ -211,6 +211,7 @@ class InvoiceRepository {
   /// Create invoice with items and extra charges (atomic transaction)
   /// Replaces: InvoiceDB.addInvoice
   Future<Result<String>> createInvoice({
+    String? invoiceId,
     required String customerId,
     required String customerName,
     required List<InvoiceItemData> items,
@@ -223,7 +224,7 @@ class InvoiceRepository {
     List<String>? comments,
   }) async {
     try {
-      final invoiceId = IDGenerator.generateInvoiceId();
+      final finalInvoiceId = invoiceId ?? IDGenerator.generateInvoiceId();
 
       // Calculate totals
       double totalNet = 0.0;
@@ -244,7 +245,7 @@ class InvoiceRepository {
       // Create invoice
       await _database.createInvoiceWithItems(
         invoice: InvoicesCompanion.insert(
-          invoiceId: invoiceId,
+          invoiceId: finalInvoiceId,
           customerId: customerId,
           createdDate: DateTime.now(),
           totalNet: totalNet,
@@ -260,7 +261,7 @@ class InvoiceRepository {
         ),
         items: items
             .map((item) => InvoiceItemsCompanion.insert(
-                  invoiceId: invoiceId,
+                  invoiceId: finalInvoiceId,
                   itemId: item.itemId,
                   itemName: item.itemName,
                   quantity: item.quantity,
@@ -271,7 +272,7 @@ class InvoiceRepository {
             .toList(),
         charges: extraCharges
                 ?.map((charge) => ExtraChargesCompanion.insert(
-                      invoiceId: invoiceId,
+                      invoiceId: finalInvoiceId,
                       description: charge.description,
                       amount: charge.amount,
                     ))
@@ -279,8 +280,8 @@ class InvoiceRepository {
             [],
       );
 
-      AppLogger.info('Invoice created: $invoiceId for customer $customerId');
-      return Result.success(invoiceId);
+      AppLogger.info('Invoice created: $finalInvoiceId for customer $customerId');
+      return Result.success(finalInvoiceId);
     } catch (e, stack) {
       AppLogger.error('Failed to create invoice', e, stack);
       return Result.failure(AppError.generic('Failed to create invoice: ${e.toString()}'));
