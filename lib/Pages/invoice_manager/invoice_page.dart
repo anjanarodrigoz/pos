@@ -528,7 +528,7 @@ class _InvoicePageState extends State<InvoicePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
+        return const Dialog(
           child: InvoiceCustomerSelectPage(
             invoiceType: InvoiceType.invoice,
           ),
@@ -724,7 +724,7 @@ class _InvoicePageState extends State<InvoicePage> {
               ),
               const SizedBox(height: AppTheme.spacingMd),
               Obx(() => DropdownButtonFormField<Paymethod>(
-                    value: selectedMethod.value,
+                    initialValue: selectedMethod.value,
                     decoration: const InputDecoration(
                       labelText: 'Payment Method',
                       border: OutlineInputBorder(),

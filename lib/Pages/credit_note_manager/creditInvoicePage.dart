@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:pos/models/invoice_item.dart';
 import 'package:pos/utils/constant.dart';
 import 'package:pos/widgets/paid_status_widget.dart';

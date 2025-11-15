@@ -4,7 +4,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:pos/models/supplyer.dart';
 import 'package:pos/utils/val.dart';
 
-import '../models/supplyer.dart';
 import 'abstract_db.dart';
 
 class SupplyerDB implements AbstractDB {

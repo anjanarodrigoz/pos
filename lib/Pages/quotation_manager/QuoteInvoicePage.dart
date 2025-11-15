@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:pos/models/invoice_item.dart';
 import 'package:pos/utils/constant.dart';
-import 'package:pos/widgets/outstanding_date_widget.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../../data_sources/invoiceDataSource.dart';
 import '../../enums/enums.dart';
 import '../../models/extra_charges.dart';
 import '../../models/invoice.dart';
 import '../../models/invoice_row.dart';
-import '../../models/supply_invoice.dart';
 import '../../theme/t_colors.dart';
 import '../../utils/my_format.dart';
 import '../../utils/val.dart';
-import '../../widgets/paid_status_widget.dart';
 
 class QuoteInvoicePage extends StatelessWidget {
   Invoice invoice;

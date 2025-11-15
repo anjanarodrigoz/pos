@@ -51,7 +51,7 @@ class _MainWindowState extends State<MainWindow> {
             // Header
             Container(
               width: double.infinity,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppTheme.cardBackground,
                 border: Border(
                   bottom: BorderSide(color: AppTheme.borderColor),
@@ -60,7 +60,7 @@ class _MainWindowState extends State<MainWindow> {
               padding: const EdgeInsets.all(AppTheme.spacingXl),
               child: Column(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.storefront_rounded,
                     size: 48,
                     color: AppTheme.primaryColor,
@@ -257,7 +257,7 @@ class _MainWindowState extends State<MainWindow> {
   openSupplyerManager() async {
     await windowResizer();
 
-    Get.offAll(() => SupplyerPage());
+    Get.offAll(() => const SupplyerPage());
   }
 
   openPaymentManager() async {
@@ -269,13 +269,13 @@ class _MainWindowState extends State<MainWindow> {
   openSupplyInvoiceManager() async {
     await windowResizer();
 
-    Get.offAll(() => SupplyAllInvoice());
+    Get.offAll(() => const SupplyAllInvoice());
   }
 
   openReturnNoteManager() async {
     await windowResizer();
 
-    Get.offAll(() => SupplyAllInvoice(
+    Get.offAll(() => const SupplyAllInvoice(
           isReturnManager: true,
         ));
   }

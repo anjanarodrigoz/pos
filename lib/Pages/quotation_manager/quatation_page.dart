@@ -11,7 +11,6 @@ import 'package:pos/enums/enums.dart';
 import 'package:pos/models/customer.dart';
 
 import 'package:pos/utils/alert_message.dart';
-import 'package:pos/widgets/alert_dialog.dart';
 
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/verify_dialog.dart';

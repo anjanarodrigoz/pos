@@ -68,7 +68,7 @@ class QuoteDraftPage extends StatelessWidget {
                     onPressed: () {
                       addComments();
                     }),
-                SizedBox(height: 50.0),
+                const SizedBox(height: 50.0),
                 PosButton(
                   text: 'Close Draft',
                   onPressed: () async {

@@ -39,7 +39,7 @@ class AllQuotesPage extends StatelessWidget {
           PosButton(
             text: ' + Add Quote',
             onPressed: () {
-              Get.to((InvoiceCustomerSelectPage(
+              Get.to((const InvoiceCustomerSelectPage(
                 invoiceType: InvoiceType.quotation,
               )));
             },

@@ -193,8 +193,9 @@ class _SaveInvoiceViewPageState extends State<SaveInvoiceViewPage> {
   /// Outstanding badge showing days overdue
   Widget _buildOutstandingBadge() {
     final outstandingDays = widget.invoice.outStandingDates;
-    if (outstandingDays <= const Duration(days: 0))
+    if (outstandingDays <= const Duration(days: 0)) {
       return const SizedBox.shrink();
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(

@@ -139,7 +139,7 @@ class _SupplyerFormPageState extends State<SupplyerFormPage> {
         ),
         backgroundColor: AppTheme.cardBackground,
         elevation: 0,
-        iconTheme: IconThemeData(color: AppTheme.textPrimary),
+        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(height: 1, color: AppTheme.borderColor),
@@ -419,7 +419,7 @@ class _SupplyerFormPageState extends State<SupplyerFormPage> {
             // Action Buttons
             Container(
               padding: const EdgeInsets.all(AppTheme.spacingLg),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppTheme.cardBackground,
                 border: Border(
                   top: BorderSide(color: AppTheme.borderColor),
@@ -440,7 +440,7 @@ class _SupplyerFormPageState extends State<SupplyerFormPage> {
                     onPressed: _isSaving ? null : _saveSupplier,
                     style: AppTheme.primaryButtonStyle(),
                     child: _isSaving
-                        ? SizedBox(
+                        ? const SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(

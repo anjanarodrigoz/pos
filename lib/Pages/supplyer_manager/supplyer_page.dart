@@ -91,7 +91,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
         backgroundColor: AppTheme.cardBackground,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+          icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
           onPressed: _navigateToMainMenu,
           tooltip: 'Back to Main Menu',
         ),
@@ -144,14 +144,14 @@ class _SupplyerPageState extends State<SupplyerPage> {
                             hintStyle: AppTheme.bodyMedium.copyWith(
                               color: AppTheme.textHint,
                             ),
-                            prefixIcon: Icon(
+                            prefixIcon: const Icon(
                               Icons.search,
                               color: AppTheme.textSecondary,
                               size: 20,
                             ),
                             suffixIcon: _searchQuery.isNotEmpty
                                 ? IconButton(
-                                    icon: Icon(
+                                    icon: const Icon(
                                       Icons.clear,
                                       color: AppTheme.textSecondary,
                                       size: 20,
@@ -225,12 +225,12 @@ class _SupplyerPageState extends State<SupplyerPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.error_outline,
                           size: 64,
                           color: AppTheme.errorColor,
                         ),
-                        SizedBox(height: AppTheme.spacingMd),
+                        const SizedBox(height: AppTheme.spacingMd),
                         Text(
                           'Error loading suppliers',
                           style: AppTheme.headlineSmall.copyWith(
@@ -267,7 +267,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
                           size: 64,
                           color: AppTheme.textHint,
                         ),
-                        SizedBox(height: AppTheme.spacingMd),
+                        const SizedBox(height: AppTheme.spacingMd),
                         Text(
                           _searchQuery.isEmpty
                               ? 'No suppliers yet'
@@ -276,7 +276,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
                             color: AppTheme.textSecondary,
                           ),
                         ),
-                        SizedBox(height: AppTheme.spacingSm),
+                        const SizedBox(height: AppTheme.spacingSm),
                         Text(
                           _searchQuery.isEmpty
                               ? 'Click "New Supplier" to add your first supplier'
@@ -312,9 +312,9 @@ class _SupplyerPageState extends State<SupplyerPage> {
                           horizontal: AppTheme.spacingMd,
                           vertical: AppTheme.spacingSm,
                         ),
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: AppTheme.backgroundGrey,
-                          borderRadius: const BorderRadius.only(
+                          borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(AppTheme.radiusLg),
                             topRight: Radius.circular(AppTheme.radiusLg),
                           ),
@@ -374,7 +374,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
                                 ),
                               ),
                             ),
-                            SizedBox(width: 60),
+                            const SizedBox(width: 60),
                           ],
                         ),
                       ),
@@ -423,7 +423,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
                                               ),
                                             ),
                                           ),
-                                          SizedBox(width: AppTheme.spacingSm),
+                                          const SizedBox(width: AppTheme.spacingSm),
                                           Expanded(
                                             child: Text(
                                               '${supplier.firstName} ${supplier.lastName}',
@@ -499,7 +499,7 @@ class _SupplyerPageState extends State<SupplyerPage> {
                                     ),
 
                                     // Status Icon
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 60,
                                       child: Icon(
                                         Icons.chevron_right,

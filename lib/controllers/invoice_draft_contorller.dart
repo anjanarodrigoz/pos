@@ -117,7 +117,6 @@ class InvoiceDraftController extends GetxController {
 
     // Save invoice using InvoiceRepository (Drift database)
     final result = await _invoiceRepo.createInvoice(
-      invoiceId: invoice.invoiceId,
       customerId: invoice.customerId,
       customerName: invoice.customerName,
       customerMobile: invoice.customerMobile,
@@ -126,7 +125,7 @@ class InvoiceDraftController extends GetxController {
       billingAddress: invoice.billingAddress,
       shippingAddress: invoice.shippingAddress,
       items: itemList,
-      extraCharges: extraList,
+      extraCharges: extraList.toList()?? [],
       comments: comments,
     );
 

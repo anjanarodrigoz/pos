@@ -263,7 +263,7 @@ class _SupplyerViewPageState extends State<SupplyerViewPage> {
         ),
         backgroundColor: AppTheme.cardBackground,
         elevation: 0,
-        iconTheme: IconThemeData(color: AppTheme.textPrimary),
+        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
         actions: [
           if (!_isEditMode)
             IconButton(
@@ -326,7 +326,7 @@ class _SupplyerViewPageState extends State<SupplyerViewPage> {
                       if (_isEditMode)
                         Container(
                           padding: const EdgeInsets.all(AppTheme.spacingLg),
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: AppTheme.cardBackground,
                             border: Border(
                               top: BorderSide(color: AppTheme.borderColor),
@@ -398,7 +398,7 @@ class _SupplyerViewPageState extends State<SupplyerViewPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.local_shipping_outlined, color: AppTheme.primaryColor),
+              const Icon(Icons.local_shipping_outlined, color: AppTheme.primaryColor),
               const SizedBox(width: AppTheme.spacingSm),
               Text(
                 'Supplier Details',
@@ -410,7 +410,7 @@ class _SupplyerViewPageState extends State<SupplyerViewPage> {
             ],
           ),
           const SizedBox(height: AppTheme.spacingLg),
-          Divider(color: AppTheme.dividerColor),
+          const Divider(color: AppTheme.dividerColor),
           const SizedBox(height: AppTheme.spacingLg),
 
           if (_isEditMode) ...[
@@ -528,7 +528,7 @@ class _SupplyerViewPageState extends State<SupplyerViewPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.business_outlined, color: AppTheme.primaryColor),
+              const Icon(Icons.business_outlined, color: AppTheme.primaryColor),
               const SizedBox(width: AppTheme.spacingSm),
               Text(
                 'Business Details',
@@ -540,7 +540,7 @@ class _SupplyerViewPageState extends State<SupplyerViewPage> {
             ],
           ),
           const SizedBox(height: AppTheme.spacingLg),
-          Divider(color: AppTheme.dividerColor),
+          const Divider(color: AppTheme.dividerColor),
           const SizedBox(height: AppTheme.spacingLg),
 
           if (_isEditMode) ...[
@@ -630,7 +630,7 @@ class _SupplyerViewPageState extends State<SupplyerViewPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.location_on_outlined, color: AppTheme.primaryColor),
+              const Icon(Icons.location_on_outlined, color: AppTheme.primaryColor),
               const SizedBox(width: AppTheme.spacingSm),
               Text(
                 'Address',
@@ -642,7 +642,7 @@ class _SupplyerViewPageState extends State<SupplyerViewPage> {
             ],
           ),
           const SizedBox(height: AppTheme.spacingLg),
-          Divider(color: AppTheme.dividerColor),
+          const Divider(color: AppTheme.dividerColor),
           const SizedBox(height: AppTheme.spacingLg),
 
           if (_isEditMode) ...[

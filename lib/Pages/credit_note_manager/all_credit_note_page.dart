@@ -38,7 +38,7 @@ class AllCreditNotePage extends StatelessWidget {
           PosButton(
             text: ' + Add Credit Note',
             onPressed: () {
-              Get.to((InvoiceCustomerSelectPage(
+              Get.to((const InvoiceCustomerSelectPage(
                 invoiceType: InvoiceType.creditNote,
               )));
             },

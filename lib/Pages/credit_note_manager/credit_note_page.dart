@@ -1,9 +1,7 @@
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'package:pdf/pdf.dart';
 import 'package:pos/Pages/credit_note_manager/all_credit_note_page.dart';
 import 'package:pos/Pages/credit_note_manager/credit_draft_page.dart';
 import 'package:pos/Pages/invoice_draft_manager/invoice_customer_select.dart';

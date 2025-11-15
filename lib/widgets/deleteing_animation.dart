@@ -5,7 +5,7 @@ class DataDeletionAnimation extends StatefulWidget {
   final bool isDeleting;
   final Duration animationDuration;
 
-  DataDeletionAnimation({
+  const DataDeletionAnimation({super.key, 
     required this.child,
     required this.isDeleting,
     this.animationDuration = const Duration(milliseconds: 500),
@@ -27,7 +27,7 @@ class _DataDeletionAnimationState extends State<DataDeletionAnimation> {
                 parent: ModalRoute.of(context)!.animation!,
                 curve: Curves.easeOut,
               )
-            : AlwaysStoppedAnimation(1),
+            : const AlwaysStoppedAnimation(1),
         builder: (context, child) {
           return Transform.translate(
             offset:

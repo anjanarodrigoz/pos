@@ -285,14 +285,10 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
         // Convert Drift items to domain Item models
         _items = driftItems.map((driftItem) {
           return Item(
-            id: driftItem.itemId,
-            name: driftItem.itemName,
+            id: driftItem.id,
+            name: driftItem.name,
             qty: driftItem.quantity,
             price: driftItem.price,
-            priceTwo: driftItem.priceTwo,
-            priceThree: driftItem.priceThree,
-            priceFour: driftItem.priceFour,
-            priceFive: driftItem.priceFive,
           );
         }).toList();
 

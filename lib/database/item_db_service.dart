@@ -1,5 +1,4 @@
 import 'package:get_storage/get_storage.dart';
-import 'package:pos/database/cart_db_service.dart';
 import 'package:pos/utils/val.dart';
 
 import '../models/cart.dart';

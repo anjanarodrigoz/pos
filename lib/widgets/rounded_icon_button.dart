@@ -31,7 +31,7 @@ class RoundedIconButton extends StatelessWidget {
             onPressed();
           },
           child: Container(
-            padding: EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(12.0),
             child: Icon(
               icon,
               size: 15.0,

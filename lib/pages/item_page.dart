@@ -94,7 +94,7 @@ class _ItemPageState extends State<ItemPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+          icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
           onPressed: _navigateToMainMenu,
           tooltip: 'Back to Main Menu',
         ),
@@ -147,14 +147,14 @@ class _ItemPageState extends State<ItemPage> {
                             hintStyle: AppTheme.bodyMedium.copyWith(
                               color: AppTheme.textHint,
                             ),
-                            prefixIcon: Icon(
+                            prefixIcon: const Icon(
                               Icons.search,
                               color: AppTheme.textSecondary,
                               size: 20,
                             ),
                             suffixIcon: _searchQuery.isNotEmpty
                                 ? IconButton(
-                                    icon: Icon(
+                                    icon: const Icon(
                                       Icons.clear,
                                       color: AppTheme.textSecondary,
                                       size: 20,
@@ -183,7 +183,7 @@ class _ItemPageState extends State<ItemPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: AppTheme.spacingSm),
+                const SizedBox(height: AppTheme.spacingSm),
                 // Show Inactive Items Checkbox
                 Row(
                   children: [
@@ -214,7 +214,7 @@ class _ItemPageState extends State<ItemPage> {
               stream: _repository.watchAllItems(activeOnly: !_showInactiveItems),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
+                  return const Center(
                     child: CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(
                         AppTheme.primaryColor,
@@ -228,19 +228,19 @@ class _ItemPageState extends State<ItemPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.error_outline,
                           size: 48,
                           color: AppTheme.errorColor,
                         ),
-                        SizedBox(height: AppTheme.spacingMd),
+                        const SizedBox(height: AppTheme.spacingMd),
                         Text(
                           'Failed to load items',
                           style: AppTheme.headlineSmall.copyWith(
                             color: AppTheme.textPrimary,
                           ),
                         ),
-                        SizedBox(height: AppTheme.spacingSm),
+                        const SizedBox(height: AppTheme.spacingSm),
                         Text(
                           snapshot.error.toString(),
                           style: AppTheme.bodySmall.copyWith(
@@ -277,7 +277,7 @@ class _ItemPageState extends State<ItemPage> {
                           size: 64,
                           color: AppTheme.textHint,
                         ),
-                        SizedBox(height: AppTheme.spacingMd),
+                        const SizedBox(height: AppTheme.spacingMd),
                         Text(
                           _searchQuery.isEmpty
                               ? 'No items yet'
@@ -286,7 +286,7 @@ class _ItemPageState extends State<ItemPage> {
                             color: AppTheme.textSecondary,
                           ),
                         ),
-                        SizedBox(height: AppTheme.spacingSm),
+                        const SizedBox(height: AppTheme.spacingSm),
                         Text(
                           _searchQuery.isEmpty
                               ? 'Click "New Item" to add your first item'
@@ -322,9 +322,9 @@ class _ItemPageState extends State<ItemPage> {
                           horizontal: AppTheme.spacingMd,
                           vertical: AppTheme.spacingSm,
                         ),
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: AppTheme.backgroundGrey,
-                          borderRadius: const BorderRadius.only(
+                          borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(AppTheme.radiusLg),
                             topRight: Radius.circular(AppTheme.radiusLg),
                           ),
@@ -397,7 +397,7 @@ class _ItemPageState extends State<ItemPage> {
                                 textAlign: TextAlign.right,
                               ),
                             ),
-                            SizedBox(width: 60),
+                            const SizedBox(width: 60),
                           ],
                         ),
                       ),
@@ -546,7 +546,7 @@ class _ItemPageState extends State<ItemPage> {
                                     SizedBox(
                                       width: 60,
                                       child: IconButton(
-                                        icon: Icon(
+                                        icon: const Icon(
                                           Icons.arrow_forward_ios,
                                           size: 16,
                                           color: AppTheme.textSecondary,

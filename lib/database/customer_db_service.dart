@@ -1,13 +1,6 @@
-import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:pos/database/abstract_db.dart';
 import 'package:pos/utils/val.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:encrypt/encrypt.dart' as encrypt;
 
 import '../models/customer.dart';
 

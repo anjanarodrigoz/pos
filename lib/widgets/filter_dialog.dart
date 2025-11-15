@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pos/controllers/report_controller.dart';
 import 'package:pos/enums/enums.dart';
-import 'package:pos/models/payment.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/alert_message.dart';
 import 'package:pos/utils/my_format.dart';
-import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/pos_progress_button.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 

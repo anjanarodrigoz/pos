@@ -100,7 +100,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: IconThemeData(color: AppTheme.textPrimary),
+        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(
@@ -133,7 +133,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
                     return null;
                   },
                 ),
-                SizedBox(height: AppTheme.spacingMd),
+                const SizedBox(height: AppTheme.spacingMd),
                 TextFormField(
                   controller: _descriptionController,
                   style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
@@ -143,7 +143,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
                   ),
                   maxLines: 2,
                 ),
-                SizedBox(height: AppTheme.spacingMd),
+                const SizedBox(height: AppTheme.spacingMd),
                 Row(
                   children: [
                     Expanded(
@@ -156,7 +156,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
                         ),
                       ),
                     ),
-                    SizedBox(width: AppTheme.spacingMd),
+                    const SizedBox(width: AppTheme.spacingMd),
                     Expanded(
                       child: TextFormField(
                         controller: _itemCodeController,
@@ -179,7 +179,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
               ],
             ),
 
-            SizedBox(height: AppTheme.spacingLg),
+            const SizedBox(height: AppTheme.spacingLg),
 
             // Pricing Section
             _buildSectionCard(
@@ -208,7 +208,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
                     return null;
                   },
                 ),
-                SizedBox(height: AppTheme.spacingSm),
+                const SizedBox(height: AppTheme.spacingSm),
                 Text(
                   'Note: Stock quantity starts at 0 and can ONLY be updated via supply invoices.',
                   style: AppTheme.bodySmall.copyWith(
@@ -219,7 +219,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
               ],
             ),
 
-            SizedBox(height: AppTheme.spacingXl),
+            const SizedBox(height: AppTheme.spacingXl),
 
             // Save Button
             SizedBox(
@@ -241,7 +241,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
               ),
             ),
 
-            SizedBox(height: AppTheme.spacingMd),
+            const SizedBox(height: AppTheme.spacingMd),
           ],
         ),
       ),
@@ -273,7 +273,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
           Row(
             children: [
               Icon(icon, color: AppTheme.primaryColor, size: 24),
-              SizedBox(width: AppTheme.spacingSm),
+              const SizedBox(width: AppTheme.spacingSm),
               Text(
                 title,
                 style: AppTheme.headlineSmall.copyWith(
@@ -282,9 +282,9 @@ class _ItemFormPageState extends State<ItemFormPage> {
               ),
             ],
           ),
-          SizedBox(height: AppTheme.spacingMd),
-          Divider(color: AppTheme.dividerColor),
-          SizedBox(height: AppTheme.spacingMd),
+          const SizedBox(height: AppTheme.spacingMd),
+          const Divider(color: AppTheme.dividerColor),
+          const SizedBox(height: AppTheme.spacingMd),
           ...children,
         ],
       ),

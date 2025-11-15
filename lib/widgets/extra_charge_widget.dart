@@ -85,7 +85,7 @@ class ExtraChargeDialog extends StatelessWidget {
                     labelText: 'Net price',
                     controller: netPriceController,
                     keyboardType:
-                        TextInputType.numberWithOptions(decimal: true),
+                        const TextInputType.numberWithOptions(decimal: true),
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
                     ],
@@ -199,7 +199,7 @@ class _ExtraChargeSavedDialogState extends State<ExtraChargeSavedDialog> {
           PosTextFormField(
             onChanged: filterExtraCharges,
             hintText: 'Search Extra Charges',
-            prefixIcon: Icon(
+            prefixIcon: const Icon(
               Icons.search,
               size: 25.0,
             ),
@@ -249,7 +249,7 @@ class _ExtraChargeSavedDialogState extends State<ExtraChargeSavedDialog> {
             );
           },
           separatorBuilder: (BuildContext context, int index) {
-            return Divider();
+            return const Divider();
           },
         ),
       ),

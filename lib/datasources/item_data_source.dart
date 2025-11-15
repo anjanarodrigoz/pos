@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:pos/database/pos_database.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import '../../models/item.dart' as item_model;
 
 /// DataSource for Syncfusion DataGrid to display items in invoice selection
 class ItemDataSource extends DataGridSource {
-  List<Item> itemData;
+  List<item_model.Item> itemData;
 
   ItemDataSource({required this.itemData}) {
     buildDataGridRows();
@@ -16,13 +17,13 @@ class ItemDataSource extends DataGridSource {
     dataGridRows = itemData.map<DataGridRow>((item) {
       return DataGridRow(cells: [
         DataGridCell<String>(columnName: 'id', value: item.id),
-        DataGridCell<String>(columnName: 'itemCode', value: item.itemCode),
+        DataGridCell<String>(columnName: 'itemCode', value: item.id),
         DataGridCell<String>(columnName: 'name', value: item.name),
         DataGridCell<String>(
             columnName: 'description', value: item.description ?? ''),
         DataGridCell<double>(columnName: 'price', value: item.price),
-        DataGridCell<int>(columnName: 'quantity', value: item.quantity),
-        DataGridCell<String>(columnName: 'category', value: item.category ?? ''),
+        DataGridCell<int>(columnName: 'quantity', value: item.qty),
+        DataGridCell<String>(columnName: 'category', value:  ''),
       ]);
     }).toList();
   }

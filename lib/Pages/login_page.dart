@@ -67,7 +67,7 @@ class LoginPage extends StatelessWidget {
                       color: AppTheme.primaryLight,
                       borderRadius: BorderRadius.circular(AppTheme.radiusLg),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.storefront_rounded,
                       size: 40,
                       color: AppTheme.primaryDark,
@@ -187,7 +187,7 @@ class PasswordResetRequestPage extends StatelessWidget {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: IconThemeData(color: AppTheme.textPrimary),
+        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(height: 1, color: AppTheme.borderColor),
@@ -215,7 +215,7 @@ class PasswordResetRequestPage extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.email_outlined,
                     size: 64,
                     color: AppTheme.primaryColor,

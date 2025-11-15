@@ -1,5 +1,4 @@
 import 'package:get_storage/get_storage.dart';
-import 'package:pos/models/extra_charges.dart';
 import 'package:pos/utils/val.dart';
 
 import 'abstract_db.dart';

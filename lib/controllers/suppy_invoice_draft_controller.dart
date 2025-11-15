@@ -1,12 +1,7 @@
 import 'package:get/get.dart';
-import 'package:pos/database/item_db_service.dart';
 import 'package:pos/database/supplyer_invoice_db_service.dart';
-import '../database/cart_db_service.dart';
-import '../database/invoice_db_service.dart';
 import '../models/cart.dart';
-import '../models/customer.dart';
 import '../models/extra_charges.dart';
-import '../models/invoice.dart';
 import '../models/invoice_item.dart';
 import '../models/supply_invoice.dart';
 import '../models/supplyer.dart';

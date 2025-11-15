@@ -110,7 +110,7 @@ class _InvoiceSearchPageState extends State<InvoiceSearchPage> {
       ),
       child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.info_outline,
             color: AppTheme.infoColor,
             size: 20,

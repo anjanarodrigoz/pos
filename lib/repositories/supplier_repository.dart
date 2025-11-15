@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:pos/database/pos_database.dart';
 import 'package:pos/services/logger_service.dart';
-import 'package:pos/utils/id_generator.dart';
 import 'package:pos/utils/result.dart';
 
 /// Repository for supplier operations

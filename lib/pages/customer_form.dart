@@ -200,7 +200,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                         },
                       ),
                     ),
-                    SizedBox(width: AppTheme.spacingMd),
+                    const SizedBox(width: AppTheme.spacingMd),
                     Expanded(
                       child: TextFormField(
                         controller: _lastNameController,
@@ -217,7 +217,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: AppTheme.spacingMd),
+                const SizedBox(height: AppTheme.spacingMd),
                 TextFormField(
                   controller: _mobileController,
                   decoration: AppTheme.inputDecoration(
@@ -232,7 +232,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                     return null;
                   },
                 ),
-                SizedBox(height: AppTheme.spacingMd),
+                const SizedBox(height: AppTheme.spacingMd),
                 TextFormField(
                   controller: _emailController,
                   decoration: AppTheme.inputDecoration(
@@ -249,7 +249,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                     return null;
                   },
                 ),
-                SizedBox(height: AppTheme.spacingMd),
+                const SizedBox(height: AppTheme.spacingMd),
                 Row(
                   children: [
                     Expanded(
@@ -261,7 +261,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                         ),
                       ),
                     ),
-                    SizedBox(width: AppTheme.spacingMd),
+                    const SizedBox(width: AppTheme.spacingMd),
                     Expanded(
                       child: TextFormField(
                         controller: _webController,
@@ -274,7 +274,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: AppTheme.spacingMd),
+                const SizedBox(height: AppTheme.spacingMd),
                 Row(
                   children: [
                     Expanded(
@@ -286,7 +286,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                         ),
                       ),
                     ),
-                    SizedBox(width: AppTheme.spacingMd),
+                    const SizedBox(width: AppTheme.spacingMd),
                     Expanded(
                       child: TextFormField(
                         controller: _acnController,
@@ -298,7 +298,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: AppTheme.spacingMd),
+                const SizedBox(height: AppTheme.spacingMd),
                 TextFormField(
                   controller: _commentController,
                   decoration: AppTheme.inputDecoration(
@@ -310,7 +310,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
               ],
             ),
 
-            SizedBox(height: AppTheme.spacingLg),
+            const SizedBox(height: AppTheme.spacingLg),
 
             // Billing Address Section
             _buildSectionCard(
@@ -323,7 +323,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                     labelText: 'Street',
                   ),
                 ),
-                SizedBox(height: AppTheme.spacingMd),
+                const SizedBox(height: AppTheme.spacingMd),
                 Row(
                   children: [
                     Expanded(
@@ -334,7 +334,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                         ),
                       ),
                     ),
-                    SizedBox(width: AppTheme.spacingMd),
+                    const SizedBox(width: AppTheme.spacingMd),
                     Expanded(
                       child: TextFormField(
                         controller: _billingStateController,
@@ -345,7 +345,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: AppTheme.spacingMd),
+                const SizedBox(height: AppTheme.spacingMd),
                 Row(
                   children: [
                     Expanded(
@@ -356,7 +356,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                         ),
                       ),
                     ),
-                    SizedBox(width: AppTheme.spacingMd),
+                    const SizedBox(width: AppTheme.spacingMd),
                     Expanded(
                       child: TextFormField(
                         controller: _billingPostalCodeController,
@@ -367,7 +367,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: AppTheme.spacingMd),
+                const SizedBox(height: AppTheme.spacingMd),
                 TextFormField(
                   controller: _billingCountryController,
                   decoration: AppTheme.inputDecoration(
@@ -377,7 +377,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
               ],
             ),
 
-            SizedBox(height: AppTheme.spacingLg),
+            const SizedBox(height: AppTheme.spacingLg),
 
             // Postal Address Section
             _buildSectionCard(
@@ -396,7 +396,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                     labelText: 'Street',
                   ),
                 ),
-                SizedBox(height: AppTheme.spacingMd),
+                const SizedBox(height: AppTheme.spacingMd),
                 Row(
                   children: [
                     Expanded(
@@ -407,7 +407,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                         ),
                       ),
                     ),
-                    SizedBox(width: AppTheme.spacingMd),
+                    const SizedBox(width: AppTheme.spacingMd),
                     Expanded(
                       child: TextFormField(
                         controller: _postalStateController,
@@ -418,7 +418,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: AppTheme.spacingMd),
+                const SizedBox(height: AppTheme.spacingMd),
                 Row(
                   children: [
                     Expanded(
@@ -429,7 +429,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                         ),
                       ),
                     ),
-                    SizedBox(width: AppTheme.spacingMd),
+                    const SizedBox(width: AppTheme.spacingMd),
                     Expanded(
                       child: TextFormField(
                         controller: _postalPostalCodeController,
@@ -440,7 +440,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: AppTheme.spacingMd),
+                const SizedBox(height: AppTheme.spacingMd),
                 TextFormField(
                   controller: _postalCountryController,
                   decoration: AppTheme.inputDecoration(
@@ -450,7 +450,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
               ],
             ),
 
-            SizedBox(height: AppTheme.spacingXl),
+            const SizedBox(height: AppTheme.spacingXl),
 
             // Save Button
             SizedBox(
@@ -472,7 +472,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
               ),
             ),
 
-            SizedBox(height: AppTheme.spacingMd),
+            const SizedBox(height: AppTheme.spacingMd),
           ],
         ),
       ),
@@ -494,7 +494,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
           Row(
             children: [
               Icon(icon, color: AppTheme.primaryColor, size: 24),
-              SizedBox(width: AppTheme.spacingSm),
+              const SizedBox(width: AppTheme.spacingSm),
               Expanded(
                 child: Text(
                   title,
@@ -504,9 +504,9 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
               if (trailing != null) trailing,
             ],
           ),
-          SizedBox(height: AppTheme.spacingMd),
+          const SizedBox(height: AppTheme.spacingMd),
           const Divider(),
-          SizedBox(height: AppTheme.spacingMd),
+          const SizedBox(height: AppTheme.spacingMd),
           ...children,
         ],
       ),

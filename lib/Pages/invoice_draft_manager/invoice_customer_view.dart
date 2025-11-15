@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pos/Pages/credit_note_manager/credit_draft_page.dart';
 import 'package:pos/Pages/invoice_draft_manager/invoice_draft_page.dart';
-import 'package:pos/Pages/quotation_manager/all_quotation_invoice.dart';
 import 'package:pos/controllers/credit_draft_controller.dart';
 import 'package:pos/controllers/invoice_draft_contorller.dart';
 import 'package:pos/controllers/quote_draft_controller.dart';
@@ -362,21 +361,35 @@ class _InvoiceCustomerViewPageState extends State<InvoiceCustomerViewPage> {
 
         setState(() {
           _customer = Customer(
-            id: driftCustomer.customerId,
+            id: driftCustomer.id,
             firstName: driftCustomer.firstName,
             lastName: driftCustomer.lastName,
-            mobileNumber: driftCustomer.mobileNumber,
+            mobileNumber: driftCustomer.mobileNumber??"",
             email: driftCustomer.email,
             fax: driftCustomer.fax,
             web: driftCustomer.web,
             abn: driftCustomer.abn,
             acn: driftCustomer.acn,
             comment: driftCustomer.comment,
-            deliveryAddress: driftCustomer.deliveryAddress != null
-                ? Address.fromJson(driftCustomer.deliveryAddress!)
+            deliveryAddress: driftCustomer.postalStreet != null
+                ? Address(
+                    areaCode: driftCustomer.postalAreaCode,
+                    city: driftCustomer.postalCity,
+                    county: driftCustomer.postalCountry,
+                    postalCode: driftCustomer.postalPostalCode,
+                    state: driftCustomer.postalState,
+                    street: driftCustomer.postalStreet,
+                  )
                 : null,
-            postalAddress: driftCustomer.postalAddress != null
-                ? Address.fromJson(driftCustomer.postalAddress!)
+            postalAddress: driftCustomer.billingStreet != null
+                ? Address(
+                    areaCode: driftCustomer.billingAreaCode,
+                    city: driftCustomer.billingCity,
+                    county: driftCustomer.billingCountry,
+                    postalCode: driftCustomer.billingPostalCode,
+                    state: driftCustomer.billingState,
+                    street: driftCustomer.billingStreet,
+                  )
                 : null,
           );
           _isLoading = false;

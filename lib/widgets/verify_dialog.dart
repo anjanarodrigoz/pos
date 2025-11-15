@@ -11,7 +11,7 @@ class POSVerifyDialog extends StatefulWidget {
   final Function()? onClose;
   final Function()? onContinue;
 
-  POSVerifyDialog({
+  const POSVerifyDialog({
     Key? key,
     required this.title,
     required this.content,
@@ -28,7 +28,7 @@ class POSVerifyDialog extends StatefulWidget {
 }
 
 class _POSVerifyDialogState extends State<POSVerifyDialog> {
-  TextEditingController _textController = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
   bool isTextValid = true;
 
   @override

@@ -5,7 +5,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:pos/database/item_db_service.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/payment.dart';
-import 'package:pos/utils/alert_message.dart';
 import 'package:pos/utils/val.dart';
 import '../models/cart.dart';
 import '../models/invoice.dart';

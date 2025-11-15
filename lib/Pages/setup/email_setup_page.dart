@@ -4,7 +4,6 @@ import 'package:pos/database/store_db.dart';
 import 'package:pos/models/store.dart';
 import 'package:pos/services/email_credentials_service.dart';
 import 'package:pos/utils/alert_message.dart';
-import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/pos_progress_button.dart';
 import 'package:pos/widgets/rounded_icon_button.dart';
 

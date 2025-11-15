@@ -237,21 +237,35 @@ class _InvoiceCustomerSelectPageState
         final List<Customer> domainCustomers =
             driftCustomers.map((driftCustomer) {
           return Customer(
-            id: driftCustomer.customerId,
+            id: driftCustomer.id,
             firstName: driftCustomer.firstName,
             lastName: driftCustomer.lastName,
-            mobileNumber: driftCustomer.mobileNumber,
+            mobileNumber: driftCustomer.mobileNumber??"",
             email: driftCustomer.email,
             fax: driftCustomer.fax,
             web: driftCustomer.web,
             abn: driftCustomer.abn,
             acn: driftCustomer.acn,
             comment: driftCustomer.comment,
-            deliveryAddress: driftCustomer.deliveryAddress != null
-                ? Address.fromJson(driftCustomer.deliveryAddress!)
+            deliveryAddress: driftCustomer.postalStreet != null
+                ? Address(
+                    areaCode: driftCustomer.postalAreaCode,
+                    city: driftCustomer.postalCity,
+                    county: driftCustomer.postalCountry,
+                    postalCode: driftCustomer.postalPostalCode,
+                    state: driftCustomer.postalState,
+                    street: driftCustomer.postalStreet,
+                  )
                 : null,
-            postalAddress: driftCustomer.postalAddress != null
-                ? Address.fromJson(driftCustomer.postalAddress!)
+            postalAddress: driftCustomer.billingStreet != null
+                ? Address(
+                    areaCode: driftCustomer.billingAreaCode,
+                    city: driftCustomer.billingCity,
+                    county: driftCustomer.billingCountry,
+                    postalCode: driftCustomer.billingPostalCode,
+                    state: driftCustomer.billingState,
+                    street: driftCustomer.billingStreet,
+                  )
                 : null,
           );
         }).toList();

@@ -194,9 +194,9 @@ class _ItemViewPageState extends State<ItemViewPage> {
               ),
               backgroundColor: Colors.white,
               elevation: 0,
-              iconTheme: IconThemeData(color: AppTheme.textPrimary),
+              iconTheme: const IconThemeData(color: AppTheme.textPrimary),
             ),
-            body: Center(
+            body: const Center(
               child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
               ),
@@ -214,18 +214,18 @@ class _ItemViewPageState extends State<ItemViewPage> {
               ),
               backgroundColor: Colors.white,
               elevation: 0,
-              iconTheme: IconThemeData(color: AppTheme.textPrimary),
+              iconTheme: const IconThemeData(color: AppTheme.textPrimary),
             ),
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.error_outline,
                     size: 48,
                     color: AppTheme.errorColor,
                   ),
-                  SizedBox(height: AppTheme.spacingMd),
+                  const SizedBox(height: AppTheme.spacingMd),
                   Text(
                     'Item not found',
                     style: AppTheme.headlineSmall.copyWith(color: AppTheme.textPrimary),
@@ -251,7 +251,7 @@ class _ItemViewPageState extends State<ItemViewPage> {
             ),
             backgroundColor: Colors.white,
             elevation: 0,
-            iconTheme: IconThemeData(color: AppTheme.textPrimary),
+            iconTheme: const IconThemeData(color: AppTheme.textPrimary),
             actions: [
               if (!_isEditMode)
                 IconButton(
@@ -316,13 +316,13 @@ class _ItemViewPageState extends State<ItemViewPage> {
                         color: AppTheme.primaryLight,
                         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.inventory_2,
                         color: AppTheme.primaryDark,
                         size: 32,
                       ),
                     ),
-                    SizedBox(width: AppTheme.spacingMd),
+                    const SizedBox(width: AppTheme.spacingMd),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,7 +333,7 @@ class _ItemViewPageState extends State<ItemViewPage> {
                               color: AppTheme.textPrimary,
                             ),
                           ),
-                          SizedBox(height: AppTheme.spacingXs),
+                          const SizedBox(height: AppTheme.spacingXs),
                           if (item.category != null)
                             Text(
                               item.category!,
@@ -369,7 +369,7 @@ class _ItemViewPageState extends State<ItemViewPage> {
                 ),
               ),
 
-              SizedBox(height: AppTheme.spacingMd),
+              const SizedBox(height: AppTheme.spacingMd),
 
               // Item Statistics
               FutureBuilder<Result<ItemStats>>(
@@ -439,18 +439,18 @@ class _ItemViewPageState extends State<ItemViewPage> {
                 },
               ),
 
-              SizedBox(height: AppTheme.spacingLg),
+              const SizedBox(height: AppTheme.spacingLg),
 
               // Basic Details
               _buildDetailsCard(item),
 
-              SizedBox(height: AppTheme.spacingLg),
+              const SizedBox(height: AppTheme.spacingLg),
 
               // Pricing
               _buildPricingCard(item),
 
               if (_isEditMode) ...[
-                SizedBox(height: AppTheme.spacingXl),
+                const SizedBox(height: AppTheme.spacingXl),
                 SizedBox(
                   height: 48,
                   child: ElevatedButton.icon(
@@ -472,7 +472,7 @@ class _ItemViewPageState extends State<ItemViewPage> {
                 ),
               ],
 
-              SizedBox(height: AppTheme.spacingMd),
+              const SizedBox(height: AppTheme.spacingMd),
             ],
           ),
         );
@@ -485,7 +485,7 @@ class _ItemViewPageState extends State<ItemViewPage> {
     return Column(
       children: [
         Icon(icon, color: color, size: 24),
-        SizedBox(height: AppTheme.spacingXs),
+        const SizedBox(height: AppTheme.spacingXs),
         Text(
           value,
           style: AppTheme.headlineSmall.copyWith(color: color),
@@ -519,31 +519,31 @@ class _ItemViewPageState extends State<ItemViewPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.info_outline, color: AppTheme.primaryColor),
-              SizedBox(width: AppTheme.spacingSm),
+              const Icon(Icons.info_outline, color: AppTheme.primaryColor),
+              const SizedBox(width: AppTheme.spacingSm),
               Text(
                 'Item Details',
                 style: AppTheme.headlineSmall.copyWith(color: AppTheme.textPrimary),
               ),
             ],
           ),
-          SizedBox(height: AppTheme.spacingMd),
-          Divider(color: AppTheme.dividerColor),
-          SizedBox(height: AppTheme.spacingMd),
+          const SizedBox(height: AppTheme.spacingMd),
+          const Divider(color: AppTheme.dividerColor),
+          const SizedBox(height: AppTheme.spacingMd),
           if (_isEditMode) ...[
             TextField(
               controller: _nameController,
               style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
               decoration: AppTheme.inputDecoration(labelText: 'Name'),
             ),
-            SizedBox(height: AppTheme.spacingMd),
+            const SizedBox(height: AppTheme.spacingMd),
             TextField(
               controller: _descriptionController,
               style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
               decoration: AppTheme.inputDecoration(labelText: 'Description'),
               maxLines: 2,
             ),
-            SizedBox(height: AppTheme.spacingMd),
+            const SizedBox(height: AppTheme.spacingMd),
             TextField(
               controller: _categoryController,
               style: AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
@@ -595,17 +595,17 @@ class _ItemViewPageState extends State<ItemViewPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.payments_outlined, color: AppTheme.primaryColor),
-              SizedBox(width: AppTheme.spacingSm),
+              const Icon(Icons.payments_outlined, color: AppTheme.primaryColor),
+              const SizedBox(width: AppTheme.spacingSm),
               Text(
                 'Pricing',
                 style: AppTheme.headlineSmall.copyWith(color: AppTheme.textPrimary),
               ),
             ],
           ),
-          SizedBox(height: AppTheme.spacingMd),
-          Divider(color: AppTheme.dividerColor),
-          SizedBox(height: AppTheme.spacingMd),
+          const SizedBox(height: AppTheme.spacingMd),
+          const Divider(color: AppTheme.dividerColor),
+          const SizedBox(height: AppTheme.spacingMd),
           if (_isEditMode) ...[
             TextField(
               controller: _priceController,
@@ -619,7 +619,7 @@ class _ItemViewPageState extends State<ItemViewPage> {
                 FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
               ],
             ),
-            SizedBox(height: AppTheme.spacingSm),
+            const SizedBox(height: AppTheme.spacingSm),
             Text(
               'Note: Stock quantity is updated via supply invoices.',
               style: AppTheme.bodySmall.copyWith(

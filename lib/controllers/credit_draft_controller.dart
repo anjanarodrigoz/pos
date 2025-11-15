@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:pos/database/credit_db_serive.dart';
-import 'package:pos/database/quatation_db_serive.dart';
 import '../models/cart.dart';
 import '../models/customer.dart';
 import '../models/extra_charges.dart';

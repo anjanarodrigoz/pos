@@ -12,7 +12,6 @@ import 'package:pos/utils/alert_message.dart';
 import 'package:pos/utils/my_format.dart';
 import 'dart:developer' as dev;
 
-import '../models/invoice.dart';
 import '../models/store.dart';
 import '../widgets/emial_sending_widget.dart';
 import 'pdf_api.dart';

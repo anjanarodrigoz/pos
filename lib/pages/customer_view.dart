@@ -169,8 +169,8 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Customer updated successfully'),
+          const SnackBar(
+            content: Text('Customer updated successfully'),
             backgroundColor: AppTheme.successColor,
           ),
         );
@@ -256,12 +256,12 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.error_outline,
                     size: 48,
                     color: AppTheme.errorColor,
                   ),
-                  SizedBox(height: AppTheme.spacingMd),
+                  const SizedBox(height: AppTheme.spacingMd),
                   Text(
                     'Customer not found',
                     style: AppTheme.headlineSmall,
@@ -319,28 +319,28 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
               // Customer Header
               _buildHeaderCard(customer),
 
-              SizedBox(height: AppTheme.spacingMd),
+              const SizedBox(height: AppTheme.spacingMd),
 
               // Customer Statistics
               _buildStatsCard(),
 
-              SizedBox(height: AppTheme.spacingLg),
+              const SizedBox(height: AppTheme.spacingLg),
 
               // Customer Details
               _buildDetailsCard(customer),
 
-              SizedBox(height: AppTheme.spacingLg),
+              const SizedBox(height: AppTheme.spacingLg),
 
               // Billing Address
               _buildBillingAddressCard(customer),
 
-              SizedBox(height: AppTheme.spacingLg),
+              const SizedBox(height: AppTheme.spacingLg),
 
               // Postal Address
               _buildPostalAddressCard(customer),
 
               if (_isEditMode) ...[
-                SizedBox(height: AppTheme.spacingXl),
+                const SizedBox(height: AppTheme.spacingXl),
                 SizedBox(
                   height: 48,
                   child: ElevatedButton.icon(
@@ -362,7 +362,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                 ),
               ],
 
-              SizedBox(height: AppTheme.spacingMd),
+              const SizedBox(height: AppTheme.spacingMd),
             ],
           ),
         );
@@ -392,7 +392,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
               ),
             ),
           ),
-          SizedBox(width: AppTheme.spacingMd),
+          const SizedBox(width: AppTheme.spacingMd),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,7 +401,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                   '${customer.firstName} ${customer.lastName}',
                   style: AppTheme.headlineLarge.copyWith(color: Colors.white),
                 ),
-                SizedBox(height: AppTheme.spacingXs),
+                const SizedBox(height: AppTheme.spacingXs),
                 Text(
                   customer.id,
                   style: AppTheme.bodyMedium.copyWith(
@@ -410,14 +410,14 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                   ),
                 ),
                 if (customer.email != null) ...[
-                  SizedBox(height: AppTheme.spacingXs),
+                  const SizedBox(height: AppTheme.spacingXs),
                   Text(
                     customer.email!,
                     style: AppTheme.bodyMedium.copyWith(color: Colors.white70),
                   ),
                 ],
                 if (customer.mobileNumber != null) ...[
-                  SizedBox(height: AppTheme.spacingXs),
+                  const SizedBox(height: AppTheme.spacingXs),
                   Text(
                     customer.mobileNumber!,
                     style: AppTheme.bodyMedium.copyWith(color: Colors.white70),
@@ -494,7 +494,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
     return Column(
       children: [
         Icon(icon, color: color, size: 24),
-        SizedBox(height: AppTheme.spacingXs),
+        const SizedBox(height: AppTheme.spacingXs),
         Text(
           value,
           style: AppTheme.headlineSmall.copyWith(color: color),
@@ -517,14 +517,14 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.person_outline, color: AppTheme.primaryColor),
-              SizedBox(width: AppTheme.spacingSm),
+              const Icon(Icons.person_outline, color: AppTheme.primaryColor),
+              const SizedBox(width: AppTheme.spacingSm),
               Text('Customer Details', style: AppTheme.headlineSmall),
             ],
           ),
-          SizedBox(height: AppTheme.spacingMd),
+          const SizedBox(height: AppTheme.spacingMd),
           const Divider(),
-          SizedBox(height: AppTheme.spacingMd),
+          const SizedBox(height: AppTheme.spacingMd),
           if (_isEditMode) ...[
             Row(
               children: [
@@ -534,7 +534,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                     decoration: AppTheme.inputDecoration(labelText: 'First Name'),
                   ),
                 ),
-                SizedBox(width: AppTheme.spacingMd),
+                const SizedBox(width: AppTheme.spacingMd),
                 Expanded(
                   child: TextField(
                     controller: _lastNameController,
@@ -543,17 +543,17 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                 ),
               ],
             ),
-            SizedBox(height: AppTheme.spacingMd),
+            const SizedBox(height: AppTheme.spacingMd),
             TextField(
               controller: _mobileController,
               decoration: AppTheme.inputDecoration(labelText: 'Mobile'),
             ),
-            SizedBox(height: AppTheme.spacingMd),
+            const SizedBox(height: AppTheme.spacingMd),
             TextField(
               controller: _emailController,
               decoration: AppTheme.inputDecoration(labelText: 'Email'),
             ),
-            SizedBox(height: AppTheme.spacingMd),
+            const SizedBox(height: AppTheme.spacingMd),
             Row(
               children: [
                 Expanded(
@@ -562,7 +562,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                     decoration: AppTheme.inputDecoration(labelText: 'Fax'),
                   ),
                 ),
-                SizedBox(width: AppTheme.spacingMd),
+                const SizedBox(width: AppTheme.spacingMd),
                 Expanded(
                   child: TextField(
                     controller: _webController,
@@ -571,7 +571,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                 ),
               ],
             ),
-            SizedBox(height: AppTheme.spacingMd),
+            const SizedBox(height: AppTheme.spacingMd),
             Row(
               children: [
                 Expanded(
@@ -580,7 +580,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                     decoration: AppTheme.inputDecoration(labelText: 'ABN'),
                   ),
                 ),
-                SizedBox(width: AppTheme.spacingMd),
+                const SizedBox(width: AppTheme.spacingMd),
                 Expanded(
                   child: TextField(
                     controller: _acnController,
@@ -589,7 +589,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                 ),
               ],
             ),
-            SizedBox(height: AppTheme.spacingMd),
+            const SizedBox(height: AppTheme.spacingMd),
             TextField(
               controller: _commentController,
               decoration: AppTheme.inputDecoration(labelText: 'Comments'),
@@ -618,20 +618,20 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.home_outlined, color: AppTheme.primaryColor),
-              SizedBox(width: AppTheme.spacingSm),
+              const Icon(Icons.home_outlined, color: AppTheme.primaryColor),
+              const SizedBox(width: AppTheme.spacingSm),
               Text('Billing/Delivery Address', style: AppTheme.headlineSmall),
             ],
           ),
-          SizedBox(height: AppTheme.spacingMd),
+          const SizedBox(height: AppTheme.spacingMd),
           const Divider(),
-          SizedBox(height: AppTheme.spacingMd),
+          const SizedBox(height: AppTheme.spacingMd),
           if (_isEditMode) ...[
             TextField(
               controller: _billingStreetController,
               decoration: AppTheme.inputDecoration(labelText: 'Street'),
             ),
-            SizedBox(height: AppTheme.spacingMd),
+            const SizedBox(height: AppTheme.spacingMd),
             Row(
               children: [
                 Expanded(
@@ -640,7 +640,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                     decoration: AppTheme.inputDecoration(labelText: 'City'),
                   ),
                 ),
-                SizedBox(width: AppTheme.spacingMd),
+                const SizedBox(width: AppTheme.spacingMd),
                 Expanded(
                   child: TextField(
                     controller: _billingStateController,
@@ -649,7 +649,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                 ),
               ],
             ),
-            SizedBox(height: AppTheme.spacingMd),
+            const SizedBox(height: AppTheme.spacingMd),
             Row(
               children: [
                 Expanded(
@@ -658,7 +658,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                     decoration: AppTheme.inputDecoration(labelText: 'Area Code'),
                   ),
                 ),
-                SizedBox(width: AppTheme.spacingMd),
+                const SizedBox(width: AppTheme.spacingMd),
                 Expanded(
                   child: TextField(
                     controller: _billingPostalCodeController,
@@ -667,7 +667,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                 ),
               ],
             ),
-            SizedBox(height: AppTheme.spacingMd),
+            const SizedBox(height: AppTheme.spacingMd),
             TextField(
               controller: _billingCountryController,
               decoration: AppTheme.inputDecoration(labelText: 'Country'),
@@ -694,20 +694,20 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.mail_outline, color: AppTheme.primaryColor),
-              SizedBox(width: AppTheme.spacingSm),
+              const Icon(Icons.mail_outline, color: AppTheme.primaryColor),
+              const SizedBox(width: AppTheme.spacingSm),
               Text('Postal Address', style: AppTheme.headlineSmall),
             ],
           ),
-          SizedBox(height: AppTheme.spacingMd),
+          const SizedBox(height: AppTheme.spacingMd),
           const Divider(),
-          SizedBox(height: AppTheme.spacingMd),
+          const SizedBox(height: AppTheme.spacingMd),
           if (_isEditMode) ...[
             TextField(
               controller: _postalStreetController,
               decoration: AppTheme.inputDecoration(labelText: 'Street'),
             ),
-            SizedBox(height: AppTheme.spacingMd),
+            const SizedBox(height: AppTheme.spacingMd),
             Row(
               children: [
                 Expanded(
@@ -716,7 +716,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                     decoration: AppTheme.inputDecoration(labelText: 'City'),
                   ),
                 ),
-                SizedBox(width: AppTheme.spacingMd),
+                const SizedBox(width: AppTheme.spacingMd),
                 Expanded(
                   child: TextField(
                     controller: _postalStateController,
@@ -725,7 +725,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                 ),
               ],
             ),
-            SizedBox(height: AppTheme.spacingMd),
+            const SizedBox(height: AppTheme.spacingMd),
             Row(
               children: [
                 Expanded(
@@ -734,7 +734,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                     decoration: AppTheme.inputDecoration(labelText: 'Area Code'),
                   ),
                 ),
-                SizedBox(width: AppTheme.spacingMd),
+                const SizedBox(width: AppTheme.spacingMd),
                 Expanded(
                   child: TextField(
                     controller: _postalPostalCodeController,
@@ -743,7 +743,7 @@ class _CustomerViewPageState extends State<CustomerViewPage> {
                 ),
               ],
             ),
-            SizedBox(height: AppTheme.spacingMd),
+            const SizedBox(height: AppTheme.spacingMd),
             TextField(
               controller: _postalCountryController,
               decoration: AppTheme.inputDecoration(labelText: 'Country'),
