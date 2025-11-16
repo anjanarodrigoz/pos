@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:pos/database/invoice_db_service.dart';
+import 'package:pos/repositories/invoice_repository.dart';
+import 'package:pos/utils/invoice_converter.dart';
 import 'package:pos/utils/constant.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/utils/val.dart';
@@ -19,28 +19,15 @@ class PaymentPage extends StatefulWidget {
 }
 
 class _PaymentPageState extends State<PaymentPage> {
-  late final _databaseService; // Use your DatabaseService class
+  final InvoiceRepository _invoiceRepo = Get.find<InvoiceRepository>();
 
   List<Payment> _payments = [];
   PaymentDataSource paymentDataSource = PaymentDataSource(paymentsData: []);
-  Function? disposeListen;
 
   @override
   void initState() {
     super.initState();
-    _databaseService = InvoiceDB();
-
-    disposeListen = GetStorage(DBVal.invoice).listen(() {
-      getPaymentData();
-    });
     getPaymentData();
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    disposeListen?.call();
   }
 
   @override
@@ -114,28 +101,40 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   Future<void> getPaymentData() async {
-    List<Invoice> invoices = await _databaseService.getAllInvoices();
+    final result = await _invoiceRepo.getAllInvoices();
 
-    _payments = [];
+    if (result.isSuccess) {
+      final driftInvoices = result.data ?? [];
 
-    for (Invoice invoice in invoices) {
-      for (Payment payment in invoice.payments ?? []) {
-        _payments.add(Payment(
-            date: payment.date,
-            amount: payment.amount,
-            paymethod: payment.paymethod,
-            comment: payment.comment,
-            payId: payment.payId,
-            invoiceId: invoice.invoiceId,
-            customerName: invoice.customerName,
-            customerId: invoice.customerId));
+      _payments = [];
+
+      // Get payments for each invoice
+      for (var driftInvoice in driftInvoices) {
+        final paymentsResult = await _invoiceRepo.getInvoicePayments(driftInvoice.invoiceId);
+
+        if (paymentsResult.isSuccess) {
+          final driftPayments = paymentsResult.data ?? [];
+
+          for (var driftPayment in driftPayments) {
+            _payments.add(Payment(
+              date: driftPayment.date,
+              amount: driftPayment.amount,
+              paymethod: driftPayment.paymentMethod,
+              comment: driftPayment.comment,
+              payId: driftPayment.payId,
+              invoiceId: driftInvoice.invoiceId,
+              customerName: driftInvoice.customerName,
+              customerId: driftInvoice.customerId,
+            ));
+          }
+        }
       }
+
+      _payments.sort((a, b) => b.date.compareTo(a.date));
+
+      paymentDataSource = PaymentDataSource(paymentsData: _payments);
+      setState(() {});
     }
-
-    _payments.sort((a, b) => b.date.compareTo(a.date));
-
-    paymentDataSource = PaymentDataSource(paymentsData: _payments);
-    setState(() {});
   }
 
   Future<void> removePayment(String invoiceId, String payId) async {
@@ -146,8 +145,7 @@ class _PaymentPageState extends State<PaymentPage> {
               content:
                   'Do you want to delete in #$invoiceId invoice #$payId payment?',
               onContinue: () async {
-                await InvoiceDB()
-                    .removeInvoicePayment(invoiceId, payId, context);
+                await _invoiceRepo.removePayment(invoiceId, payId);
                 Get.back();
               },
               continueText: 'Delete',
