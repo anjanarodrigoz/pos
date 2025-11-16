@@ -270,6 +270,7 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
           return Item(
             id: driftItem.id,
             name: driftItem.name,
+            itemCode: driftItem.itemCode,
             qty: driftItem.quantity,
             price: driftItem.price,
           );
