@@ -232,6 +232,31 @@ class CreditNotes extends Table {
   Set<Column> get primaryKey => {creditNoteId};
 }
 
+// Template tables for reusable extra charges and comments
+class ExtraChargeTemplates extends Table {
+  TextColumn get id => text()(); // Use name as ID
+  TextColumn get name => text()();
+  RealColumn get price => real()();
+  IntColumn get quantity => integer().withDefault(const Constant(1))();
+  TextColumn get comment => text().nullable()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+class CommentTemplates extends Table {
+  TextColumn get id => text()(); // Use name as ID
+  TextColumn get name => text()();
+  TextColumn get comment => text()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 // Database
 @DriftDatabase(tables: [
   Customers,
@@ -245,12 +270,14 @@ class CreditNotes extends Table {
   SupplierInvoiceItems,
   Quotations,
   CreditNotes,
+  ExtraChargeTemplates,
+  CommentTemplates,
 ])
 class POSDatabase extends _$POSDatabase {
   POSDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -271,6 +298,8 @@ class POSDatabase extends _$POSDatabase {
             CREATE INDEX idx_supplier_invoices_date ON supplier_invoices(created_date);
             CREATE INDEX idx_supplier_invoices_paid ON supplier_invoices(is_paid);
             CREATE INDEX idx_supplier_invoice_items_invoice ON supplier_invoice_items(invoice_id);
+            CREATE INDEX idx_extra_charge_templates_name ON extra_charge_templates(name);
+            CREATE INDEX idx_comment_templates_name ON comment_templates(name);
           ''');
         },
         onUpgrade: (Migrator m, int from, int to) async {
@@ -438,6 +467,16 @@ class POSDatabase extends _$POSDatabase {
             await customStatement('CREATE INDEX idx_supplier_invoices_date ON supplier_invoices(created_date)');
             await customStatement('CREATE INDEX idx_supplier_invoices_paid ON supplier_invoices(is_paid)');
             await customStatement('CREATE INDEX idx_supplier_invoice_items_invoice ON supplier_invoice_items(invoice_id)');
+          }
+
+          // Migration from v4 to v5: Add extra charge and comment template tables
+          if (from == 4 && to == 5) {
+            await m.createTable(extraChargeTemplates);
+            await m.createTable(commentTemplates);
+
+            // Create indexes
+            await customStatement('CREATE INDEX idx_extra_charge_templates_name ON extra_charge_templates(name)');
+            await customStatement('CREATE INDEX idx_comment_templates_name ON comment_templates(name)');
           }
         },
       );
