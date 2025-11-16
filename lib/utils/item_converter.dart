@@ -9,10 +9,12 @@ class ItemConverter {
   static domain.Item toDomain(drift.Item driftItem) {
     return domain.Item(
       id: driftItem.id,
+      itemCode: driftItem.itemCode, // User-facing identifier
       name: driftItem.name,
       description: driftItem.description,
       price: driftItem.price,
       qty: driftItem.quantity,
+      category: driftItem.category,
       // Fields not in Drift - use defaults
       comment: null,
       buyingPrice: 0.0,

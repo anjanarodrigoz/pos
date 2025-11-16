@@ -100,13 +100,15 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
                   var row =
                       itemDataSource.effectiveRows.elementAt(selectedRowIndex);
 
-                  addItemtoList(row.getCells()[0].value.toString(), domainItems);
+                  // Get itemCode from first cell (column 0)
+                  String itemCode = row.getCells()[0].value.toString();
+                  addItemtoList(itemCode, domainItems);
                 }
               }),
               columns: [
                 GridColumn(
-                    columnName: Item.idKey,
-                    label: const Center(child: Text('Item ID'))),
+                    columnName: 'itemCode',
+                    label: const Center(child: Text('Item Code'))),
                 GridColumn(
                     columnName: Item.nameKey,
                     label: const Center(child: Text('Item Name'))),
@@ -126,9 +128,9 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
     );
   }
 
-  Future<void> addItemtoList(String itemId, List<Item> items) async {
-    // Find item from the list
-    Item? item = items.firstWhereOrNull((i) => i.id == itemId);
+  Future<void> addItemtoList(String itemCode, List<Item> items) async {
+    // Find item by itemCode (user-facing identifier)
+    Item? item = items.firstWhereOrNull((i) => i.itemCode == itemCode);
 
     if (item == null) return;
     TextEditingController netPriceController = TextEditingController();
@@ -148,7 +150,7 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
           width: 300,
           height: 400,
           child: AlertDialog(
-            title: Text('${item.id} - ${item.name}'),
+            title: Text('${item.itemCode} - ${item.name}'),
             content: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
