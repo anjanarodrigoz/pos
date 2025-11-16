@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:drift/drift.dart';
+import 'package:flutter/material.dart';
 import 'package:pos/database/pos_database.dart';
 import 'package:pos/services/logger_service.dart';
 import 'package:pos/utils/result.dart';
@@ -99,6 +100,35 @@ class SupplierInvoiceRepository {
       return Result.success(invoices);
     } catch (e, stack) {
       AppLogger.error('Failed to search supplier invoices', e, stack);
+      return Result.failure(AppError.generic('Failed to search supplier invoices'));
+    }
+  }
+
+  /// Search supplier invoices by date range with optional return note filter
+  Future<Result<List<SupplierInvoice>>> searchByDateRange(
+    DateTimeRange dateRange, {
+    bool? isReturnNote,
+  }) async {
+    try {
+      var query = _database.select(_database.supplierInvoices)
+        ..where((si) => si.isDeleted.equals(false));
+
+      // Apply date filter
+      query = query
+        ..where((si) => si.createdDate.isBiggerOrEqualValue(dateRange.start))
+        ..where((si) => si.createdDate.isSmallerOrEqualValue(dateRange.end));
+
+      // Apply return note filter if specified
+      if (isReturnNote != null) {
+        query = query..where((si) => si.isReturnNote.equals(isReturnNote));
+      }
+
+      query = query..orderBy([(si) => OrderingTerm.desc(si.createdDate)]);
+
+      final invoices = await query.get();
+      return Result.success(invoices);
+    } catch (e, stack) {
+      AppLogger.error('Failed to search supplier invoices by date', e, stack);
       return Result.failure(AppError.generic('Failed to search supplier invoices'));
     }
   }

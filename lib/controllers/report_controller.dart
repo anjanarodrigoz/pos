@@ -2,11 +2,12 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pos/database/customer_db_service.dart';
-import 'package:pos/database/supplyer_invoice_db_service.dart';
 import 'package:pos/repositories/invoice_repository.dart';
 import 'package:pos/repositories/item_repository.dart';
+import 'package:pos/repositories/supplier_invoice_repository.dart';
 import 'package:pos/utils/invoice_converter.dart';
 import 'package:pos/utils/item_converter.dart';
+import 'package:pos/utils/supplier_invoice_converter.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/customer.dart';
 import 'package:pos/models/extra_charges.dart';
@@ -22,6 +23,8 @@ import '../models/item.dart';
 class ReportController extends GetxController {
   final InvoiceRepository _invoiceRepo = Get.find<InvoiceRepository>();
   final ItemRepository _itemRepo = Get.find<ItemRepository>();
+  final SupplierInvoiceRepository _supplierInvoiceRepo =
+      Get.find<SupplierInvoiceRepository>();
 
   late DateTimeRange dateTimeRange =
       DateTimeRange(start: DateTime(0), end: DateTime(0));
@@ -419,14 +422,26 @@ class ReportController extends GetxController {
             .toList();
       }
     } else if (reportType == ReportType.supplyItem) {
-      searchInvoiceList = await SupplyerInvoiceDB()
-          .searchInvoiceByDate(dateTimeRange, isReturnNote: false);
+      final result = await _supplierInvoiceRepo.searchByDateRange(
+          dateTimeRange,
+          isReturnNote: false);
+      if (result.isSuccess && result.data != null) {
+        searchInvoiceList = SupplierInvoiceConverter.toDomainList(result.data!);
+      }
     } else if (reportType == ReportType.itemReturn) {
-      searchInvoiceList = await SupplyerInvoiceDB()
-          .searchInvoiceByDate(dateTimeRange, isReturnNote: true);
+      final result = await _supplierInvoiceRepo.searchByDateRange(
+          dateTimeRange,
+          isReturnNote: true);
+      if (result.isSuccess && result.data != null) {
+        searchInvoiceList = SupplierInvoiceConverter.toDomainList(result.data!);
+      }
     } else {
-      searchInvoiceList = await SupplyerInvoiceDB()
-          .searchInvoiceByDate(dateTimeRange, isReturnNote: null);
+      final result = await _supplierInvoiceRepo.searchByDateRange(
+          dateTimeRange,
+          isReturnNote: null);
+      if (result.isSuccess && result.data != null) {
+        searchInvoiceList = SupplierInvoiceConverter.toDomainList(result.data!);
+      }
     }
 
     if (searchInvoiceList.isEmpty) {
@@ -540,8 +555,15 @@ class ReportController extends GetxController {
 
   Future<void> generateSupplyInvoiceReport(isReturnNote) async {
     isRequiredTableSummery = true;
-    List<SupplyInvoice> supplyInvoiceList = await SupplyerInvoiceDB()
-        .searchInvoiceByDate(dateTimeRange, isReturnNote: isReturnNote);
+    List<SupplyInvoice> supplyInvoiceList = [];
+
+    final result = await _supplierInvoiceRepo.searchByDateRange(
+        dateTimeRange,
+        isReturnNote: isReturnNote);
+
+    if (result.isSuccess && result.data != null) {
+      supplyInvoiceList = SupplierInvoiceConverter.toDomainList(result.data!);
+    }
 
     if (supplyInvoiceList.isEmpty) {
       isrecordAvaliable = false;
@@ -643,8 +665,14 @@ class ReportController extends GetxController {
           .toList();
     }
 
-    returnSupplyInvoiceList = await SupplyerInvoiceDB()
-        .searchInvoiceByDate(dateTimeRange, isReturnNote: true);
+    final supplierResult = await _supplierInvoiceRepo.searchByDateRange(
+        dateTimeRange,
+        isReturnNote: true);
+
+    if (supplierResult.isSuccess && supplierResult.data != null) {
+      returnSupplyInvoiceList =
+          SupplierInvoiceConverter.toDomainList(supplierResult.data!);
+    }
 
     if (searchInvoiceList.isEmpty && returnSupplyInvoiceList.isEmpty) {
       isrecordAvaliable = false;
@@ -1079,8 +1107,15 @@ class ReportController extends GetxController {
 
   generateReturnNoteReport() async {
     isRequiredTableSummery = true;
-    List<SupplyInvoice> supplyInvoiceList = await SupplyerInvoiceDB()
-        .searchInvoiceByDate(dateTimeRange, isReturnNote: true);
+    List<SupplyInvoice> supplyInvoiceList = [];
+
+    final result = await _supplierInvoiceRepo.searchByDateRange(
+        dateTimeRange,
+        isReturnNote: true);
+
+    if (result.isSuccess && result.data != null) {
+      supplyInvoiceList = SupplierInvoiceConverter.toDomainList(result.data!);
+    }
 
     if (supplyInvoiceList.isEmpty) {
       isrecordAvaliable = false;
