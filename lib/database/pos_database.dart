@@ -279,6 +279,12 @@ class POSDatabase extends _$POSDatabase {
   @override
   int get schemaVersion => 5;
 
+  /// Get the database file path
+  Future<String> getDatabasePath() async {
+    final dbFolder = await getApplicationDocumentsDirectory();
+    return p.join(dbFolder.path, 'pos_db.sqlite');
+  }
+
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (Migrator m) async {

@@ -1,24 +1,15 @@
-import 'dart:convert';
 import 'dart:io';
-import 'package:archive/archive_io.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:get/state_manager.dart';
-import 'package:pos/database/abstract_db.dart';
-import 'package:pos/database/commnets_db_service.dart';
-import 'package:pos/database/credit_db_serive.dart';
-import 'package:pos/database/customer_db_service.dart';
-import 'package:pos/database/extra_charges_db_service.dart';
-import 'package:pos/database/invoice_db_service.dart';
-import 'package:pos/database/item_db_service.dart';
-import 'package:pos/database/quatation_db_serive.dart';
-import 'package:pos/database/supplyer_db_service.dart';
-import 'package:pos/database/supplyer_invoice_db_service.dart';
+import 'package:get/get.dart';
+import 'package:path/path.dart' as path;
+import 'package:pos/database/pos_database.dart';
 import 'package:pos/utils/alert_message.dart';
 import 'package:pos/widgets/progressing_dot.dart';
 
+/// Backup and restore controller using Drift database
 class MainDB extends GetxController {
-  List<AbstractDB> dbList = [];
+  final POSDatabase _database = Get.find<POSDatabase>();
   RxList<Widget> content = <Widget>[].obs;
 
   @override
@@ -27,126 +18,170 @@ class MainDB extends GetxController {
     content.clear();
   }
 
-  MainDB() {
-    dbList = [
-      CommentsDB(),
-      CreditNoteDB(),
-      CustomerDB(),
-      ExtraChargeDB(),
-      InvoiceDB(),
-      ItemDB(),
-      QuotationDB(),
-      SupplyerDB(),
-      SupplyerInvoiceDB()
-    ];
-  }
-
+  /// Restore database from a backup file
   Future<void> readDBFile(BuildContext context) async {
     content.clear();
-    final result = await FilePicker.platform
-        .pickFiles(type: FileType.custom, allowedExtensions: ['zip', 'db']
-            // Specify the allowed file extension
-            );
 
-    if (result != null && result.files.isNotEmpty) {
-      final filePath = result.files.single.path;
-
-      final zipFile = File(filePath!);
-      final destinationDir = Directory.current;
-
-      final archive = ZipDecoder().decodeBytes(zipFile.readAsBytesSync());
-
-      for (final file in archive) {
-        final filename = file.name;
-        print(filename);
-        if (file.isFile) {
-          final data = file.content as List<int>;
-          File('${destinationDir.path}/$filename')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(data, flush: true);
-        } else {
-          Directory('${destinationDir.path}/$filename').create(recursive: true);
-        }
-      }
-
-      try {
-        content.add(ProgressingDots(text: 'Extracting backup.db file'));
-
-        content.remove(content.last);
-
-        for (AbstractDB db in dbList) {
-          content.add(ProgressingDots(text: 'Uploading ${db.getName()} data'));
-          final file = File('${destinationDir.path}/${db.getName()}.json');
-          final fileContent = file.readAsStringSync();
-          db.insertData(jsonDecode(fileContent));
-          file.delete();
-          content.remove(content.last);
-          content.add(textWidget('${db.getName()} data was uploaded'));
-        }
-      } catch (e) {
-        content.clear();
-        AlertMessage.snakMessage('Something went wrong', context);
-      }
-    } else {
-      // User canceled file selection
-      content.clear();
-      AlertMessage.snakMessage('Something went wrong', context);
-    }
-  }
-
-  Future<void> backupDBFile(context) async {
-    content.clear();
-    final List<File> files = [];
-    final sourceDir = Directory.current;
-    final encoder = ZipFileEncoder();
-
-    final result = await FilePicker.platform.saveFile(
+    // Pick backup file
+    final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['.db'], // Specify the file type/extension
-      fileName: 'backup.db',
-      dialogTitle: 'Save File As',
-      initialDirectory: Directory.current.path,
+      allowedExtensions: ['db', 'sqlite', 'sqlite3'],
+      dialogTitle: 'Select Backup File',
     );
 
-    if (result != null) {
-      encoder.create(result);
-      try {
-        for (AbstractDB db in dbList) {
-          content
-              .add(ProgressingDots(text: 'Creating ${db.getName()}.db file'));
-          final json = await db.backupData();
-          var file = File('${sourceDir.path}/${db.getName()}.json');
-          file.writeAsStringSync(jsonEncode(json), flush: true);
-          content.remove(content.last);
-          content.add(textWidget('${db.getName()}.db file was created'));
-          encoder.addFile(file);
-        }
-        content.add(ProgressingDots(text: 'Creating backup.db file'));
-        encoder.close();
+    if (result == null || result.files.isEmpty) {
+      content.clear();
+      AlertMessage.snakMessage('File selection cancelled', context);
+      return;
+    }
 
-        // await ZipFile.createFromFiles(
-        //     sourceDir: sourceDir, files: files, zipFile: zipFile);
-        for (AbstractDB db in dbList) {
-          var file = File('${sourceDir.path}/${db.getName()}.json');
-          await file.delete();
-        }
-        content.remove(content.last);
-        content.add(textWidget('backup.db file was created'));
-        AlertMessage.snakMessage('File saved to $result', context);
-      } catch (e) {
-        content.clear();
+    try {
+      final filePath = result.files.single.path;
+      if (filePath == null) {
+        AlertMessage.snakMessage('Invalid file path', context);
+        return;
       }
+
+      content.add(ProgressingDots(text: 'Restoring database...'));
+
+      // Close current database connection
+      await _database.close();
+
+      // Get the database file path
+      final dbPath = await _database.getDatabasePath();
+      final dbFile = File(dbPath);
+      final backupFile = File(filePath);
+
+      // Create backup of current database before restoring
+      final tempBackupPath = '${dbPath}.temp_backup';
+      if (await dbFile.exists()) {
+        await dbFile.copy(tempBackupPath);
+      }
+
+      try {
+        // Copy backup file to database location
+        await backupFile.copy(dbPath);
+
+        // Delete temp backup on success
+        final tempBackup = File(tempBackupPath);
+        if (await tempBackup.exists()) {
+          await tempBackup.delete();
+        }
+
+        content.remove(content.last);
+        content.add(textWidget('Database restored successfully'));
+
+        AlertMessage.snakMessage(
+          'Database restored! Please restart the application.',
+          context,
+        );
+      } catch (e) {
+        // Restore original database on failure
+        final tempBackup = File(tempBackupPath);
+        if (await tempBackup.exists()) {
+          await tempBackup.copy(dbPath);
+          await tempBackup.delete();
+        }
+        throw e;
+      }
+    } catch (e) {
+      content.clear();
+      AlertMessage.snakMessage(
+        'Failed to restore database: ${e.toString()}',
+        context,
+      );
     }
   }
 
+  /// Create a backup of the database
+  Future<void> backupDBFile(BuildContext context) async {
+    content.clear();
+
+    // Generate default backup filename with timestamp
+    final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
+    final defaultFileName = 'pos_backup_$timestamp.db';
+
+    // Let user choose save location
+    final result = await FilePicker.platform.saveFile(
+      fileName: defaultFileName,
+      dialogTitle: 'Save Backup As',
+      type: FileType.custom,
+      allowedExtensions: ['db'],
+    );
+
+    if (result == null) {
+      content.clear();
+      AlertMessage.snakMessage('Backup cancelled', context);
+      return;
+    }
+
+    try {
+      content.add(ProgressingDots(text: 'Creating database backup...'));
+
+      // Get the current database file path
+      final dbPath = await _database.getDatabasePath();
+      final dbFile = File(dbPath);
+
+      if (!await dbFile.exists()) {
+        throw Exception('Database file not found');
+      }
+
+      // Ensure database is flushed to disk
+      await _database.customStatement('PRAGMA wal_checkpoint(FULL)');
+
+      // Copy database file to backup location
+      await dbFile.copy(result);
+
+      content.remove(content.last);
+      content.add(textWidget('Backup created successfully'));
+
+      AlertMessage.snakMessage('Backup saved to $result', context);
+    } catch (e) {
+      content.clear();
+      AlertMessage.snakMessage(
+        'Failed to create backup: ${e.toString()}',
+        context,
+      );
+    }
+  }
+
+  /// Reset database by deleting all data
   Future<void> resetDatabase(BuildContext context) async {
     content.clear();
-    content.add(ProgressingDots(text: 'Your data is deleting'));
-    for (AbstractDB db in dbList) {
-      await db.deleteDB();
+
+    try {
+      content.add(ProgressingDots(text: 'Deleting all data...'));
+
+      // Delete all data from all tables
+      await _database.transaction(() async {
+        // Delete in order to respect foreign key constraints
+        await _database.delete(_database.payments).go();
+        await _database.delete(_database.invoiceItems).go();
+        await _database.delete(_database.invoiceExtraCharges).go();
+        await _database.delete(_database.invoices).go();
+
+        await _database.delete(_database.supplierInvoiceItems).go();
+        await _database.delete(_database.supplierInvoices).go();
+
+        await _database.delete(_database.customers).go();
+        await _database.delete(_database.suppliers).go();
+        await _database.delete(_database.items).go();
+
+        await _database.delete(_database.extraChargeTemplates).go();
+        await _database.delete(_database.commentTemplates).go();
+      });
+
+      content.remove(content.last);
+      content.add(textWidget('All data deleted successfully'));
+
+      AlertMessage.snakMessage('Database reset complete', context);
+    } catch (e) {
+      content.clear();
+      AlertMessage.snakMessage(
+        'Failed to reset database: ${e.toString()}',
+        context,
+      );
     }
-    content.remove(content.last);
-    content.add(textWidget('Data deleted successfull'));
   }
 
   Widget textWidget(String text) {
