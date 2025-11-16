@@ -2,10 +2,11 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pos/database/customer_db_service.dart';
-import 'package:pos/database/item_db_service.dart';
 import 'package:pos/database/supplyer_invoice_db_service.dart';
 import 'package:pos/repositories/invoice_repository.dart';
+import 'package:pos/repositories/item_repository.dart';
 import 'package:pos/utils/invoice_converter.dart';
+import 'package:pos/utils/item_converter.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/customer.dart';
 import 'package:pos/models/extra_charges.dart';
@@ -20,6 +21,7 @@ import '../models/item.dart';
 
 class ReportController extends GetxController {
   final InvoiceRepository _invoiceRepo = Get.find<InvoiceRepository>();
+  final ItemRepository _itemRepo = Get.find<ItemRepository>();
 
   late DateTimeRange dateTimeRange =
       DateTimeRange(start: DateTime(0), end: DateTime(0));
@@ -723,7 +725,13 @@ class ReportController extends GetxController {
     isRequiredTableSummery = false;
     List<Item> itemList = [];
 
-    itemList = await ItemDB().getAllItems();
+    // Get items from repository
+    final result = await _itemRepo.getAllItems(activeOnly: true);
+
+    if (result.isSuccess && result.data != null) {
+      // Convert Drift items to domain items
+      itemList = ItemConverter.toDomainList(result.data!);
+    }
 
     if (itemList.isEmpty) {
       isrecordAvaliable = false;
@@ -950,7 +958,13 @@ class ReportController extends GetxController {
     isRequiredTableSummery = true;
     List<Item> itemList = [];
 
-    itemList = await ItemDB().getAllItems();
+    // Get items from repository
+    final result = await _itemRepo.getAllItems(activeOnly: true);
+
+    if (result.isSuccess && result.data != null) {
+      // Convert Drift items to domain items
+      itemList = ItemConverter.toDomainList(result.data!);
+    }
 
     if (itemList.isEmpty) {
       isrecordAvaliable = false;
@@ -999,7 +1013,13 @@ class ReportController extends GetxController {
     isRequiredTableSummery = true;
     List<Item> itemList = [];
 
-    itemList = await ItemDB().getAllItems();
+    // Get items from repository
+    final result = await _itemRepo.getAllItems(activeOnly: true);
+
+    if (result.isSuccess && result.data != null) {
+      // Convert Drift items to domain items
+      itemList = ItemConverter.toDomainList(result.data!);
+    }
 
     if (itemList.isEmpty) {
       isrecordAvaliable = false;
