@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:pos/database/pos_database.dart';
 import '../database/cart_db_service.dart';
 import '../repositories/invoice_repository.dart';
 import '../models/cart.dart';
@@ -142,8 +141,8 @@ class InvoiceEditController extends GetxController {
       customerMobile: _invoice.customerMobile,
       customerId: _invoice.customerId,
       customerName: _invoice.customerName,
-      billingAddress: _invoice.billingAddress,
-      shippingAddress: _invoice.shippingAddress,
+      billingAddress: _invoice.billingAddress?.toJson(),
+      shippingAddress: _invoice.shippingAddress?.toJson(),
       gstPercentage: Val.gstPrecentage,
     );
 

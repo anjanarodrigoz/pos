@@ -116,7 +116,7 @@ class SupplyInvoiceDraftController extends GetxController {
       items: items,
       extraCharges: charges.isNotEmpty ? charges : null,
       comments: comments.isNotEmpty ? comments : null,
-      billingAddress: supplyer.address,
+      billingAddress: supplyer.address?.toJson(),
       gstPercentage: Val.gstPrecentage,
       isReturnNote: isReturnManager,
     );

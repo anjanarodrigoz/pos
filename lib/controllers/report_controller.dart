@@ -5,6 +5,7 @@ import 'package:pos/repositories/customer_repository.dart';
 import 'package:pos/repositories/invoice_repository.dart';
 import 'package:pos/repositories/item_repository.dart';
 import 'package:pos/repositories/supplier_invoice_repository.dart';
+import 'package:pos/utils/customer_converter.dart';
 import 'package:pos/utils/invoice_converter.dart';
 import 'package:pos/utils/item_converter.dart';
 import 'package:pos/utils/supplier_invoice_converter.dart';
@@ -817,7 +818,8 @@ class ReportController extends GetxController {
     final result = await _customerRepo.getAllCustomers();
 
     if (result.isSuccess && result.data != null) {
-      customersList = result.data!;
+      // Convert Drift customers to domain customers
+      customersList = CustomerConverter.toDomainList(result.data!);
     }
 
     if (customersList.isEmpty) {
