@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pos/database/customer_db_service.dart';
+import 'package:pos/repositories/customer_repository.dart';
 import 'package:pos/repositories/invoice_repository.dart';
 import 'package:pos/repositories/item_repository.dart';
 import 'package:pos/repositories/supplier_invoice_repository.dart';
@@ -25,6 +25,7 @@ class ReportController extends GetxController {
   final ItemRepository _itemRepo = Get.find<ItemRepository>();
   final SupplierInvoiceRepository _supplierInvoiceRepo =
       Get.find<SupplierInvoiceRepository>();
+  final CustomerRepository _customerRepo = Get.find<CustomerRepository>();
 
   late DateTimeRange dateTimeRange =
       DateTimeRange(start: DateTime(0), end: DateTime(0));
@@ -810,7 +811,14 @@ class ReportController extends GetxController {
 
   Future<void> generateCustomerDetailsReport() async {
     isRequiredTableSummery = false;
-    List<Customer> customersList = await CustomerDB().getAllCustomers();
+    List<Customer> customersList = [];
+
+    // Get customers from repository
+    final result = await _customerRepo.getAllCustomers();
+
+    if (result.isSuccess && result.data != null) {
+      customersList = result.data!;
+    }
 
     if (customersList.isEmpty) {
       isrecordAvaliable = false;
