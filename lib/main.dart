@@ -13,6 +13,8 @@ import 'package:pos/repositories/supplier_invoice_repository.dart';
 import 'package:pos/repositories/payment_repository.dart';
 import 'package:pos/repositories/quotation_repository.dart';
 import 'package:pos/repositories/credit_note_repository.dart';
+import 'package:pos/repositories/extra_charge_template_repository.dart';
+import 'package:pos/repositories/comment_template_repository.dart';
 import 'package:pos/services/auth_service.dart';
 import 'package:pos/services/encryption_service.dart';
 import 'package:pos/services/logger_service.dart';
@@ -77,6 +79,8 @@ void main() async {
     Get.put(PaymentRepository(database));
     Get.put(QuotationRepository(database));
     Get.put(CreditNoteRepository(database));
+    Get.put(ExtraChargeTemplateRepository(database));
+    Get.put(CommentTemplateRepository(database));
     AppLogger.info('Repositories registered with GetX');
   } catch (e, stack) {
     AppLogger.error('Failed to initialize database and repositories', e, stack);
