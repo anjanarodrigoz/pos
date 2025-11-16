@@ -1,13 +1,17 @@
 import 'package:get/get.dart';
+import 'package:pos/database/pos_database.dart';
 import '../database/cart_db_service.dart';
-import '../database/invoice_db_service.dart';
+import '../repositories/invoice_repository.dart';
 import '../models/cart.dart';
 import '../models/extra_charges.dart';
 import '../models/invoice.dart';
 import '../models/invoice_item.dart';
+import '../repositories/item_repository.dart';
 import '../utils/val.dart';
 
 class InvoiceEditController extends GetxController {
+  final InvoiceRepository _invoiceRepo = Get.find<InvoiceRepository>();
+
   late Invoice _invoice;
   RxList<ExtraCharges> extraList = <ExtraCharges>[].obs;
   RxList<String> comments = <String>[].obs;
@@ -105,32 +109,50 @@ class InvoiceEditController extends GetxController {
   }
 
   Future<void> updateInvoice() async {
-    final db = InvoiceDB();
-
-    List<InvoicedItem> itemList = newCartList
-        .map((cart) => InvoicedItem(
-            itemId: cart.itemId,
-            name: cart.name,
-            netPrice: cart.price,
-            qty: cart.qty,
-            comment: cart.comment,
-            isPostedItem: cart.isPostedItem))
+    // Convert Cart items to InvoiceItemData
+    List<InvoiceItemData> items = newCartList
+        .map((cart) => InvoiceItemData(
+              invoiceId: _invoice.invoiceId,
+              itemId: cart.itemId,
+              itemName: cart.name,
+              quantity: cart.qty,
+              unitPrice: cart.price,
+              comment: cart.comment,
+              isPosted: cart.isPostedItem,
+            ))
         .toList();
 
-    Invoice newInvoice = _invoice.copyWith(
+    // Convert ExtraCharges to ExtraChargeData
+    List<ExtraChargeData> charges = extraList
+        .map((extra) => ExtraChargeData(
+              invoiceId: _invoice.invoiceId,
+              chargeName: extra.name,
+              quantity: extra.qty,
+              unitPrice: extra.price,
+              comment: extra.comment,
+            ))
+        .toList();
+
+    // Update invoice using repository
+    final result = await _invoiceRepo.updateInvoiceWithItems(
+      invoiceId: _invoice.invoiceId,
+      items: items,
+      extraCharges: charges,
+      comments: comments.isNotEmpty ? comments : null,
       customerMobile: _invoice.customerMobile,
       customerId: _invoice.customerId,
-      gstPrecentage: Val.gstPrecentage,
       customerName: _invoice.customerName,
       billingAddress: _invoice.billingAddress,
       shippingAddress: _invoice.shippingAddress,
-      comments: comments,
-      extraCharges: extraList,
-      itemList: itemList,
+      gstPercentage: Val.gstPrecentage,
     );
 
-    await db.updateInvoice(newInvoice);
-    await CartDB().clearCart();
+    if (result.isSuccess) {
+      await CartDB().clearCart();
+    } else {
+      // Handle error - could show snackbar or dialog
+      print('Error updating invoice: ${result.error}');
+    }
   }
 
   Future<void> close() async {
