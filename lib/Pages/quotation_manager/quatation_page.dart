@@ -214,7 +214,7 @@ class _QuotationPageState extends State<QuotationPage> {
             lastName: ''),
         wantToUpdate: true,
         copyInvoice: invoice));
-    Get.offAll(QuoteDraftPage());
+    Get.to(() => QuoteDraftPage());
   }
 
   void printInvoice() async {

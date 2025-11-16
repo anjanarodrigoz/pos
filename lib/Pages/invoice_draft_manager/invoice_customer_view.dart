@@ -427,14 +427,14 @@ class _InvoiceCustomerViewPageState extends State<InvoiceCustomerViewPage> {
             customer: _customer,
             copyInvoice: invoice,
           ));
-          Get.offAll(() => QuoteDraftPage());
+          Get.to(() => QuoteDraftPage());
           break;
         case InvoiceType.creditNote:
           Get.put(CreditDraftController(
             customer: _customer,
             copyInvoice: invoice,
           ));
-          Get.offAll(() => const CreditDraftPage());
+          Get.to(() => const CreditDraftPage());
           break;
         case InvoiceType.supplyInvoice:
         case InvoiceType.returnNote:

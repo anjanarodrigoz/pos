@@ -210,7 +210,7 @@ class _CreditNotePageState extends State<CreditNotePage> {
             lastName: ''),
         wantToUpdate: true,
         copyInvoice: invoice!));
-    Get.offAll(const CreditDraftPage());
+    Get.to(() => const CreditDraftPage());
   }
 
   void printInvoice() async {
