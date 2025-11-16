@@ -156,7 +156,6 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                 allowFiltering: true,
                 rowHeight: 30.0,
                 allowColumnsResizing: true,
-                showFilterIconOnHover: true,
                 columnWidthMode: ColumnWidthMode.auto,
                 headerRowHeight: 48,
                 source: itemDataSource,
@@ -177,22 +176,6 @@ class InvoiceItemSelectPageState extends State<InvoiceItemSelectPage> {
                   GridColumn(
                     columnName: Item.priceKey,
                     label: _buildColumnHeader('Price'),
-                  ),
-                  GridColumn(
-                    columnName: Item.priceTwoKey,
-                    label: _buildColumnHeader('Price 2'),
-                  ),
-                  GridColumn(
-                    columnName: Item.priceThreeKey,
-                    label: _buildColumnHeader('Price 3'),
-                  ),
-                  GridColumn(
-                    columnName: Item.priceFourKey,
-                    label: _buildColumnHeader('Price 4'),
-                  ),
-                  GridColumn(
-                    columnName: Item.priceFiveKey,
-                    label: _buildColumnHeader('Price 5'),
                   ),
                 ],
               ),

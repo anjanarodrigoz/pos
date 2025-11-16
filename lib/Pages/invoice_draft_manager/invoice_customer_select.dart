@@ -130,10 +130,13 @@ class _InvoiceCustomerSelectPageState
                     columnName: Customer.emailKey,
                     label: _buildColumnHeader('Email'),
                   ),
+                   GridColumn(
+                    columnName: Address.areaCodeKey, label: _buildColumnHeader( 'Area Code'),),
                   GridColumn(
                     columnName: Address.cityKey,
                     label: _buildColumnHeader('City'),
                   ),
+                 
                   GridColumn(
                     columnName: Address.postalCodeKey,
                     label: _buildColumnHeader('Postal Code'),

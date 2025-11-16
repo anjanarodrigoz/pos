@@ -16,6 +16,7 @@ import 'package:printing/printing.dart';
 import '../../api/pdf_invoice_api.dart';
 import '../../controllers/invoice_edit_controller.dart';
 import '../../models/invoice.dart';
+import '../main_window.dart';
 
 class InvoicePage extends StatefulWidget {
   String? searchInvoiceId;
@@ -77,11 +78,16 @@ class _InvoicePageState extends State<InvoicePage> {
     });
   }
 
+  void _navigateToMainMenu() {
+    Get.offAll(() => const MainWindow());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundGrey,
       appBar: AppBar(
+        leading: IconButton(onPressed: _navigateToMainMenu , icon: const Icon(Icons.arrow_back_sharp)),
         title: Text(
           'Invoice Management',
           style: AppTheme.headlineMedium.copyWith(color: Colors.white),
