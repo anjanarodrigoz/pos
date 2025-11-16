@@ -47,7 +47,7 @@ class _QuotationPageState extends State<QuotationPage> {
     final result = await _invoiceRepo.getFullInvoiceData(widget.invoiceId);
 
     if (result.isSuccess && result.data != null) {
-      invoice = InvoiceConverter.fullDataToDomainInvoice(result.data!);
+      invoice = InvoiceConverter.fromFullInvoiceData(result.data!);
     }
 
     setState(() => _isLoading = false);
@@ -93,7 +93,7 @@ class _QuotationPageState extends State<QuotationPage> {
         appBar: AppBar(
           toolbarHeight: 40.0,
           backgroundColor: TColors.blue,
-          title: Text('Quote #$invoiceId'),
+          title: Text('Quote #${widget.invoiceId}'),
           leading: IconButton(
               onPressed: () {
                 Get.offAll(AllQuotesPage());
@@ -121,7 +121,7 @@ class _QuotationPageState extends State<QuotationPage> {
                   // PosButton(
                   //   onPressed: () async =>
                   //       await EmailSender.showEmailSendingDialog(
-                  //           context, invoice, InvoiceType.quotation),
+                  //           context, invoice!, InvoiceType.quotation),
                   //   text: 'Email',
                   // ),
                   const SizedBox(
@@ -137,7 +137,7 @@ class _QuotationPageState extends State<QuotationPage> {
               ),
             ),
           ),
-          QuoteInvoicePage(invoice: invoice)
+          QuoteInvoicePage(invoice: invoice!)
         ]));
   }
 
@@ -197,7 +197,7 @@ class _QuotationPageState extends State<QuotationPage> {
           builder: (BuildContext context) {
             return Dialog(
               child: InvoiceCustomerSelectPage(
-                invoice: invoice,
+                invoice: invoice!,
                 invoiceType: invoiceType,
               ),
             );
@@ -208,17 +208,17 @@ class _QuotationPageState extends State<QuotationPage> {
   openEditInvoice() {
     Get.put(QuoteDraftController(
         customer: Customer(
-            id: invoice.customerId,
-            firstName: invoice.customerName,
-            mobileNumber: invoice.customerMobile,
+            id: invoice!.customerId,
+            firstName: invoice!.customerName,
+            mobileNumber: invoice!.customerMobile,
             lastName: ''),
         wantToUpdate: true,
-        copyInvoice: invoice));
+        copyInvoice: invoice!));
     Get.offAll(QuoteDraftPage());
   }
 
   void printInvoice() async {
-    Invoice oldInvoice = invoice.copyWith();
+    Invoice oldInvoice = invoice!.copyWith();
 
     showDialog(
         context: context,

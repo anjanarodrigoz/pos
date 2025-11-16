@@ -47,7 +47,7 @@ class _CreditNotePageState extends State<CreditNotePage> {
     final result = await _invoiceRepo.getFullInvoiceData(widget.invoiceId);
 
     if (result.isSuccess && result.data != null) {
-      invoice = InvoiceConverter.fullDataToDomainInvoice(result.data!);
+      invoice = InvoiceConverter.fromFullInvoiceData(result.data!);
     }
 
     setState(() => _isLoading = false);
@@ -133,7 +133,7 @@ class _CreditNotePageState extends State<CreditNotePage> {
               ],
             ),
           ),
-          CreditInvoicePage(invoice: invoice)
+          CreditInvoicePage(invoice: invoice!)
         ]));
   }
 
@@ -193,7 +193,7 @@ class _CreditNotePageState extends State<CreditNotePage> {
           builder: (BuildContext context) {
             return Dialog(
               child: InvoiceCustomerSelectPage(
-                invoice: invoice,
+                invoice: invoice!,
                 invoiceType: invoiceType,
               ),
             );
@@ -204,17 +204,17 @@ class _CreditNotePageState extends State<CreditNotePage> {
   openEditInvoice() {
     Get.put(CreditDraftController(
         customer: Customer(
-            id: invoice.customerId,
-            firstName: invoice.customerName,
-            mobileNumber: invoice.customerMobile,
+            id: invoice!.customerId,
+            firstName: invoice!.customerName,
+            mobileNumber: invoice!.customerMobile,
             lastName: ''),
         wantToUpdate: true,
-        copyInvoice: invoice));
+        copyInvoice: invoice!));
     Get.offAll(const CreditDraftPage());
   }
 
   void printInvoice() async {
-    Invoice oldInvoice = invoice.copyWith();
+    Invoice oldInvoice = invoice!.copyWith();
 
     showDialog(
         context: context,

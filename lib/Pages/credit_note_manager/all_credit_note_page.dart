@@ -51,7 +51,12 @@ class AllCreditNotePage extends StatelessWidget {
                     final allInvoices = snapshot.data ?? [];
                     _invoice = allInvoices
                         .where((inv) => inv.invoiceId.startsWith('CN-'))
-                        .map((driftInv) => InvoiceConverter.toDomainInvoice(driftInv, [], [], []))
+                        .map((driftInv) => InvoiceConverter.toDomain(
+                              driftInvoice: driftInv,
+                              items: [],
+                              payments: [],
+                              extraCharges: [],
+                            ))
                         .toList();
 
                     invoiceDataSource = InvoiceDataSource(
