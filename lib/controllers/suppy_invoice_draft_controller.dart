@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:pos/database/supplyer_invoice_db_service.dart';
+import 'package:pos/repositories/supplier_invoice_repository.dart';
 import '../models/cart.dart';
 import '../models/extra_charges.dart';
 import '../models/invoice_item.dart';
@@ -8,6 +8,9 @@ import '../models/supplyer.dart';
 import '../utils/val.dart';
 
 class SupplyInvoiceDraftController extends GetxController {
+  final SupplierInvoiceRepository _supplierInvoiceRepo =
+      Get.find<SupplierInvoiceRepository>();
+
   final Supplyer supplyer;
   RxString invoiceId = ''.obs;
   RxString referenceId = ''.obs;
@@ -32,9 +35,9 @@ class SupplyInvoiceDraftController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    invoiceId.value = isReturnManager
-        ? SupplyerInvoiceDB().generateReturnNoteId()
-        : SupplyerInvoiceDB().generateInvoiceId();
+    // Generate invoice ID using repository
+    invoiceId.value =
+        await _supplierInvoiceRepo.generateNextInvoiceId(isReturnNote: isReturnManager);
     if (copyInvoice != null) {
       extraList.value = copyInvoice!.extraCharges ?? [];
       cartList.value =
@@ -83,37 +86,46 @@ class SupplyInvoiceDraftController extends GetxController {
   }
 
   Future<void> saveInvoice() async {
-    final db = SupplyerInvoiceDB();
-
-    List<InvoicedItem> itemList = cartList
-        .map((cart) => InvoicedItem(
-            itemId: cart.itemId,
-            name: cart.name,
-            netPrice: cart.price,
-            qty: cart.qty,
-            comment: cart.comment,
-            isPostedItem: cart.isPostedItem))
+    // Convert Cart items to InvoiceItemData (using cart.price as buyingPrice)
+    List<InvoiceItemData> items = cartList
+        .map((cart) => InvoiceItemData(
+              itemId: cart.itemId,
+              itemName: cart.name,
+              quantity: cart.qty,
+              buyingPrice: cart.price,
+              comment: cart.comment,
+            ))
         .toList();
 
-    SupplyInvoice invoice = SupplyInvoice(
-        email: supplyer.email ?? '',
-        referenceId: referenceId.value,
-        isReturnNote: isReturnManager,
-        supplyerMobile: supplyer.mobileNumber,
-        invoiceId: invoiceId.value,
-        createdDate: DateTime.now(),
-        supplyerId: supplyer.id,
-        gstPrecentage: Val.gstPrecentage,
-        supplyerName: '${supplyer.firstName} ${supplyer.lastName}',
-        billingAddress: supplyer.address,
-        comments: comments,
-        extraCharges: extraList,
-        itemList: itemList);
+    // Convert ExtraCharges to ExtraChargeData
+    List<ExtraChargeData> charges = extraList
+        .map((extra) => ExtraChargeData(
+              description: extra.name,
+              amount: extra.netTotal,
+            ))
+        .toList();
 
-    isReturnManager
-        ? await db.saveReturnNoteId(invoiceId.value)
-        : await db.saveLastId(invoiceId.value);
-    await db.addInvoice(invoice);
-    Get.delete<SupplyInvoiceDraftController>();
+    // Create invoice using repository
+    final result = await _supplierInvoiceRepo.createInvoice(
+      invoiceId: invoiceId.value,
+      supplierId: supplyer.id,
+      supplierName: '${supplyer.firstName} ${supplyer.lastName}',
+      supplierMobile: supplyer.mobileNumber,
+      supplierEmail: supplyer.email,
+      referenceId: referenceId.value.isNotEmpty ? referenceId.value : null,
+      items: items,
+      extraCharges: charges.isNotEmpty ? charges : null,
+      comments: comments.isNotEmpty ? comments : null,
+      billingAddress: supplyer.address,
+      gstPercentage: Val.gstPrecentage,
+      isReturnNote: isReturnManager,
+    );
+
+    if (result.isSuccess) {
+      Get.delete<SupplyInvoiceDraftController>();
+    } else {
+      // Handle error - could show snackbar or dialog
+      print('Error creating supplier invoice: ${result.error}');
+    }
   }
 }

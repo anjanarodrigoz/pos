@@ -10,6 +10,19 @@ class SupplierInvoiceRepository {
 
   SupplierInvoiceRepository(this._database);
 
+  /// Generate next invoice ID
+  Future<String> generateNextInvoiceId({bool isReturnNote = false}) async {
+    final prefix = isReturnNote ? 'RN-' : 'SINV-';
+
+    // Count existing invoices with this prefix
+    final invoices = await (_database.select(_database.supplierInvoices)
+          ..where((si) => si.invoiceId.like('$prefix%')))
+        .get();
+
+    final nextNumber = invoices.length + 1;
+    return '$prefix${nextNumber.toString().padLeft(4, '0')}';
+  }
+
   /// Get all supplier invoices with optional filters
   Future<Result<List<SupplierInvoice>>> getAllInvoices({
     bool activeOnly = true,
@@ -112,6 +125,7 @@ class SupplierInvoiceRepository {
     required String supplierName,
     required List<InvoiceItemData> items,
     required double gstPercentage,
+    String? invoiceId,
     String? supplierMobile,
     String? supplierEmail,
     String? referenceId,
@@ -121,13 +135,13 @@ class SupplierInvoiceRepository {
     bool isReturnNote = false,
   }) async {
     try {
-      // Generate auto-incremental invoice ID
-      final count = await (_database.selectOnly(_database.supplierInvoices)
-            ..addColumns([_database.supplierInvoices.invoiceId.count()]))
-          .getSingle()
-          .then((row) => row.read(_database.supplierInvoices.invoiceId.count()) ?? 0);
-
-      final invoiceId = 'SINV-${(count + 1).toString().padLeft(4, '0')}';
+      // Use provided invoice ID or generate one
+      final String finalInvoiceId;
+      if (invoiceId != null) {
+        finalInvoiceId = invoiceId;
+      } else {
+        finalInvoiceId = await generateNextInvoiceId(isReturnNote: isReturnNote);
+      }
 
       // Calculate totals
       double totalNet = 0.0;
@@ -147,7 +161,7 @@ class SupplierInvoiceRepository {
 
       // Create invoice
       final companion = SupplierInvoicesCompanion.insert(
-        invoiceId: invoiceId,
+        invoiceId: finalInvoiceId,
         supplierId: supplierId,
         createdDate: DateTime.now(),
         totalNet: totalNet,
@@ -169,7 +183,7 @@ class SupplierInvoiceRepository {
       // Insert invoice items and update item quantities
       for (var item in items) {
         final itemCompanion = SupplierInvoiceItemsCompanion.insert(
-          invoiceId: invoiceId,
+          invoiceId: finalInvoiceId,
           itemId: item.itemId,
           itemName: item.itemName,
           quantity: item.quantity,
@@ -184,8 +198,8 @@ class SupplierInvoiceRepository {
         await _updateItemQuantity(item.itemId, item.quantity, isReturnNote);
       }
 
-      AppLogger.info('Supplier invoice created: $invoiceId for supplier $supplierId');
-      return await getInvoice(invoiceId);
+      AppLogger.info('Supplier invoice created: $finalInvoiceId for supplier $supplierId');
+      return await getInvoice(finalInvoiceId);
     } catch (e, stack) {
       AppLogger.error('Failed to create supplier invoice', e, stack);
       return Result.failure(AppError.generic('Failed to create supplier invoice'));
