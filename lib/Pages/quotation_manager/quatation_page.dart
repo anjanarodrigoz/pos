@@ -47,7 +47,7 @@ class _QuotationPageState extends State<QuotationPage> {
     final result = await _invoiceRepo.getFullInvoiceData(widget.invoiceId);
 
     if (result.isSuccess && result.data != null) {
-      invoice = InvoiceConverter.fullDataToDomainInvoice(result.data!);
+      invoice = InvoiceConverter.fromFullInvoiceData(result.data!);
     }
 
     setState(() => _isLoading = false);
