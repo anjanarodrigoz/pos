@@ -331,6 +331,106 @@ class InvoiceRepository {
     }
   }
 
+  /// Update invoice with items and extra charges (replaces all items and charges)
+  /// Used for updating quotations and credit notes with new items/charges
+  Future<Result<Invoice>> updateInvoiceWithItems({
+    required String invoiceId,
+    required String customerId,
+    required String customerName,
+    required List<InvoiceItemData> items,
+    List<ExtraChargeData>? extraCharges,
+    String? customerMobile,
+    String? email,
+    double? gstPercentage,
+    Map<String, dynamic>? billingAddress,
+    Map<String, dynamic>? shippingAddress,
+    List<String>? comments,
+  }) async {
+    try {
+      // Calculate totals
+      double totalNet = 0.0;
+      for (final item in items) {
+        totalNet += item.netPrice * item.quantity;
+      }
+
+      if (extraCharges != null) {
+        for (final charge in extraCharges) {
+          totalNet += charge.amount;
+        }
+      }
+
+      final gst = gstPercentage ?? 0.1; // Default 10% GST
+      final totalGst = (totalNet * gst * 100).round() / 100;
+      final total = ((totalNet + totalGst) * 100).round() / 100;
+
+      // Delete existing items and charges
+      await (_database.delete(_database.invoiceItems)
+            ..where((ii) => ii.invoiceId.equals(invoiceId)))
+          .go();
+
+      await (_database.delete(_database.extraCharges)
+            ..where((ec) => ec.invoiceId.equals(invoiceId)))
+          .go();
+
+      // Update invoice header
+      await (_database.update(_database.invoices)
+            ..where((i) => i.invoiceId.equals(invoiceId)))
+          .write(InvoicesCompanion(
+            customerId: Value(customerId),
+            customerName: Value(customerName),
+            customerMobile: customerMobile != null ? Value(customerMobile) : const Value.absent(),
+            email: email != null ? Value(email) : const Value.absent(),
+            gstPercentage: Value(gst),
+            totalNet: Value(totalNet),
+            totalGst: Value(totalGst),
+            total: Value(total),
+            billingAddressJson: billingAddress != null
+                ? Value(jsonEncode(billingAddress))
+                : const Value.absent(),
+            shippingAddressJson: shippingAddress != null
+                ? Value(jsonEncode(shippingAddress))
+                : const Value.absent(),
+            commentsJson: comments != null
+                ? Value(jsonEncode(comments))
+                : const Value.absent(),
+          ));
+
+      // Insert new items
+      for (final item in items) {
+        await _database.into(_database.invoiceItems).insert(
+              InvoiceItemsCompanion.insert(
+                invoiceId: invoiceId,
+                itemId: item.itemId,
+                itemName: item.itemName,
+                quantity: item.quantity,
+                netPrice: item.netPrice,
+                comment: Value(item.comment),
+                isPostedItem: Value(item.isPostedItem ?? false),
+              ),
+            );
+      }
+
+      // Insert new extra charges
+      if (extraCharges != null) {
+        for (final charge in extraCharges) {
+          await _database.into(_database.extraCharges).insert(
+                ExtraChargesCompanion.insert(
+                  invoiceId: invoiceId,
+                  description: charge.description,
+                  amount: charge.amount,
+                ),
+              );
+        }
+      }
+
+      AppLogger.info('Invoice updated with items: $invoiceId');
+      return await getInvoice(invoiceId);
+    } catch (e, stack) {
+      AppLogger.error('Failed to update invoice with items $invoiceId', e, stack);
+      return Result.failure(AppError.generic('Failed to update invoice with items'));
+    }
+  }
+
   /// Add comment to invoice
   Future<Result<void>> addComment(String invoiceId, String comment) async {
     try {

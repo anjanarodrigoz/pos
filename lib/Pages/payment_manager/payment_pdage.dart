@@ -116,11 +116,20 @@ class _PaymentPageState extends State<PaymentPage> {
           final driftPayments = paymentsResult.data ?? [];
 
           for (var driftPayment in driftPayments) {
+            // Convert payment method string to Paymethod enum
+            Paymethod paymethod;
+            try {
+              paymethod = Paymethod.values.byName(driftPayment.paymentMethod);
+            } catch (e) {
+              // Default to cash if payment method is invalid
+              paymethod = Paymethod.cash;
+            }
+
             _payments.add(Payment(
               date: driftPayment.date,
               amount: driftPayment.amount,
-              paymethod: driftPayment.paymentMethod,
-              comment: driftPayment.comment,
+              paymethod: paymethod,
+              comment: driftPayment.comment ?? '',
               payId: driftPayment.payId,
               invoiceId: driftInvoice.invoiceId,
               customerName: driftInvoice.customerName,

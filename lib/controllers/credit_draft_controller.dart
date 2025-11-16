@@ -136,16 +136,24 @@ class CreditDraftController extends GetxController {
             ))
         .toList();
 
-    // Update credit note using InvoiceRepository (stored as Invoice with CN- prefix)
-    await _invoiceRepo.updateInvoice(
+    // Update credit note with items using InvoiceRepository (stored as Invoice with CN- prefix)
+    final result = await _invoiceRepo.updateInvoiceWithItems(
       invoiceId: invoiceId.value,
+      customerId: customer.id,
       customerName: '${customer.firstName} ${customer.lastName}',
       customerMobile: customer.mobileNumber,
       email: customer.email,
+      gstPercentage: Val.gstPrecentage,
       billingAddress: customer.deliveryAddress?.toJson(),
       shippingAddress: customer.postalAddress?.toJson(),
+      items: items,
+      extraCharges: charges,
       comments: comments.isNotEmpty ? comments : null,
     );
+
+    if (result.isFailure) {
+      throw Exception(result.error?.message ?? 'Failed to update credit note');
+    }
 
     Get.delete<CreditDraftController>();
   }
