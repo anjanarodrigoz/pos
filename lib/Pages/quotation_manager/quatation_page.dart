@@ -33,7 +33,6 @@ class _QuotationPageState extends State<QuotationPage> {
   final InvoiceRepository _invoiceRepo = Get.find<InvoiceRepository>();
   Invoice? invoice;
   bool _isLoading = true;
-  late BuildContext context;
 
   @override
   void initState() {
@@ -55,8 +54,6 @@ class _QuotationPageState extends State<QuotationPage> {
 
   @override
   Widget build(BuildContext context) {
-    this.context = context;
-
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(
@@ -214,7 +211,7 @@ class _QuotationPageState extends State<QuotationPage> {
             lastName: ''),
         wantToUpdate: true,
         copyInvoice: invoice!));
-    Get.offAll(QuoteDraftPage());
+    Get.offAll(const QuoteDraftPage());
   }
 
   void printInvoice() async {
