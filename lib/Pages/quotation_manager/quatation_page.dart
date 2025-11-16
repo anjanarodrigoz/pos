@@ -33,6 +33,7 @@ class _QuotationPageState extends State<QuotationPage> {
   final InvoiceRepository _invoiceRepo = Get.find<InvoiceRepository>();
   Invoice? invoice;
   bool _isLoading = true;
+  late BuildContext context;
 
   @override
   void initState() {
@@ -46,7 +47,7 @@ class _QuotationPageState extends State<QuotationPage> {
     final result = await _invoiceRepo.getFullInvoiceData(widget.invoiceId);
 
     if (result.isSuccess && result.data != null) {
-      invoice = InvoiceConverter.fromFullInvoiceData(result.data!);
+      invoice = InvoiceConverter.fullDataToDomainInvoice(result.data!);
     }
 
     setState(() => _isLoading = false);
@@ -54,6 +55,8 @@ class _QuotationPageState extends State<QuotationPage> {
 
   @override
   Widget build(BuildContext context) {
+    this.context = context;
+
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(
@@ -90,7 +93,7 @@ class _QuotationPageState extends State<QuotationPage> {
         appBar: AppBar(
           toolbarHeight: 40.0,
           backgroundColor: TColors.blue,
-          title: Text('Quote #${widget.invoiceId}'),
+          title: Text('Quote #${invoice!.invoiceId}'),
           leading: IconButton(
               onPressed: () {
                 Get.offAll(AllQuotesPage());
@@ -118,7 +121,7 @@ class _QuotationPageState extends State<QuotationPage> {
                   // PosButton(
                   //   onPressed: () async =>
                   //       await EmailSender.showEmailSendingDialog(
-                  //           context, invoice!, InvoiceType.quotation),
+                  //           context, invoice, InvoiceType.quotation),
                   //   text: 'Email',
                   // ),
                   const SizedBox(
@@ -194,7 +197,7 @@ class _QuotationPageState extends State<QuotationPage> {
           builder: (BuildContext context) {
             return Dialog(
               child: InvoiceCustomerSelectPage(
-                invoice: invoice!,
+                invoice: invoice,
                 invoiceType: invoiceType,
               ),
             );
@@ -210,8 +213,8 @@ class _QuotationPageState extends State<QuotationPage> {
             mobileNumber: invoice!.customerMobile,
             lastName: ''),
         wantToUpdate: true,
-        copyInvoice: invoice!));
-    Get.offAll(const QuoteDraftPage());
+        copyInvoice: invoice));
+    Get.offAll(QuoteDraftPage());
   }
 
   void printInvoice() async {
