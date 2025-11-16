@@ -157,7 +157,7 @@ class MainDB extends GetxController {
         // Delete in order to respect foreign key constraints
         await _database.delete(_database.payments).go();
         await _database.delete(_database.invoiceItems).go();
-        await _database.delete(_database.invoiceExtraCharges).go();
+        await _database.delete(_database.extraCharges).go();
         await _database.delete(_database.invoices).go();
 
         await _database.delete(_database.supplierInvoiceItems).go();
