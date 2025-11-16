@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 import 'package:pos/controllers/invoice_edit_controller.dart';
 import 'package:pos/data_sources/invoiceDataSource.dart';
 import 'package:pos/database/cart_db_service.dart';
-import 'package:pos/database/item_db_service.dart';
+import 'package:pos/repositories/item_repository.dart';
+import 'package:pos/utils/item_converter.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/extra_charges.dart';
 import 'package:pos/theme/app_theme.dart';
@@ -543,14 +544,20 @@ class _InvoiceEditViewState extends State<InvoiceEditView> {
             ),
             ElevatedButton(
               onPressed: () async {
-                Item? item = ItemDB().getItem(oldCart.itemId);
-                if (item == null) {
+                // Get item from repository to verify it exists
+                final ItemRepository itemRepo = Get.find<ItemRepository>();
+                final result = await itemRepo.getItem(oldCart.itemId);
+
+                if (result.isFailure || result.data == null) {
                   AlertMessage.snakMessage(
                     'This item cannot be found in the stock. Cannot update',
                     context,
                   );
                   return;
                 }
+
+                // Convert to domain model
+                final Item item = ItemConverter.toDomain(result.data!);
 
                 double itemPrice = net;
                 String comment =
