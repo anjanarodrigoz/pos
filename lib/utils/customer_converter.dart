@@ -15,9 +15,9 @@ class CustomerConverter {
         street: driftCustomer.billingStreet ?? '',
         city: driftCustomer.billingCity ?? '',
         state: driftCustomer.billingState ?? '',
-        postalcode: driftCustomer.billingPostalCode ?? '',
-        area_code: driftCustomer.billingAreaCode ?? '',
-        country: driftCustomer.billingCountry ?? '',
+        postalCode: driftCustomer.billingPostalCode ?? '',
+        areaCode: driftCustomer.billingAreaCode ?? '',
+        county: driftCustomer.billingCountry ?? '',
       );
     }
 
@@ -30,9 +30,9 @@ class CustomerConverter {
         street: driftCustomer.postalStreet ?? '',
         city: driftCustomer.postalCity ?? '',
         state: driftCustomer.postalState ?? '',
-        postalcode: driftCustomer.postalPostalCode ?? '',
-        area_code: driftCustomer.postalAreaCode ?? '',
-        country: driftCustomer.postalCountry ?? '',
+        postalCode: driftCustomer.postalPostalCode ?? '',
+        areaCode: driftCustomer.postalAreaCode ?? '',
+        county: driftCustomer.postalCountry ?? '',
       );
     }
 

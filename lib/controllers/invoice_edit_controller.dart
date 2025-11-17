@@ -111,24 +111,21 @@ class InvoiceEditController extends GetxController {
     // Convert Cart items to InvoiceItemData
     List<InvoiceItemData> items = newCartList
         .map((cart) => InvoiceItemData(
-              invoiceId: _invoice.invoiceId,
+            
               itemId: cart.itemId,
               itemName: cart.name,
               quantity: cart.qty,
-              unitPrice: cart.price,
+              netPrice: cart.price,
               comment: cart.comment,
-              isPosted: cart.isPostedItem,
+              isPostedItem: cart.isPostedItem,
             ))
         .toList();
 
     // Convert ExtraCharges to ExtraChargeData
     List<ExtraChargeData> charges = extraList
         .map((extra) => ExtraChargeData(
-              invoiceId: _invoice.invoiceId,
-              chargeName: extra.name,
-              quantity: extra.qty,
-              unitPrice: extra.price,
-              comment: extra.comment,
+              amount: extra.price,
+              description: extra.name,
             ))
         .toList();
 
