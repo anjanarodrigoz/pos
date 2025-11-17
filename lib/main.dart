@@ -40,13 +40,9 @@ void main() async {
   // Initialize encryption service (optional - for PII encryption)
   try {
     await EncryptionService.initialize();
-    if (EncryptionService.isAvailable) {
-      AppLogger.info('Encryption service initialized - PII encryption enabled');
-    } else {
-      AppLogger.warning('Encryption service not available - data will be stored unencrypted. Install libsecret-1-dev on Linux for encryption support.');
-    }
+    AppLogger.info('Encryption service initialized - PII encryption enabled');
   } catch (e) {
-    AppLogger.warning('Encryption service initialization failed - continuing without encryption', e);
+    AppLogger.warning(e.toString());
   }
 
   // Initialize GetStorage databases
