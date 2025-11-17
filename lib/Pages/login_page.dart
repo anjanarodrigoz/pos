@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pos/Pages/main_window.dart';
+import 'package:pos/pages/main_window.dart';
 import 'package:pos/api/email_sender.dart';
 import 'package:pos/services/auth_service.dart';
 import 'package:pos/services/verification_service.dart';

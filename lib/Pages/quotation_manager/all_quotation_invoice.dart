@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:get/get.dart';
-import 'package:pos/Pages/invoice_draft_manager/invoice_customer_select.dart';
-import 'package:pos/Pages/invoice_manager/invoice_page.dart';
-import 'package:pos/Pages/main_window.dart';
-import 'package:pos/Pages/quotation_manager/quatation_page.dart';
+import 'package:pos/pages/invoice_draft_manager/invoice_customer_select.dart';
+import 'package:pos/pages/invoice_manager/invoice_page.dart';
+import 'package:pos/pages/main_window.dart';
+import 'package:pos/pages/quotation_manager/quatation_page.dart';
 import 'package:pos/repositories/invoice_repository.dart';
 import 'package:pos/utils/invoice_converter.dart';
 import 'package:pos/enums/enums.dart';

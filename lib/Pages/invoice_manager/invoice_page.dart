@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pos/Pages/invoice_draft_manager/invoice_customer_select.dart';
-import 'package:pos/Pages/invoice_manager/invoice_edit_page.dart';
-import 'package:pos/Pages/invoice_manager/save_invoice_page.dart';
-import 'package:pos/Pages/invoice_manager/search_invoice_page.dart';
+import 'package:pos/pages/invoice_draft_manager/invoice_customer_select.dart';
+import 'package:pos/pages/invoice_manager/invoice_edit_page.dart';
+import 'package:pos/pages/invoice_manager/save_invoice_page.dart';
+import 'package:pos/pages/invoice_manager/search_invoice_page.dart';
 import 'package:pos/api/email_sender.dart';
 import 'package:pos/api/pdf_api.dart';
 import 'package:pos/repositories/invoice_repository.dart';

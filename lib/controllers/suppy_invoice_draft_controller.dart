@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 import 'package:pos/repositories/supplier_invoice_repository.dart';
 import '../models/cart.dart';
 import '../models/extra_charges.dart';
-import '../models/invoice_item.dart';
 import '../models/supply_invoice.dart';
 import '../models/supplyer.dart';
 import '../utils/val.dart';

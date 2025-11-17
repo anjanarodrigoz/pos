@@ -4,7 +4,6 @@ import '../models/cart.dart';
 import '../models/customer.dart';
 import '../models/extra_charges.dart';
 import '../models/invoice.dart';
-import '../models/invoice_item.dart';
 import '../utils/id_generator.dart';
 import '../utils/val.dart';
 

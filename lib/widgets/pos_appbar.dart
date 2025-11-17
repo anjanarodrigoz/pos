@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pos/theme/t_colors.dart';
 
-import '../Pages/main_window.dart';
+import '../pages/main_window.dart';
 
 class PosAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;

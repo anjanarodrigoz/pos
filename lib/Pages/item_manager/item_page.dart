@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pos/database/pos_database.dart';
 import 'package:pos/repositories/item_repository.dart';
-import 'package:pos/pages/item_form.dart';
-import 'package:pos/pages/item_view.dart';
+import 'package:pos/pages/item_manager/item_form.dart';
+import 'package:pos/pages/item_manager/item_view.dart';
 import 'package:pos/Pages/main_window.dart';
 import 'package:pos/theme/app_theme.dart';
 
