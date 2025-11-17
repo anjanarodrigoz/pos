@@ -41,18 +41,27 @@ class EncryptionService {
   }
 
   /// Encrypt a string
+  /// Returns plaintext if encryption is not available (graceful degradation)
   static String encryptString(String plainText) {
     if (!_initialized || _encrypter == null || _iv == null) {
-      throw Exception('Encryption service not initialized. Call initialize() first.');
+      // Gracefully degrade to plaintext if encryption not available
+      return plainText;
     }
     if (plainText.isEmpty) return '';
-    return _encrypter!.encrypt(plainText, iv: _iv!).base64;
+    try {
+      return _encrypter!.encrypt(plainText, iv: _iv!).base64;
+    } catch (e) {
+      // Return plaintext if encryption fails
+      return plainText;
+    }
   }
 
   /// Decrypt a string
+  /// Returns the input string if decryption is not available (graceful degradation)
   static String decryptString(String encrypted) {
     if (!_initialized || _encrypter == null || _iv == null) {
-      throw Exception('Encryption service not initialized. Call initialize() first.');
+      // Gracefully degrade - return as-is if encryption not available
+      return encrypted;
     }
     if (encrypted.isEmpty) return '';
 
@@ -83,6 +92,9 @@ class EncryptionService {
     }
     return encryptString(text);
   }
+
+  /// Check if encryption is available
+  static bool get isAvailable => _initialized && _encrypter != null && _iv != null;
 
   /// Reset encryption keys (WARNING: All encrypted data will be lost)
   static Future<void> resetKeys() async {

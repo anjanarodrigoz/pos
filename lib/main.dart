@@ -37,12 +37,16 @@ void main() async {
     AppLogger.error('Failed to initialize secure storage', e);
   }
 
-  // Initialize encryption service (required for secure data storage)
+  // Initialize encryption service (optional - for PII encryption)
   try {
     await EncryptionService.initialize();
-    AppLogger.info('Encryption service initialized');
+    if (EncryptionService.isAvailable) {
+      AppLogger.info('Encryption service initialized - PII encryption enabled');
+    } else {
+      AppLogger.warning('Encryption service not available - data will be stored unencrypted. Install libsecret-1-dev on Linux for encryption support.');
+    }
   } catch (e) {
-    AppLogger.error('Failed to initialize encryption service', e);
+    AppLogger.warning('Encryption service initialization failed - continuing without encryption', e);
   }
 
   // Initialize GetStorage databases
