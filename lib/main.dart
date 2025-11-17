@@ -47,20 +47,12 @@ void main() async {
 
   // Initialize GetStorage databases
   await GetStorage.init();
-  await GetStorage.init(DBVal.customers);
-  await GetStorage.init(DBVal.items);
-  await GetStorage.init(DBVal.invoice);
   await GetStorage.init(DBVal.cart);
-  await GetStorage.init(DBVal.comments);
-  await GetStorage.init(DBVal.supplyer);
-  await GetStorage.init(DBVal.extraCharges);
-  await GetStorage.init(DBVal.supplyerInvoice);
-  await GetStorage.init(DBVal.quatation);
-  await GetStorage.init(DBVal.creditNote);
   await GetStorage.init(DBVal.store);
   AppLogger.info('Storage initialized');
 
   // Reset cart
+  Get.put(ItemRepository(POSDatabase()));
   final storage = CartDB();
   await storage.resetCart();
 
