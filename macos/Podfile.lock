@@ -40,14 +40,14 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/window_manager/macos
 
 SPEC CHECKSUMS:
-  desktop_lifecycle: a600c10e12fe033c7be9078f2e929b8241f2c1e3
-  desktop_multi_window: 566489c048b501134f9d7fb6a2354c60a9126486
-  FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
-  printing: 1dd6a1fce2209ec240698e2439a4adbb9b427637
-  screen_retriever: 59634572a57080243dd1bf715e55b6c54f241a38
-  window_manager: 3a1844359a6295ab1e47659b1a777e36773cd6e8
+  desktop_lifecycle: e4d2ff93af77bbbd473fe1a61773fdf9c5a79c91
+  desktop_multi_window: 93667594ccc4b88d91a97972fd3b1b89667fa80a
+  FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
+  path_provider_foundation: 2a68637f8a62df7f6e790a428d1bdf72cb4e2d59
+  printing: c4cf83c78fd684f9bc318e6aadc18972aa48f617
+  screen_retriever: 4f97c103641aab8ce183fa5af3b87029df167936
+  window_manager: 1d01fa7ac65a6e6f83b965471b1a7fdd3f06166c
 
-PODFILE CHECKSUM: 236401fc2c932af29a9fcf0e97baeeb2d750d367
+PODFILE CHECKSUM: 9ebaf0ce3d369aaa26a9ea0e159195ed94724cf3
 
-COCOAPODS: 1.13.0
+COCOAPODS: 1.17.0

@@ -114,25 +114,13 @@ class EmailSender {
 
   static String emailBody(invoice, InvoiceType invoiceType) {
     Store store = StoreDB().getStore();
-    return '''
-Dear ${invoiceType == InvoiceType.supplyInvoice ? invoice.supplyerName : invoice.customerName},
-
-We hope this email finds you well. We want to express our gratitude for your continued support. As a token of our appreciation, we've attached your latest ${invoiceType.name().toLowerCase()}.
-
-${invoiceType.name()} Details:
-${invoiceType.name()} Number: ${invoice.invoiceId}
-${invoiceType.name()} Date: ${MyFormat.formatDateOne(invoice.createdDate)}
-Total Amount: ${MyFormat.formatCurrency(invoice.total)}
-
-Please feel free to reach out if you have any questions or concerns regarding your ${invoiceType.name().toLowerCase()} or any other matter. We are here to assist you in any way we can.
-
-Thank you for choosing our services. We look forward to serving you again in the future.
+    return '''Here with we have attached your ${invoiceType.name().toLowerCase()}.
+Thank for your business.
 
 Best regards,
 ${store.companyName}
 ${store.mobileNumber1}
-${store.email}
-''';
+${store.email}''';
   }
 
   static Future<void> showEmailSendingDialog(
