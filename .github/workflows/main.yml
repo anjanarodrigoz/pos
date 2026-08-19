@@ -2,9 +2,8 @@ name: Flutter CI
 
 on: 
   push:
-   branches: 
-    - main
-     
+    branches: 
+      - release
 
 jobs:
   
@@ -25,17 +24,25 @@ jobs:
         run: flutter config --enable-windows-desktop
       - name: Build artifacts
         run: flutter build windows --release
+      
+      - name: Get version from pubspec.yaml
+        id: get_version
+        run: |
+          VERSION=$(grep '^version: ' pubspec.yaml | cut -d' ' -f2 | cut -d'+' -f1)
+          echo "version=v$VERSION" >> $GITHUB_OUTPUT
+        shell: bash
+
       - name: Archive Release
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          filename: ${{github.ref_name}}.zip
+          filename: ${{ steps.get_version.outputs.version }}.zip
           directory: build/windows/x64/runner/Release
       - name: Push to Releases
         uses: ncipollo/release-action@v1
         with:
-            artifacts: " build/windows/x64/runner/Release/${{github.ref_name}}.zip"
-            tag: v1.1.2
+            artifacts: "build/windows/x64/runner/Release/${{ steps.get_version.outputs.version }}.zip"
+            tag: ${{ steps.get_version.outputs.version }}
             token: ${{ secrets.POS_TOKEN }}
 
   
