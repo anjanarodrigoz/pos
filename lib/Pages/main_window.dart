@@ -101,7 +101,10 @@ class _MainWindowState extends State<MainWindow> {
           fixedSize: const Size(200, 50.0),
           backgroundColor: TColors.blue,
         ),
-        child: Text(text),
+        child: Text(
+          text,
+          style: TextStyle(color: TColors.white),
+        ),
       ),
     );
   }
