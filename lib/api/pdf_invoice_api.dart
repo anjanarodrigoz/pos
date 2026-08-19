@@ -85,30 +85,26 @@ class PdfInvoiceApi {
   static Widget buildHeader(Invoice invoice, InvoiceType invoiceType) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Row(
-          //     mainAxisAlignment: MainAxisAlignment.start,
-          //     crossAxisAlignment: CrossAxisAlignment.start,
-          //     children: [
-          //       Expanded(
-          //           flex: 1,
-          //           child: Align(
-          //               alignment: Alignment.centerLeft,
-          //               child: buildTitle(invoiceType))),
-          //       Expanded(
-          //         flex: 2,
-          //         child: companyName(),
-          //       ),
-          //       Expanded(child: SizedBox(), flex: 1),
-          //     ]),
-          Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+          Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                companyName(),
-                Align(
-                    alignment: Alignment.center,
-                    child: buildTitle(invoiceType)),
+                Expanded(
+                    flex: 1,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 0.6 * PdfPageFormat.cm),
+                        buildTitle(invoiceType),
+                      ],
+                    )),
+                Expanded(
+                  flex: 2,
+                  child: companyName(),
+                ),
+                Expanded(child: SizedBox(), flex: 1),
               ]),
+          SizedBox(height: 0.5 * PdfPageFormat.cm),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -141,17 +137,24 @@ class PdfInvoiceApi {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: SizedBox(), flex: 1),
+                Expanded(
+                    flex: 1,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 0.6 * PdfPageFormat.cm),
+                        buildTitle(invoice.isReturnNote
+                            ? InvoiceType.returnNote
+                            : InvoiceType.supplyInvoice),
+                      ],
+                    )),
                 Expanded(
                   flex: 2,
                   child: companyName(),
                 ),
-                Expanded(
-                    flex: 1,
-                    child: buildTitle(invoice.isReturnNote
-                        ? InvoiceType.returnNote
-                        : InvoiceType.supplyInvoice)),
+                Expanded(child: SizedBox(), flex: 1),
               ]),
+          SizedBox(height: 0.5 * PdfPageFormat.cm),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -231,12 +234,17 @@ class PdfInvoiceApi {
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0)),
       if (store.slogan.isNotEmpty)
         Text(store.slogan,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.0))
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.0)),
+      SizedBox(height: 0.1 * PdfPageFormat.cm),
+      Text('${store.street}, ${store.city}, ${store.state} ${store.postalcode}',
+          style: const TextStyle(fontSize: 9.0)),
+      Text('Email: ${store.email} | Mobile: ${store.mobileNumber1}',
+          style: const TextStyle(fontSize: 9.0)),
     ]);
   }
 
   static Widget buildTitle(InvoiceType type) => Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // SizedBox(height: 0.5 * PdfPageFormat.cm),
           Text(
@@ -429,8 +437,7 @@ class PdfInvoiceApi {
                 Text(
                     '${store.street},${store.city},${store.state},${store.postalcode}',
                     style: const TextStyle(fontSize: 9.0)),
-                Text(store.email, style: const TextStyle(fontSize: 9.0)),
-                Text(store.mobileNumber1,
+                Text('Email: ${store.email} | Mobile: ${store.mobileNumber1}',
                     style: const TextStyle(fontSize: 9.0)),
               ]),
               Column(children: [
@@ -474,6 +481,8 @@ class PdfInvoiceApi {
             Text('ABN ${store.abn}', style: const TextStyle(fontSize: 10.0)),
             Text(
                 '${store.street},${store.city},${store.state},${store.postalcode}',
+                style: const TextStyle(fontSize: 10.0)),
+            Text('Email: ${store.email} | Mobile: ${store.mobileNumber1}',
                 style: const TextStyle(fontSize: 10.0)),
           ]),
           Column(children: [

@@ -232,6 +232,10 @@ class _MainWindowState extends State<MainWindow> {
             ],
           ),
         ),
+        child: Text(
+          text,
+          style: TextStyle(color: TColors.white),
+        ),
       ),
     );
   }

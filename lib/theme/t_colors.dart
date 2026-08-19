@@ -11,6 +11,8 @@ class TColors {
   static Color green2 = const Color(0xffC6FFCF);
 
   static Color grey = const Color(0xffB5B5B5);
+
+  static Color white = const Color(0xffFFFFFF);
 }
 
 class TStyle {

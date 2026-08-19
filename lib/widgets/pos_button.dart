@@ -51,7 +51,10 @@ class PosButton extends StatelessWidget {
                   const SizedBox(
                     width: 10.0,
                   ),
-                Text(text!),
+                Text(
+                  text!,
+                  style: TextStyle(color: TColors.white),
+                ),
               ],
             ),
       ),
