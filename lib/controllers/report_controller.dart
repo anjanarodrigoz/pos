@@ -1,12 +1,14 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pos/database/credit_db_serive.dart';
-import 'package:pos/database/customer_db_service.dart';
-import 'package:pos/database/invoice_db_service.dart';
-import 'package:pos/database/item_db_service.dart';
-import 'package:pos/database/quatation_db_serive.dart';
-import 'package:pos/database/supplyer_invoice_db_service.dart';
+import 'package:pos/repositories/customer_repository.dart';
+import 'package:pos/repositories/invoice_repository.dart';
+import 'package:pos/repositories/item_repository.dart';
+import 'package:pos/repositories/supplier_invoice_repository.dart';
+import 'package:pos/utils/customer_converter.dart';
+import 'package:pos/utils/invoice_converter.dart';
+import 'package:pos/utils/item_converter.dart';
+import 'package:pos/utils/supplier_invoice_converter.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/customer.dart';
 import 'package:pos/models/extra_charges.dart';
@@ -20,6 +22,12 @@ import '../models/invoice.dart';
 import '../models/item.dart';
 
 class ReportController extends GetxController {
+  final InvoiceRepository _invoiceRepo = Get.find<InvoiceRepository>();
+  final ItemRepository _itemRepo = Get.find<ItemRepository>();
+  final SupplierInvoiceRepository _supplierInvoiceRepo =
+      Get.find<SupplierInvoiceRepository>();
+  final CustomerRepository _customerRepo = Get.find<CustomerRepository>();
+
   late DateTimeRange dateTimeRange =
       DateTimeRange(start: DateTime(0), end: DateTime(0));
   ReportPaymentFilter paidStatus = ReportPaymentFilter.all;
@@ -142,16 +150,35 @@ class ReportController extends GetxController {
 
     isRequiredTableSummery = true;
 
-    if (reportType == ReportType.invoice) {
-      searchInvoiceList =
-          await InvoiceDB().searchInvoiceByDate(dateTimeRange, paidStatus);
-    } else if (reportType == ReportType.creditNote) {
-      searchInvoiceList =
-          await CreditNoteDB().searchInvoiceByDate(dateTimeRange, paidStatus);
-    } else {
-      searchInvoiceList =
-          await QuotationDB().searchInvoiceByDate(dateTimeRange, paidStatus);
+    // Get invoices from repository
+    final result = await _invoiceRepo.searchInvoiceByDate(dateTimeRange, paidStatus);
+
+    if (result.isFailure || result.data == null) {
+      isrecordAvaliable = false;
+      return;
     }
+
+    // Filter by invoice type using ID prefix
+    final allInvoices = result.data!;
+    final driftInvoices = allInvoices.where((inv) {
+      if (reportType == ReportType.invoice) {
+        return inv.invoiceId.startsWith('INV-');
+      } else if (reportType == ReportType.creditNote) {
+        return inv.invoiceId.startsWith('CN-');
+      } else {
+        return inv.invoiceId.startsWith('QUO-');
+      }
+    }).toList();
+
+    // Convert Drift invoices to domain invoices
+    searchInvoiceList = driftInvoices
+        .map((driftInv) => InvoiceConverter.toDomain(
+              driftInvoice: driftInv,
+              items: [],
+              payments: [],
+              extraCharges: [],
+            ))
+        .toList();
 
     if (searchInvoiceList.isEmpty) {
       isrecordAvaliable = false;
@@ -240,8 +267,29 @@ class ReportController extends GetxController {
 
   Future<void> generateSummeryReport() async {
     isRequiredTableSummery = false;
-    List<Invoice> searchInvoiceList =
-        await InvoiceDB().searchInvoiceByDate(dateTimeRange, paidStatus);
+
+    // Get invoices from repository (only INV- prefixed ones)
+    final result = await _invoiceRepo.searchInvoiceByDate(dateTimeRange, paidStatus);
+
+    if (result.isFailure || result.data == null) {
+      isrecordAvaliable = false;
+      return;
+    }
+
+    final driftInvoices = result.data!
+        .where((inv) => inv.invoiceId.startsWith('INV-'))
+        .toList();
+
+    // Convert to domain invoices
+    final searchInvoiceList = driftInvoices
+        .map((driftInv) => InvoiceConverter.toDomain(
+              driftInvoice: driftInv,
+              items: [],
+              payments: [],
+              extraCharges: [],
+            ))
+        .toList();
+
     if (searchInvoiceList.isEmpty) {
       isrecordAvaliable = false;
       return;
@@ -345,24 +393,57 @@ class ReportController extends GetxController {
 
     isRequiredTableSummery = true;
 
-    if (reportType == ReportType.itemInvoice) {
-      searchInvoiceList =
-          await InvoiceDB().searchInvoiceByDate(dateTimeRange, paidStatus);
-    } else if (reportType == ReportType.itemCreditNote) {
-      searchInvoiceList =
-          await CreditNoteDB().searchInvoiceByDate(dateTimeRange, paidStatus);
-    } else if (reportType == ReportType.quote) {
-      searchInvoiceList =
-          await QuotationDB().searchInvoiceByDate(dateTimeRange, paidStatus);
+    // Handle customer invoices (invoice, credit note, quote)
+    if (reportType == ReportType.itemInvoice ||
+        reportType == ReportType.itemCreditNote ||
+        reportType == ReportType.quote) {
+      final result = await _invoiceRepo.searchInvoiceByDate(dateTimeRange, paidStatus);
+
+      if (result.isSuccess && result.data != null) {
+        final allInvoices = result.data!;
+
+        // Filter by invoice type using ID prefix
+        final driftInvoices = allInvoices.where((inv) {
+          if (reportType == ReportType.itemInvoice) {
+            return inv.invoiceId.startsWith('INV-');
+          } else if (reportType == ReportType.itemCreditNote) {
+            return inv.invoiceId.startsWith('CN-');
+          } else {
+            return inv.invoiceId.startsWith('QUO-');
+          }
+        }).toList();
+
+        // Convert to domain invoices
+        searchInvoiceList = driftInvoices
+            .map((driftInv) => InvoiceConverter.toDomain(
+                  driftInvoice: driftInv,
+                  items: [],
+                  payments: [],
+                  extraCharges: [],
+                ))
+            .toList();
+      }
     } else if (reportType == ReportType.supplyItem) {
-      searchInvoiceList = await SupplyerInvoiceDB()
-          .searchInvoiceByDate(dateTimeRange, isReturnNote: false);
+      final result = await _supplierInvoiceRepo.searchByDateRange(
+          dateTimeRange,
+          isReturnNote: false);
+      if (result.isSuccess && result.data != null) {
+        searchInvoiceList = SupplierInvoiceConverter.toDomainList(result.data!);
+      }
     } else if (reportType == ReportType.itemReturn) {
-      searchInvoiceList = await SupplyerInvoiceDB()
-          .searchInvoiceByDate(dateTimeRange, isReturnNote: true);
+      final result = await _supplierInvoiceRepo.searchByDateRange(
+          dateTimeRange,
+          isReturnNote: true);
+      if (result.isSuccess && result.data != null) {
+        searchInvoiceList = SupplierInvoiceConverter.toDomainList(result.data!);
+      }
     } else {
-      searchInvoiceList = await SupplyerInvoiceDB()
-          .searchInvoiceByDate(dateTimeRange, isReturnNote: null);
+      final result = await _supplierInvoiceRepo.searchByDateRange(
+          dateTimeRange,
+          isReturnNote: null);
+      if (result.isSuccess && result.data != null) {
+        searchInvoiceList = SupplierInvoiceConverter.toDomainList(result.data!);
+      }
     }
 
     if (searchInvoiceList.isEmpty) {
@@ -476,8 +557,15 @@ class ReportController extends GetxController {
 
   Future<void> generateSupplyInvoiceReport(isReturnNote) async {
     isRequiredTableSummery = true;
-    List<SupplyInvoice> supplyInvoiceList = await SupplyerInvoiceDB()
-        .searchInvoiceByDate(dateTimeRange, isReturnNote: isReturnNote);
+    List<SupplyInvoice> supplyInvoiceList = [];
+
+    final result = await _supplierInvoiceRepo.searchByDateRange(
+        dateTimeRange,
+        isReturnNote: isReturnNote);
+
+    if (result.isSuccess && result.data != null) {
+      supplyInvoiceList = SupplierInvoiceConverter.toDomainList(result.data!);
+    }
 
     if (supplyInvoiceList.isEmpty) {
       isrecordAvaliable = false;
@@ -560,11 +648,33 @@ class ReportController extends GetxController {
     List searchInvoiceList = [];
     List returnSupplyInvoiceList = [];
 
-    searchInvoiceList =
-        await InvoiceDB().searchInvoiceByDate(dateTimeRange, paidStatus);
+    // Get invoices from repository (only INV- prefixed ones)
+    final result = await _invoiceRepo.searchInvoiceByDate(dateTimeRange, paidStatus);
 
-    returnSupplyInvoiceList = await SupplyerInvoiceDB()
-        .searchInvoiceByDate(dateTimeRange, isReturnNote: true);
+    if (result.isSuccess && result.data != null) {
+      final driftInvoices = result.data!
+          .where((inv) => inv.invoiceId.startsWith('INV-'))
+          .toList();
+
+      // Convert to domain invoices
+      searchInvoiceList = driftInvoices
+          .map((driftInv) => InvoiceConverter.toDomain(
+                driftInvoice: driftInv,
+                items: [],
+                payments: [],
+                extraCharges: [],
+              ))
+          .toList();
+    }
+
+    final supplierResult = await _supplierInvoiceRepo.searchByDateRange(
+        dateTimeRange,
+        isReturnNote: true);
+
+    if (supplierResult.isSuccess && supplierResult.data != null) {
+      returnSupplyInvoiceList =
+          SupplierInvoiceConverter.toDomainList(supplierResult.data!);
+    }
 
     if (searchInvoiceList.isEmpty && returnSupplyInvoiceList.isEmpty) {
       isrecordAvaliable = false;
@@ -645,7 +755,13 @@ class ReportController extends GetxController {
     isRequiredTableSummery = false;
     List<Item> itemList = [];
 
-    itemList = await ItemDB().getAllItems();
+    // Get items from repository
+    final result = await _itemRepo.getAllItems(activeOnly: true);
+
+    if (result.isSuccess && result.data != null) {
+      // Convert Drift items to domain items
+      itemList = ItemConverter.toDomainList(result.data!);
+    }
 
     if (itemList.isEmpty) {
       isrecordAvaliable = false;
@@ -696,7 +812,15 @@ class ReportController extends GetxController {
 
   Future<void> generateCustomerDetailsReport() async {
     isRequiredTableSummery = false;
-    List<Customer> customersList = await CustomerDB().getAllCustomers();
+    List<Customer> customersList = [];
+
+    // Get customers from repository
+    final result = await _customerRepo.getAllCustomers();
+
+    if (result.isSuccess && result.data != null) {
+      // Convert Drift customers to domain customers
+      customersList = CustomerConverter.toDomainList(result.data!);
+    }
 
     if (customersList.isEmpty) {
       isrecordAvaliable = false;
@@ -773,9 +897,26 @@ class ReportController extends GetxController {
 
     isRequiredTableSummery = true;
 
-    searchInvoiceList = await InvoiceDB().searchInvoiceByDate(
+    // Get unpaid invoices from repository
+    final result = await _invoiceRepo.searchInvoiceByDate(
         dateTimeRange, ReportPaymentFilter.notPaid,
-        getAllInvoice: true);
+        getAllUnpaidInvoice: true);
+
+    if (result.isSuccess && result.data != null) {
+      final driftInvoices = result.data!
+          .where((inv) => inv.invoiceId.startsWith('INV-'))
+          .toList();
+
+      // Convert to domain invoices
+      searchInvoiceList = driftInvoices
+          .map((driftInv) => InvoiceConverter.toDomain(
+                driftInvoice: driftInv,
+                items: [],
+                payments: [],
+                extraCharges: [],
+              ))
+          .toList();
+    }
 
     if (searchInvoiceList.isEmpty) {
       isrecordAvaliable = false;
@@ -855,7 +996,13 @@ class ReportController extends GetxController {
     isRequiredTableSummery = true;
     List<Item> itemList = [];
 
-    itemList = await ItemDB().getAllItems();
+    // Get items from repository
+    final result = await _itemRepo.getAllItems(activeOnly: true);
+
+    if (result.isSuccess && result.data != null) {
+      // Convert Drift items to domain items
+      itemList = ItemConverter.toDomainList(result.data!);
+    }
 
     if (itemList.isEmpty) {
       isrecordAvaliable = false;
@@ -904,7 +1051,13 @@ class ReportController extends GetxController {
     isRequiredTableSummery = true;
     List<Item> itemList = [];
 
-    itemList = await ItemDB().getAllItems();
+    // Get items from repository
+    final result = await _itemRepo.getAllItems(activeOnly: true);
+
+    if (result.isSuccess && result.data != null) {
+      // Convert Drift items to domain items
+      itemList = ItemConverter.toDomainList(result.data!);
+    }
 
     if (itemList.isEmpty) {
       isrecordAvaliable = false;
@@ -964,8 +1117,15 @@ class ReportController extends GetxController {
 
   generateReturnNoteReport() async {
     isRequiredTableSummery = true;
-    List<SupplyInvoice> supplyInvoiceList = await SupplyerInvoiceDB()
-        .searchInvoiceByDate(dateTimeRange, isReturnNote: true);
+    List<SupplyInvoice> supplyInvoiceList = [];
+
+    final result = await _supplierInvoiceRepo.searchByDateRange(
+        dateTimeRange,
+        isReturnNote: true);
+
+    if (result.isSuccess && result.data != null) {
+      supplyInvoiceList = SupplierInvoiceConverter.toDomainList(result.data!);
+    }
 
     if (supplyInvoiceList.isEmpty) {
       isrecordAvaliable = false;
@@ -1050,8 +1210,25 @@ class ReportController extends GetxController {
 
     isRequiredTableSummery = true;
 
-    searchInvoiceList = await InvoiceDB()
-        .searchInvoiceByDate(dateTimeRange, ReportPaymentFilter.all);
+    // Get invoices from repository (only INV- prefixed ones)
+    final result = await _invoiceRepo.searchInvoiceByDate(
+        dateTimeRange, ReportPaymentFilter.all);
+
+    if (result.isSuccess && result.data != null) {
+      final driftInvoices = result.data!
+          .where((inv) => inv.invoiceId.startsWith('INV-'))
+          .toList();
+
+      // Convert to domain invoices
+      searchInvoiceList = driftInvoices
+          .map((driftInv) => InvoiceConverter.toDomain(
+                driftInvoice: driftInv,
+                items: [],
+                payments: [],
+                extraCharges: [],
+              ))
+          .toList();
+    }
 
     if (searchInvoiceList.isEmpty) {
       isrecordAvaliable = false;
@@ -1136,7 +1313,24 @@ class ReportController extends GetxController {
 
     isRequiredTableSummery = true;
 
-    searchInvoiceList = await InvoiceDB().getAllInvoices();
+    // Get all invoices from repository (only INV- prefixed ones)
+    final result = await _invoiceRepo.getAllInvoices(activeOnly: true);
+
+    if (result.isSuccess && result.data != null) {
+      final driftInvoices = result.data!
+          .where((inv) => inv.invoiceId.startsWith('INV-'))
+          .toList();
+
+      // Convert to domain invoices
+      searchInvoiceList = driftInvoices
+          .map((driftInv) => InvoiceConverter.toDomain(
+                driftInvoice: driftInv,
+                items: [],
+                payments: [],
+                extraCharges: [],
+              ))
+          .toList();
+    }
 
     if (searchInvoiceList.isEmpty) {
       isrecordAvaliable = false;

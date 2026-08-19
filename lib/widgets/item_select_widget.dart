@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:pos/controllers/invoice_draft_contorller.dart';
-import 'package:pos/controllers/invoice_edit_controller.dart';
-import 'package:pos/controllers/suppy_invoice_draft_controller.dart';
-import 'package:pos/database/cart_db_service.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/utils/val.dart';
+import 'package:pos/utils/item_converter.dart';
+import 'package:pos/repositories/item_repository.dart';
 import 'package:pos/widgets/pos_text_form_field.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-import '../../database/item_db_service.dart';
 import '../../models/cart.dart';
 import '../../models/item.dart';
-import '../Pages/stock_manager.dart/stock_page.dart';
+import 'package:pos/datasources/item_data_source.dart';
 
 class ItemSelectWidget extends StatefulWidget {
   final invoiceController;
@@ -26,28 +22,13 @@ class ItemSelectWidget extends StatefulWidget {
 }
 
 class ItemSelectWidgetState extends State<ItemSelectWidget> {
-  late final _databaseService; // Use your DatabaseService class
-  List<Item> _item = [];
-  ItemDataSource itemDataSource = ItemDataSource(itemData: []);
-  Function? disposeListen;
+  final ItemRepository _itemRepo = Get.find<ItemRepository>();
   late final invoiceController;
 
   @override
   void initState() {
     super.initState();
-    _databaseService = ItemDB();
     invoiceController = widget.invoiceController;
-    disposeListen = GetStorage(DBVal.items).listen(() {
-      getItemData();
-    });
-    getItemData();
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    disposeListen?.call();
   }
 
   @override
@@ -88,65 +69,70 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: SfDataGrid(
-          gridLinesVisibility: GridLinesVisibility.both,
-          headerGridLinesVisibility: GridLinesVisibility.both,
-          rowHeight: 30.0,
-          allowFiltering: true,
-          allowColumnsResizing: true,
-          showFilterIconOnHover: true,
-          columnWidthMode: ColumnWidthMode.auto,
-          source: itemDataSource,
-          onCellTap: ((details) {
-            if (details.rowColumnIndex.rowIndex != 0) {
-              int selectedRowIndex = details.rowColumnIndex.rowIndex - 1;
-              var row =
-                  itemDataSource.effectiveRows.elementAt(selectedRowIndex);
-
-              addItemtoList(row.getCells()[0].value.toString());
+        child: StreamBuilder(
+          stream: _itemRepo.watchAllItems(activeOnly: true),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
             }
-          }),
-          columns: [
-            GridColumn(
-                columnName: Item.idKey,
-                label: Center(child: const Text('Item ID'))),
-            GridColumn(
-                columnName: Item.nameKey,
-                label: Center(child: const Text('Item Name'))),
-            GridColumn(
-                columnName: Item.qtyKey,
-                label: Center(child: const Text('Qty'))),
-            GridColumn(
-                columnName: Item.priceKey,
-                label: Center(child: const Text('Price'))),
-            GridColumn(
-                columnName: Item.priceTwoKey,
-                label: Center(child: const Text('Price 02'))),
-            GridColumn(
-                columnName: Item.priceThreeKey,
-                label: Center(child: const Text('Price 03'))),
-            GridColumn(
-                columnName: Item.priceFourKey,
-                label: Center(child: const Text('Price 04'))),
-            GridColumn(
-                columnName: Item.priceFiveKey,
-                label: Center(child: const Text('Price 05'))),
 
-            // Add more columns as needed
-          ],
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('No items available'));
+            }
+
+            // Convert Drift items to domain items
+            final driftItems = snapshot.data!;
+            final domainItems = ItemConverter.toDomainList(driftItems);
+            final itemDataSource = ItemDataSource(itemData: domainItems);
+
+            return SfDataGrid(
+              gridLinesVisibility: GridLinesVisibility.both,
+              headerGridLinesVisibility: GridLinesVisibility.both,
+              rowHeight: 30.0,
+              allowFiltering: true,
+              allowColumnsResizing: true,
+              showFilterIconOnHover: true,
+              columnWidthMode: ColumnWidthMode.auto,
+              source: itemDataSource,
+              onCellTap: ((details) {
+                if (details.rowColumnIndex.rowIndex != 0) {
+                  int selectedRowIndex = details.rowColumnIndex.rowIndex - 1;
+                  var row =
+                      itemDataSource.effectiveRows.elementAt(selectedRowIndex);
+
+                  // Get itemCode from first cell (column 0)
+                  String itemCode = row.getCells()[0].value.toString();
+                  addItemtoList(itemCode, domainItems);
+                }
+              }),
+              columns: [
+                GridColumn(
+                    columnName: 'itemCode',
+                    label: const Center(child: Text('Item Code'))),
+                GridColumn(
+                    columnName: Item.nameKey,
+                    label: const Center(child: Text('Item Name'))),
+                GridColumn(
+                    columnName: Item.qtyKey,
+                    label: const Center(child: Text('Qty'))),
+                GridColumn(
+                    columnName: Item.priceKey,
+                    label: const Center(child: Text('Price'))),
+
+                // Add more columns as needed
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Future<void> getItemData() async {
-    _item = await _databaseService.getAllItems();
-    itemDataSource = ItemDataSource(itemData: _item);
-    setState(() {});
-  }
+  Future<void> addItemtoList(String itemCode, List<Item> items) async {
+    // Find item by itemCode (user-facing identifier)
+    Item? item = items.firstWhereOrNull((i) => i.itemCode == itemCode);
 
-  Future<void> addItemtoList(String itemId) async {
-    Item item = _databaseService.getItem(itemId);
+    if (item == null) return;
     TextEditingController netPriceController = TextEditingController();
     TextEditingController totalPriceController = TextEditingController();
     TextEditingController commentController = TextEditingController();
@@ -164,7 +150,7 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
           width: 300,
           height: 400,
           child: AlertDialog(
-            title: Text('${item.id} - ${item.name}'),
+            title: Text('${item.itemCode} - ${item.name}'),
             content: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -196,7 +182,7 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
                           }
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       PosTextFormField(
@@ -219,7 +205,7 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
                           }
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       PosTextFormField(
@@ -292,11 +278,13 @@ class ItemSelectWidgetState extends State<ItemSelectWidget> {
       children: [
         Text(
           '$key : ',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.w400),
         ),
         Text(
           value,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         )
       ],
     );

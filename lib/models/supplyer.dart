@@ -56,7 +56,7 @@ class Supplyer {
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       mobileNumber: mobileNumber ?? this.mobileNumber,
-      address: deliveryAddress ?? this.address,
+      address: deliveryAddress ?? address,
       fax: fax ?? this.fax,
       email: email ?? this.email,
       web: web ?? this.web,

@@ -7,7 +7,7 @@ class ProgressingDots extends StatefulWidget {
   final Duration dotDuration;
   final int maxDots;
 
-  ProgressingDots({
+  const ProgressingDots({super.key, 
     required this.text,
     this.textStyle = const TextStyle(fontSize: 14),
     this.dotDuration = const Duration(seconds: 1),
@@ -30,7 +30,7 @@ class _ProgressingDotsState extends State<ProgressingDots> {
       setState(() {
         // Add a dot to the existing dots, and reset when reaching the max dots
         dots = (dots.length < widget.maxDots)
-            ? dots + '.'
+            ? '$dots.'
             : widget.text.length > widget.maxDots
                 ? '.'
                 : '';

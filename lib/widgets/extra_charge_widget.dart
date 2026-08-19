@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:pos/repositories/extra_charge_template_repository.dart';
 
-import '../database/extra_charges_db_service.dart';
 import '../models/extra_charges.dart';
 import '../utils/my_format.dart';
 import '../utils/val.dart';
@@ -85,7 +85,7 @@ class ExtraChargeDialog extends StatelessWidget {
                     labelText: 'Net price',
                     controller: netPriceController,
                     keyboardType:
-                        TextInputType.numberWithOptions(decimal: true),
+                        const TextInputType.numberWithOptions(decimal: true),
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
                     ],
@@ -179,15 +179,13 @@ class ExtraChargeSavedDialog extends StatefulWidget {
 }
 
 class _ExtraChargeSavedDialogState extends State<ExtraChargeSavedDialog> {
+  final ExtraChargeTemplateRepository _templateRepo = Get.find<ExtraChargeTemplateRepository>();
   late Function(ExtraCharges) onPressedSavedExtra;
-  List<ExtraCharges> list = [];
-  List<ExtraCharges> filteredList = [];
 
   @override
   void initState() {
     super.initState();
     onPressedSavedExtra = widget.onPressedSavedExtra;
-    getData();
   }
 
   @override
@@ -196,14 +194,7 @@ class _ExtraChargeSavedDialogState extends State<ExtraChargeSavedDialog> {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          PosTextFormField(
-            onChanged: filterExtraCharges,
-            hintText: 'Search Extra Charges',
-            prefixIcon: Icon(
-              Icons.search,
-              size: 25.0,
-            ),
-          ),
+          const Text('Saved Extra Charges'),
           IconButton(
               splashRadius: 20.0,
               onPressed: () {
@@ -212,8 +203,12 @@ class _ExtraChargeSavedDialogState extends State<ExtraChargeSavedDialog> {
                     builder: (context) => ExtraChargeDialog(
                           showSavedItem: false,
                           onPressed: (ExtraCharges extraCharge) async {
-                            await ExtraChargeDB().addExtraCharge(extraCharge);
-                            getData();
+                            await _templateRepo.createTemplate(
+                              name: extraCharge.name,
+                              price: extraCharge.price,
+                              quantity: extraCharge.qty,
+                              comment: extraCharge.comment,
+                            );
                           },
                         ));
               },
@@ -223,51 +218,52 @@ class _ExtraChargeSavedDialogState extends State<ExtraChargeSavedDialog> {
       content: SizedBox(
         width: 300.0,
         height: 500.0,
-        child: ListView.separated(
-          itemCount: filteredList.length,
-          itemBuilder: (context, index) {
-            String name = filteredList[index].name;
-            double charge = filteredList[index].price;
-            String comment = filteredList[index].comment ?? '';
+        child: StreamBuilder(
+          stream: _templateRepo.watchAllTemplates(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-            return ListTile(
-              title: Text(name),
-              trailing: IconButton(
-                splashRadius: 20.0,
-                icon: const Icon(Icons.delete),
-                onPressed: () async {
-                  await ExtraChargeDB().deleteExtraCharge(name);
-                  getData();
-                },
-              ),
-              subtitle: Text(MyFormat.formatPrice(charge)),
-              onTap: () {
-                ExtraCharges extraCharges = ExtraCharges(
-                    name: name, qty: 1, price: charge, comment: comment);
-                onPressedSavedExtra(extraCharges);
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('No saved extra charges'));
+            }
+
+            final templates = snapshot.data!;
+
+            return ListView.separated(
+              itemCount: templates.length,
+              itemBuilder: (context, index) {
+                final template = templates[index];
+                String name = template.name;
+                double charge = template.price;
+                String comment = template.comment ?? '';
+                int qty = template.quantity;
+
+                return ListTile(
+                  title: Text(name),
+                  trailing: IconButton(
+                    splashRadius: 20.0,
+                    icon: const Icon(Icons.delete),
+                    onPressed: () async {
+                      await _templateRepo.deleteTemplate(template.id);
+                    },
+                  ),
+                  subtitle: Text('${MyFormat.formatPrice(charge)} x $qty'),
+                  onTap: () {
+                    ExtraCharges extraCharges = ExtraCharges(
+                        name: name, qty: qty, price: charge, comment: comment);
+                    onPressedSavedExtra(extraCharges);
+                  },
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return const Divider();
               },
             );
-          },
-          separatorBuilder: (BuildContext context, int index) {
-            return Divider();
           },
         ),
       ),
     );
-  }
-
-  void filterExtraCharges(String query) {
-    setState(() {
-      filteredList = list
-          .where((extraCharge) =>
-              extraCharge.name.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-    });
-  }
-
-  Future<void> getData() async {
-    list = await ExtraChargeDB().readAllExtraChrages();
-    filteredList = list;
-    setState(() {});
   }
 }

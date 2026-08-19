@@ -1,15 +1,17 @@
 import 'package:get/get.dart';
-import 'package:pos/database/credit_db_serive.dart';
-import 'package:pos/database/quatation_db_serive.dart';
+import 'package:pos/repositories/invoice_repository.dart';
 import '../models/cart.dart';
 import '../models/customer.dart';
 import '../models/extra_charges.dart';
 import '../models/invoice.dart';
-import '../models/invoice_item.dart';
+import '../utils/id_generator.dart';
 import '../utils/val.dart';
 
+/// Controller for credit note draft creation with Drift database
 class CreditDraftController extends GetxController {
   final Customer customer;
+  final InvoiceRepository _invoiceRepo = Get.find<InvoiceRepository>();
+
   RxString invoiceId = ''.obs;
   RxList<ExtraCharges> extraList = <ExtraCharges>[].obs;
   RxList<String> comments = <String>[].obs;
@@ -48,7 +50,8 @@ class CreditDraftController extends GetxController {
         comments.value = copyInvoice!.comments ?? [];
       }
     } else {
-      invoiceId.value = CreditNoteDB().generateInvoiceId();
+      // Generate credit note ID using IDGenerator
+      invoiceId.value = IDGenerator.generateCreditNoteId();
       if (copyInvoice != null) {
         extraList.value = copyInvoice!.extraCharges ?? [];
         cartList.value = (copyInvoice!.itemList)
@@ -110,65 +113,92 @@ class CreditDraftController extends GetxController {
     total.value = netTotal.value * Val.gstTotalPrecentage;
   }
 
+  /// Update existing credit note using InvoiceRepository (Drift database)
   Future<void> updateInvoice() async {
-    final db = CreditNoteDB();
-
-    List<InvoicedItem> itemList = cartList
-        .map((cart) => InvoicedItem(
-            itemId: cart.itemId,
-            name: cart.name,
-            netPrice: cart.price,
-            qty: cart.qty,
-            comment: cart.comment,
-            isPostedItem: cart.isPostedItem))
+    // Convert cart items to InvoiceItemData for repository
+    final items = cartList
+        .map((cart) => InvoiceItemData(
+              itemId: cart.itemId,
+              itemName: cart.name,
+              quantity: cart.qty,
+              netPrice: cart.price,
+              comment: cart.comment,
+              isPostedItem: cart.isPostedItem,
+            ))
         .toList();
 
-    Invoice invoice = Invoice(
-        email: customer.email ?? '',
-        customerMobile: customer.mobileNumber,
-        invoiceId: invoiceId.value,
-        createdDate: DateTime.now(),
-        customerId: customer.id,
-        gstPrecentage: Val.gstPrecentage,
-        customerName: '${customer.firstName} ${customer.lastName}',
-        billingAddress: customer.deliveryAddress,
-        shippingAddress: customer.postalAddress,
-        comments: comments,
-        extraCharges: extraList,
-        itemList: itemList);
-    await db.updateInvoice(invoice);
+    // Convert extra charges to ExtraChargeData for repository
+    final charges = extraList
+        .map((extra) => ExtraChargeData(
+              description: extra.name,
+              amount: extra.netTotal,
+            ))
+        .toList();
+
+    // Update credit note with items using InvoiceRepository (stored as Invoice with CN- prefix)
+    final result = await _invoiceRepo.updateInvoiceWithItems(
+      invoiceId: invoiceId.value,
+      customerId: customer.id,
+      customerName: '${customer.firstName} ${customer.lastName}',
+      customerMobile: customer.mobileNumber,
+      email: customer.email,
+      gstPercentage: Val.gstPrecentage,
+      billingAddress: customer.deliveryAddress?.toJson(),
+      shippingAddress: customer.postalAddress?.toJson(),
+      items: items,
+      extraCharges: charges,
+      comments: comments.isNotEmpty ? comments : null,
+    );
+
+    if (result.isFailure) {
+      throw Exception(result.error?.message ?? 'Failed to update credit note');
+    }
+
     Get.delete<CreditDraftController>();
   }
 
+  /// Save new credit note using InvoiceRepository (Drift database)
   Future<void> saveInvoice() async {
-    final db = CreditNoteDB();
-
-    List<InvoicedItem> itemList = cartList
-        .map((cart) => InvoicedItem(
-            itemId: cart.itemId,
-            name: cart.name,
-            netPrice: cart.price,
-            qty: cart.qty,
-            comment: cart.comment,
-            isPostedItem: cart.isPostedItem))
+    // Convert cart items to InvoiceItemData for repository
+    final items = cartList
+        .map((cart) => InvoiceItemData(
+              itemId: cart.itemId,
+              itemName: cart.name,
+              quantity: cart.qty,
+              netPrice: cart.price,
+              comment: cart.comment,
+              isPostedItem: cart.isPostedItem,
+            ))
         .toList();
 
-    Invoice invoice = Invoice(
-        email: customer.email ?? '',
-        customerMobile: customer.mobileNumber,
-        invoiceId: invoiceId.value,
-        createdDate: DateTime.now(),
-        customerId: customer.id,
-        gstPrecentage: Val.gstPrecentage,
-        customerName: '${customer.firstName} ${customer.lastName}',
-        billingAddress: customer.deliveryAddress,
-        shippingAddress: customer.postalAddress,
-        comments: comments,
-        extraCharges: extraList,
-        itemList: itemList);
+    // Convert extra charges to ExtraChargeData for repository
+    final charges = extraList
+        .map((extra) => ExtraChargeData(
+              description: extra.name,
+              amount: extra.netTotal,
+            ))
+        .toList();
 
-    await db.saveLastId(invoiceId.value);
-    await db.addInvoice(invoice);
+    // Save credit note using InvoiceRepository (Drift database)
+    // Credit notes are stored as invoices with CN- prefix
+    final result = await _invoiceRepo.createInvoice(
+      invoiceId: invoiceId.value,
+      customerId: customer.id,
+      customerName: '${customer.firstName} ${customer.lastName}',
+      customerMobile: customer.mobileNumber,
+      email: customer.email,
+      gstPercentage: Val.gstPrecentage,
+      billingAddress: customer.deliveryAddress?.toJson(),
+      shippingAddress: customer.postalAddress?.toJson(),
+      items: items,
+      extraCharges: charges,
+      comments: comments.isNotEmpty ? comments : null,
+    );
+
+    if (result.isFailure) {
+      throw Exception(result.error?.message ?? 'Failed to save credit note');
+    }
+
     Get.delete<CreditDraftController>();
   }
 }

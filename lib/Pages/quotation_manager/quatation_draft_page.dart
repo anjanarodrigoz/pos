@@ -7,8 +7,6 @@ import 'package:pos/Pages/quotation_manager/all_quotation_invoice.dart';
 import 'package:pos/controllers/invoice_draft_contorller.dart';
 import 'package:pos/controllers/quote_draft_controller.dart';
 import 'package:pos/database/cart_db_service.dart';
-import 'package:pos/database/extra_charges_db_service.dart';
-import 'package:pos/database/invoice_db_service.dart';
 import 'package:pos/models/extra_charges.dart';
 import 'package:pos/utils/val.dart';
 import 'package:pos/widgets/comments_widget.dart';
@@ -68,7 +66,7 @@ class QuoteDraftPage extends StatelessWidget {
                     onPressed: () {
                       addComments();
                     }),
-                SizedBox(height: 50.0),
+                const SizedBox(height: 50.0),
                 PosButton(
                   text: 'Close Draft',
                   onPressed: () async {

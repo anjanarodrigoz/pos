@@ -1,14 +1,12 @@
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
-import 'package:pdf/pdf.dart';
 import 'package:pos/Pages/credit_note_manager/all_credit_note_page.dart';
 import 'package:pos/Pages/credit_note_manager/credit_draft_page.dart';
 import 'package:pos/Pages/invoice_draft_manager/invoice_customer_select.dart';
 import 'package:pos/controllers/credit_draft_controller.dart';
-import 'package:pos/database/credit_db_serive.dart';
+import 'package:pos/repositories/invoice_repository.dart';
+import 'package:pos/utils/invoice_converter.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/customer.dart';
 import 'package:pos/utils/alert_message.dart';
@@ -33,11 +31,61 @@ class CreditNotePage extends StatefulWidget {
 }
 
 class _CreditNotePageState extends State<CreditNotePage> {
-  late Invoice invoice;
+  final InvoiceRepository _invoiceRepo = Get.find<InvoiceRepository>();
+  Invoice? invoice;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInvoice();
+  }
+
+  Future<void> _loadInvoice() async {
+    setState(() => _isLoading = true);
+
+    final result = await _invoiceRepo.getFullInvoiceData(widget.invoiceId);
+
+    if (result.isSuccess && result.data != null) {
+      invoice = InvoiceConverter.fromFullInvoiceData(result.data!);
+    }
+
+    setState(() => _isLoading = false);
+  }
 
   @override
   Widget build(BuildContext context) {
-    invoice = CreditNoteDB().getInvoice(widget.invoiceId);
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 40.0,
+          backgroundColor: TColors.blue,
+          title: Text('Credit Note #${widget.invoiceId}'),
+          leading: IconButton(
+              onPressed: () {
+                Get.offAll(AllCreditNotePage());
+              },
+              icon: const Icon(Icons.arrow_back)),
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (invoice == null) {
+      return Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 40.0,
+          backgroundColor: TColors.blue,
+          title: Text('Credit Note #${widget.invoiceId}'),
+          leading: IconButton(
+              onPressed: () {
+                Get.offAll(AllCreditNotePage());
+              },
+              icon: const Icon(Icons.arrow_back)),
+        ),
+        body: const Center(child: Text('Credit note not found')),
+      );
+    }
 
     return Scaffold(
         appBar: AppBar(
@@ -85,7 +133,7 @@ class _CreditNotePageState extends State<CreditNotePage> {
               ],
             ),
           ),
-          CreditInvoicePage(invoice: invoice)
+          CreditInvoicePage(invoice: invoice!)
         ]));
   }
 
@@ -100,20 +148,20 @@ class _CreditNotePageState extends State<CreditNotePage> {
     showDialog(
         context: context,
         builder: (context) => POSVerifyDialog(
-              title: 'Delete Invoice #${invoice.invoiceId}',
+              title: 'Delete Invoice #${invoice!.invoiceId}',
               content: 'Do you want to delete this invoice?',
               onContinue: () async {
-                await CreditNoteDB().deleteInvoice(invoice);
+                await _invoiceRepo.deleteInvoice(invoice!.invoiceId);
                 Get.offAll(AllCreditNotePage());
               },
-              verifyText: invoice.invoiceId,
+              verifyText: invoice!.invoiceId,
               continueText: 'Delete',
               color: Colors.red,
             ));
   }
 
   Future<void> openCopyInvoice() async {
-    if (invoice.itemList.isEmpty) {
+    if (invoice!.itemList.isEmpty) {
       AlertMessage.snakMessage('This invoice can not be copy', context);
     } else {
       showDialog(
@@ -145,7 +193,7 @@ class _CreditNotePageState extends State<CreditNotePage> {
           builder: (BuildContext context) {
             return Dialog(
               child: InvoiceCustomerSelectPage(
-                invoice: invoice,
+                invoice: invoice!,
                 invoiceType: invoiceType,
               ),
             );
@@ -156,17 +204,17 @@ class _CreditNotePageState extends State<CreditNotePage> {
   openEditInvoice() {
     Get.put(CreditDraftController(
         customer: Customer(
-            id: invoice.customerId,
-            firstName: invoice.customerName,
-            mobileNumber: invoice.customerMobile,
+            id: invoice!.customerId,
+            firstName: invoice!.customerName,
+            mobileNumber: invoice!.customerMobile,
             lastName: ''),
         wantToUpdate: true,
-        copyInvoice: invoice));
-    Get.offAll(const CreditDraftPage());
+        copyInvoice: invoice!));
+    Get.to(() => const CreditDraftPage());
   }
 
   void printInvoice() async {
-    Invoice oldInvoice = invoice.copyWith();
+    Invoice oldInvoice = invoice!.copyWith();
 
     showDialog(
         context: context,
@@ -203,10 +251,13 @@ class _CreditNotePageState extends State<CreditNotePage> {
                   child: const Text('No')),
               TextButton(
                   onPressed: () async {
-                    invoice.isPaid = true;
-                    await CreditNoteDB().updateInvoice(invoice);
+                    await _invoiceRepo.updateInvoice(
+                      invoiceId: invoice!.invoiceId,
+                      isPaid: true,
+                      closeDate: DateTime.now(),
+                    );
                     Get.back();
-                    setState(() {});
+                    await _loadInvoice(); // Reload invoice
                   },
                   child: const Text('Yes'))
             ],

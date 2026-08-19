@@ -31,7 +31,6 @@ class StoreDB {
           mobileNumber1: '',
           email: '',
           email2: '',
-          password: '',
           smtpServer: '');
     } else {
       return Store.fromJson(data);

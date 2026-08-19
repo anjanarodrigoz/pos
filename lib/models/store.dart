@@ -9,8 +9,8 @@ class Store {
   static const postalcodeKey = 'postalcode';
   static const mobileNumber1Key = 'mobileNumber1';
   static const emailKey = 'email';
-  static const email2Key = 'email2'; // Added another email field
-  static const passwordKey = 'password';
+  static const email2Key = 'email2'; // SMTP email for sending
+  // NOTE: passwordKey removed - password now stored securely in EmailCredentialsService
   static const smtpKeyKey = 'smtp';
 
   String companyName;
@@ -23,9 +23,9 @@ class Store {
   String postalcode;
   String mobileNumber1;
   String email;
-  String email2; // Added another email field
-  String password;
+  String email2; // SMTP email for sending
   String smtpServer;
+  // NOTE: password field removed for security - now stored in EmailCredentialsService
 
   Store({
     this.fax = '',
@@ -38,8 +38,7 @@ class Store {
     required this.postalcode,
     required this.mobileNumber1,
     required this.email,
-    required this.email2, // Added another email field
-    required this.password,
+    required this.email2,
     required this.smtpServer,
   });
 
@@ -55,8 +54,7 @@ class Store {
         postalcode = json[postalcodeKey] ?? '',
         mobileNumber1 = json[mobileNumber1Key] ?? '',
         email = json[emailKey] ?? '',
-        email2 = json[email2Key] ?? '', // Added another email field
-        password = json[passwordKey] ?? '',
+        email2 = json[email2Key] ?? '',
         smtpServer = json[smtpKeyKey] ?? '';
 
   // Convert the Store object to a JSON map
@@ -72,9 +70,9 @@ class Store {
       postalcodeKey: postalcode,
       mobileNumber1Key: mobileNumber1,
       emailKey: email,
-      email2Key: email2, // Added another email field
-      passwordKey: password,
+      email2Key: email2,
       smtpKeyKey: smtpServer,
+      // password not included - stored securely in EmailCredentialsService
     };
   }
 
@@ -92,7 +90,6 @@ class Store {
       mobileNumber1: mobileNumber1,
       email: email,
       email2: email2,
-      password: password,
       smtpServer: smtpServer,
     );
   }

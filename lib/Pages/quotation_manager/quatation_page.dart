@@ -1,50 +1,99 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:pos/Pages/invoice_draft_manager/invoice_customer_select.dart';
 import 'package:pos/Pages/quotation_manager/all_quotation_invoice.dart';
 import 'package:pos/Pages/quotation_manager/quatation_draft_page.dart';
 import 'package:pos/controllers/quote_draft_controller.dart';
-import 'package:pos/database/quatation_db_serive.dart';
-
+import 'package:pos/repositories/invoice_repository.dart';
+import 'package:pos/utils/invoice_converter.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/customer.dart';
-
 import 'package:pos/utils/alert_message.dart';
-import 'package:pos/widgets/alert_dialog.dart';
-
 import 'package:pos/widgets/pos_button.dart';
 import 'package:pos/widgets/verify_dialog.dart';
 import 'package:printing/printing.dart';
-
 import '../../api/email_sender.dart';
 import '../../api/pdf_api.dart';
 import '../../api/pdf_invoice_api.dart';
-
 import '../../models/invoice.dart';
-
 import '../../theme/t_colors.dart';
 import '../../widgets/print_verify.dart';
 import 'QuoteInvoicePage.dart';
 
-class QuotationPage extends StatelessWidget {
+class QuotationPage extends StatefulWidget {
   final String invoiceId;
 
-  QuotationPage({super.key, required this.invoiceId});
+  const QuotationPage({super.key, required this.invoiceId});
 
-  late Invoice invoice;
+  @override
+  State<QuotationPage> createState() => _QuotationPageState();
+}
+
+class _QuotationPageState extends State<QuotationPage> {
+  final InvoiceRepository _invoiceRepo = Get.find<InvoiceRepository>();
+  Invoice? invoice;
+  bool _isLoading = true;
   late BuildContext context;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInvoice();
+  }
+
+  Future<void> _loadInvoice() async {
+    setState(() => _isLoading = true);
+
+    final result = await _invoiceRepo.getFullInvoiceData(widget.invoiceId);
+
+    if (result.isSuccess && result.data != null) {
+      invoice = InvoiceConverter.fromFullInvoiceData(result.data!);
+    }
+
+    setState(() => _isLoading = false);
+  }
 
   @override
   Widget build(BuildContext context) {
     this.context = context;
-    invoice = QuotationDB().getInvoice(invoiceId);
+
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 40.0,
+          backgroundColor: TColors.blue,
+          title: Text('Quote #${widget.invoiceId}'),
+          leading: IconButton(
+              onPressed: () {
+                Get.offAll(AllQuotesPage());
+              },
+              icon: const Icon(Icons.arrow_back)),
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (invoice == null) {
+      return Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 40.0,
+          backgroundColor: TColors.blue,
+          title: Text('Quote #${widget.invoiceId}'),
+          leading: IconButton(
+              onPressed: () {
+                Get.offAll(AllQuotesPage());
+              },
+              icon: const Icon(Icons.arrow_back)),
+        ),
+        body: const Center(child: Text('Quotation not found')),
+      );
+    }
 
     return Scaffold(
         appBar: AppBar(
           toolbarHeight: 40.0,
           backgroundColor: TColors.blue,
-          title: Text('Quote #$invoiceId'),
+          title: Text('Quote #${invoice!.invoiceId}'),
           leading: IconButton(
               onPressed: () {
                 Get.offAll(AllQuotesPage());
@@ -88,7 +137,7 @@ class QuotationPage extends StatelessWidget {
               ),
             ),
           ),
-          QuoteInvoicePage(invoice: invoice)
+          QuoteInvoicePage(invoice: invoice!)
         ]));
   }
 
@@ -103,20 +152,20 @@ class QuotationPage extends StatelessWidget {
     showDialog(
         context: context,
         builder: (context) => POSVerifyDialog(
-              title: 'Delete Invoice #${invoice.invoiceId}',
+              title: 'Delete Invoice #${invoice!.invoiceId}',
               content: 'Do you want to delete this invoice?',
               onContinue: () async {
-                await QuotationDB().deleteInvoice(invoice);
+                await _invoiceRepo.deleteInvoice(invoice!.invoiceId);
                 Get.offAll(AllQuotesPage());
               },
               continueText: 'Delete',
-              verifyText: invoice.invoiceId,
+              verifyText: invoice!.invoiceId,
               color: Colors.red,
             ));
   }
 
   Future<void> openCopyInvoice() async {
-    if (invoice.itemList.isEmpty) {
+    if (invoice!.itemList.isEmpty) {
       AlertMessage.snakMessage('This invoice can not be copy', context);
     } else {
       showDialog(
@@ -159,17 +208,17 @@ class QuotationPage extends StatelessWidget {
   openEditInvoice() {
     Get.put(QuoteDraftController(
         customer: Customer(
-            id: invoice.customerId,
-            firstName: invoice.customerName,
-            mobileNumber: invoice.customerMobile,
+            id: invoice!.customerId,
+            firstName: invoice!.customerName,
+            mobileNumber: invoice!.customerMobile,
             lastName: ''),
         wantToUpdate: true,
         copyInvoice: invoice));
-    Get.offAll(QuoteDraftPage());
+    Get.to(() => QuoteDraftPage());
   }
 
   void printInvoice() async {
-    Invoice oldInvoice = invoice.copyWith();
+    Invoice oldInvoice = invoice!.copyWith();
 
     showDialog(
         context: context,

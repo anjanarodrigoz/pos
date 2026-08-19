@@ -1,27 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
-import 'package:pos/Pages/invoice_draft_manager/invoice_customer_select.dart';
-
-import 'package:pos/Pages/invoice_manager/invoice_page.dart';
-import 'package:pos/Pages/main_window.dart';
-import 'package:pos/Pages/quotation_manager/quatation_page.dart';
-
-import 'package:pos/database/quatation_db_serive.dart';
+import 'package:get/get.dart';
+import 'package:pos/pages/invoice_draft_manager/invoice_customer_select.dart';
+import 'package:pos/pages/invoice_manager/invoice_page.dart';
+import 'package:pos/pages/main_window.dart';
+import 'package:pos/pages/quotation_manager/quatation_page.dart';
+import 'package:pos/repositories/invoice_repository.dart';
+import 'package:pos/utils/invoice_converter.dart';
 import 'package:pos/enums/enums.dart';
 import 'package:pos/models/invoice.dart';
 import 'package:pos/theme/t_colors.dart';
 import 'package:pos/utils/constant.dart';
 import 'package:pos/utils/my_format.dart';
 import 'package:pos/widgets/pos_appbar.dart';
-
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-
 import '../../widgets/pos_button.dart';
 
 class AllQuotesPage extends StatelessWidget {
   AllQuotesPage({super.key});
 
-  // Use your DatabaseService class
+  final InvoiceRepository _invoiceRepo = Get.find<InvoiceRepository>();
 
   List<Invoice> _invoice = [];
   InvoiceDataSource invoiceDataSource = InvoiceDataSource(invoiceData: []);
@@ -39,7 +37,7 @@ class AllQuotesPage extends StatelessWidget {
           PosButton(
             text: ' + Add Quote',
             onPressed: () {
-              Get.to((InvoiceCustomerSelectPage(
+              Get.to((const InvoiceCustomerSelectPage(
                 invoiceType: InvoiceType.quotation,
               )));
             },
@@ -49,9 +47,20 @@ class AllQuotesPage extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: StreamBuilder(
-                  stream: QuotationDB().getStreamInvoice(),
+                  stream: _invoiceRepo.watchInvoices(),
                   builder: (context, snapshot) {
-                    _invoice = snapshot.data ?? [];
+                    // Filter quotations by QUO- prefix
+                    final allInvoices = snapshot.data ?? [];
+                    _invoice = allInvoices
+                        .where((inv) => inv.invoiceId.startsWith('QUO-'))
+                        .map((driftInv) => InvoiceConverter.toDomain(
+                              driftInvoice: driftInv,
+                              items: [],
+                              payments: [],
+                              extraCharges: [],
+                            ))
+                        .toList();
+
                     invoiceDataSource = InvoiceDataSource(
                         invoiceData: _invoice.reversed.toList());
 

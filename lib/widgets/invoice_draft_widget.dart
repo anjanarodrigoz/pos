@@ -14,7 +14,7 @@ import 'package:pos/utils/constant.dart';
 import '../models/invoice_row.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../models/cart.dart';
-import '../theme/t_colors.dart';
+import '../theme/app_theme.dart';
 import '../utils/my_format.dart';
 import '../utils/val.dart';
 import 'pos_text_form_field.dart';
@@ -142,8 +142,8 @@ class _InvoiceDraftWidgetState extends State<InvoiceDraftWidget> {
         ),
         Text(
           value,
-          style:
-              const TextStyle(color: TColors.blue, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+              color: AppTheme.primaryColor, fontWeight: FontWeight.bold),
         )
       ],
     );

@@ -37,20 +37,20 @@ dependencies:
   cupertino_icons: ^1.0.2
   get: ^4.6.6
   window_manager: ^0.3.5
-  google_fonts: ^4.0.4
-  intl: ^0.18.1
-  syncfusion_flutter_datagrid: ^22.1.38
+  google_fonts: ^6.1.0
+  intl: ^0.19.0
+  syncfusion_flutter_datagrid: ^24.2.7
   desktop_multi_window: ^0.2.0
   desktop_lifecycle: ^0.1.1
-  path_provider: ^2.0.0
-  path: ^1.8.3
+  path_provider: ^2.1.0
+  path: ^1.9.0
   get_storage: ^2.1.1
   fluttertoast: ^8.2.2
   pdf: ^3.10.4
   printing: ^5.13.0
   open_file: ^3.3.2
-  file_picker: ^5.5.0
-  encrypt: ^5.0.2
+  file_picker: ^8.0.0
+  encrypt: ^5.0.3
   flutter_highlight: ^0.7.0
   syncfusion_flutter_datepicker: ^22.2.12
   syncfusion_flutter_datagrid_export: ^22.2.12

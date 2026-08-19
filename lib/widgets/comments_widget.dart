@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pos/database/commnets_db_service.dart';
+import 'package:get/get.dart';
+import 'package:pos/repositories/comment_template_repository.dart';
 
 import 'pos_text_form_field.dart';
 
@@ -13,19 +14,18 @@ class CommentsDialog extends StatefulWidget {
 }
 
 class _CommentsDialogState extends State<CommentsDialog> {
+  final CommentTemplateRepository _templateRepo = Get.find<CommentTemplateRepository>();
   late String oldComment;
   late Function(String) onPressed;
-  List<Comment> commentList = [];
-  List<Comment> filteredComments = [];
   TextEditingController commentController = TextEditingController();
+  TextEditingController searchController = TextEditingController();
+  String searchQuery = '';
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     oldComment = widget.oldComment;
     onPressed = widget.onPressed;
-    getData();
   }
 
   @override
@@ -48,7 +48,11 @@ class _CommentsDialogState extends State<CommentsDialog> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         PosTextFormField(
-                          onChanged: filterComments,
+                          onChanged: (query) {
+                            setState(() {
+                              searchQuery = query;
+                            });
+                          },
                           hintText: 'Search Comments',
                           prefixIcon: const Icon(
                             Icons.search,
@@ -69,36 +73,61 @@ class _CommentsDialogState extends State<CommentsDialog> {
                     SizedBox(
                       width: 400.0,
                       height: 430.0,
-                      child: ListView.separated(
-                        itemCount: filteredComments.length,
-                        itemBuilder: (context, index) {
-                          String name = filteredComments[index].name;
-                          String comment = filteredComments[index].comment;
-                          return ListTile(
-                            trailing: IconButton(
-                                splashRadius: 20.0,
-                                onPressed: () async {
-                                  await CommentsDB().deleteComment(name);
-                                  getData();
+                      child: StreamBuilder(
+                        stream: _templateRepo.watchAllTemplates(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }
+
+                          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return const Center(child: Text('No saved comments'));
+                          }
+
+                          final templates = snapshot.data!;
+
+                          // Filter by search query
+                          final filteredTemplates = searchQuery.isEmpty
+                              ? templates
+                              : templates
+                                  .where((t) =>
+                                      t.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
+                                      t.comment.toLowerCase().contains(searchQuery.toLowerCase()))
+                                  .toList();
+
+                          return ListView.separated(
+                            itemCount: filteredTemplates.length,
+                            itemBuilder: (context, index) {
+                              final template = filteredTemplates[index];
+                              String name = template.name;
+                              String comment = template.comment;
+
+                              return ListTile(
+                                trailing: IconButton(
+                                    splashRadius: 20.0,
+                                    onPressed: () async {
+                                      await _templateRepo.deleteTemplate(template.id);
+                                    },
+                                    icon: const Icon(Icons.delete)),
+                                title: Text(name),
+                                subtitle: Text(
+                                  comment,
+                                  overflow: TextOverflow.fade,
+                                  maxLines: 2,
+                                ),
+                                onTap: () {
+                                  String newComment =
+                                      commentController.text.toString();
+                                  newComment += comment;
+                                  oldComment = newComment;
+                                  setState(() {});
                                 },
-                                icon: const Icon(Icons.delete)),
-                            title: Text(name),
-                            subtitle: Text(
-                              comment,
-                              overflow: TextOverflow.fade,
-                              maxLines: 2,
-                            ),
-                            onTap: () {
-                              String newComment =
-                                  commentController.text.toString();
-                              newComment += comment;
-                              oldComment = newComment;
-                              setState(() {});
+                              );
+                            },
+                            separatorBuilder: (BuildContext context, int index) {
+                              return const Divider();
                             },
                           );
-                        },
-                        separatorBuilder: (BuildContext context, int index) {
-                          return const Divider();
                         },
                       ),
                     )
@@ -130,21 +159,6 @@ class _CommentsDialogState extends State<CommentsDialog> {
         ],
       ),
     );
-  }
-
-  Future<void> getData() async {
-    commentList = await CommentsDB().readAllComments();
-    filteredComments = commentList;
-    setState(() {});
-  }
-
-  filterComments(String query) {
-    setState(() {
-      filteredComments = commentList
-          .where((comment) =>
-              comment.name.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-    });
   }
 
   void showAddCommentsDialog() {
@@ -180,10 +194,11 @@ class _CommentsDialogState extends State<CommentsDialog> {
                       String comment = commentController.text.toString();
 
                       if (name.isNotEmpty && comment.isNotEmpty) {
-                        await CommentsDB()
-                            .addComments(Comment(name: name, comment: comment));
+                        await _templateRepo.createTemplate(
+                          name: name,
+                          comment: comment,
+                        );
                       }
-                      getData();
                       Navigator.of(context).pop();
                     },
                     child: const Text('Save'))

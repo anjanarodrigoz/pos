@@ -2,45 +2,46 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class PosTextFormField extends StatelessWidget {
-  String? labelText;
-  Function(String?)? onSaved;
-  String? Function(String?)? validator;
-  double width;
-  double height;
-  bool enable;
-  int maxLines;
-  List<TextInputFormatter>? inputFormatters;
-  String? initialValue;
-  Function(String)? onChanged;
-  Function()? onTap;
-  TextInputType? keyboardType;
-  TextEditingController? controller;
-  Widget? suffixIcon;
-  Widget? prefixIcon;
-  String? hintText;
-  String? errorText;
-  bool obscureText;
+  final String? labelText;
+  final Function(String?)? onSaved;
+  final String? Function(String?)? validator;
+  final double width;
+  final double height;
+  final bool enable;
+  final int maxLines;
+  final List<TextInputFormatter>? inputFormatters;
+  final String? initialValue;
+  final Function(String)? onChanged;
+  final Function()? onTap;
+  final TextInputType? keyboardType;
+  final TextEditingController? controller;
+  final Widget? suffixIcon;
+  final Widget? prefixIcon;
+  final String? hintText;
+  final String? errorText;
+  final bool obscureText;
 
-  PosTextFormField(
-      {super.key,
-      this.labelText,
-      this.onTap,
-      this.onSaved,
-      this.obscureText = false,
-      this.height = 50,
-      this.inputFormatters,
-      this.validator,
-      this.maxLines = 1,
-      this.onChanged,
-      this.keyboardType,
-      this.controller,
-      this.suffixIcon,
-      this.initialValue,
-      this.hintText,
-      this.prefixIcon,
-      this.errorText,
-      this.enable = true,
-      this.width = 300});
+  const PosTextFormField({
+    super.key,
+    this.labelText,
+    this.onTap,
+    this.onSaved,
+    this.obscureText = false,
+    this.height = 50,
+    this.inputFormatters,
+    this.validator,
+    this.maxLines = 1,
+    this.onChanged,
+    this.keyboardType,
+    this.controller,
+    this.suffixIcon,
+    this.initialValue,
+    this.hintText,
+    this.prefixIcon,
+    this.errorText,
+    this.enable = true,
+    this.width = 300,
+  });
 
   @override
   Widget build(BuildContext context) {

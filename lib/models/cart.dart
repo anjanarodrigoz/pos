@@ -44,7 +44,7 @@ class Cart {
       cartId: cartId ?? this.cartId,
       name: name ?? this.name,
       comment: comment ?? this.comment,
-      price: netPrice ?? this.price,
+      price: netPrice ?? price,
       qty: qty ?? this.qty,
       isPostedItem: isPostedItem ?? this.isPostedItem,
     );
